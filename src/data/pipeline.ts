@@ -10,7 +10,14 @@ import type { BuildMessage, ImageRef, Institution, PipelineEntry } from './types
 import { parseAmount } from '../lib/amount.ts';
 import { uniqueSlug } from '../lib/slug.ts';
 
-export class DataError extends Error {}
+export class DataError extends Error {
+  /** Warnings collected before the error, so they can still be shown. */
+  readonly messages: BuildMessage[];
+  constructor(message: string, messages: BuildMessage[] = []) {
+    super(message);
+    this.messages = messages;
+  }
+}
 
 export interface PipelineOptions {
   /** Allow image paths relative to data/sample/ (only for DATA_SOURCE=sample). */
@@ -57,6 +64,7 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
     throw new DataError(
       `Im Blatt „Öffentlich“ fehlen Pflichtspalten: ${missingRequired.map((c) => `„${c.header}“`).join(', ')}. ` +
         'Bitte die Kopfzeile im Google Sheet prüfen (Schreibweise wie im Formular).',
+      messages,
     );
   }
   for (const c of columns) {

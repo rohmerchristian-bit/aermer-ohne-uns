@@ -21,9 +21,22 @@ describe('column mapping', () => {
     expect(findColumn('BETRAG_GEPRÜFT')?.key).toBe('amountVerified');
   });
 
+  it('recognises the image consent column by the start of its long consent text', () => {
+    const title =
+      'Mit dem Hochladen bestätigen wir, dass wir die erforderlichen Nutzungsrechte an den eingereichten Bildern und Logos besitzen und dass alle erkennbar abgebildeten Personen mit der Veröffentlichung einverstanden sind …';
+    expect(findColumn(title)?.key).toBe('consentImages');
+    expect(findColumn(' Name der Institution / Einrichtung ')?.key).toBe('name');
+  });
+
+  it('knows the titles used in the live form', () => {
+    expect(findColumn('Betroffenes Projekt / Angebot: Welche konkreten Folgen hat die Kürzung?')?.key).toBe('project');
+    expect(findColumn('Absagen von Angeboten, Stellenabbau, Schließzeiten, etc.')?.key).toBe('consequences');
+  });
+
   it('has unique keys and unique headers', () => {
     expect(new Set(columns.map((c) => c.key)).size).toBe(columns.length);
-    expect(new Set(columns.map((c) => normalizeHeader(c.header))).size).toBe(columns.length);
+    const titles = columns.flatMap((c) => [c.header, ...(c.aliases ?? [])].map(normalizeHeader));
+    expect(new Set(titles).size).toBe(titles.length);
   });
 
   it('maps headers with leading spaces', () => {

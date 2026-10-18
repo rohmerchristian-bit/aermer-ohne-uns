@@ -45,6 +45,13 @@ export interface ColumnDef {
   visibility: Visibility;
   /** Build stops with an error if this column is missing. */
   required?: boolean;
+  /** Other exact titles used in the live form (old or alternative wording). */
+  aliases?: string[];
+  /**
+   * Also match headers that start with one of these texts. Needed where the form uses a long
+   * consent text as the question title.
+   */
+  headerStartsWith?: string[];
 }
 
 export const columns: readonly ColumnDef[] = [
@@ -65,7 +72,12 @@ export const columns: readonly ColumnDef[] = [
     visibility: 'public',
   },
   { key: 'reach', header: 'Wen erreicht eure Arbeit? (Zielgruppen & Reichweite in Zahlen)', visibility: 'public' },
-  { key: 'project', header: 'Betroffenes Projekt / Angebot', visibility: 'public' },
+  {
+    key: 'project',
+    header: 'Betroffenes Projekt / Angebot',
+    visibility: 'public',
+    aliases: ['Betroffenes Projekt / Angebot: Welche konkreten Folgen hat die Kürzung?'],
+  },
   {
     key: 'cutDescription',
     header: 'Welche Zuschüsse / Mittel sollen gestrichen oder gekürzt werden?',
@@ -73,7 +85,12 @@ export const columns: readonly ColumnDef[] = [
   },
   { key: 'amountReported', header: 'Geplante Kürzung in Euro pro Jahr', visibility: 'public' },
   { key: 'amountSource', header: 'Quelle des Betrags', visibility: 'public' },
-  { key: 'consequences', header: 'Welche konkreten Folgen hat die Kürzung?', visibility: 'public' },
+  {
+    key: 'consequences',
+    header: 'Welche konkreten Folgen hat die Kürzung?',
+    visibility: 'public',
+    aliases: ['Absagen von Angeboten, Stellenabbau, Schließzeiten, etc.'],
+  },
   { key: 'quote', header: 'Prägnantes Zitat / Statement zur Lage (Short Quote)', visibility: 'public' },
   {
     key: 'infoLink',
@@ -93,7 +110,12 @@ export const columns: readonly ColumnDef[] = [
     visibility: 'private',
   },
   { key: 'consentPublish', header: 'Freigabe zur Veröffentlichung', visibility: 'filter', required: true },
-  { key: 'consentImages', header: 'Rechte an Bildern und Logos', visibility: 'filter' },
+  {
+    key: 'consentImages',
+    header: 'Rechte an Bildern und Logos',
+    visibility: 'filter',
+    headerStartsWith: ['Mit dem Hochladen bestätigen wir, dass wir die erforderlichen Nutzungsrechte'],
+  },
   { key: 'mailingList', header: 'Aufnahme in den Bündnis-Verteiler', visibility: 'private' },
   { key: 'approved', header: 'Freigegeben', visibility: 'filter', required: true },
   { key: 'amountVerified', header: 'Betrag_geprüft', visibility: 'public' },
@@ -117,10 +139,13 @@ export function normalizeHeader(header: string): string {
     .toLowerCase();
 }
 
-const byHeader = new Map(columns.map((c) => [normalizeHeader(c.header), c]));
+const byHeader = new Map(columns.flatMap((c) => [c.header, ...(c.aliases ?? [])].map((h) => [normalizeHeader(h), c] as const)));
+
+const byPrefix = columns.flatMap((c) => (c.headerStartsWith ?? []).map((p) => [normalizeHeader(p), c] as const));
 
 export function findColumn(header: string): ColumnDef | undefined {
-  return byHeader.get(normalizeHeader(header));
+  const normalized = normalizeHeader(header);
+  return byHeader.get(normalized) ?? byPrefix.find(([prefix]) => normalized.startsWith(prefix))?.[1];
 }
 
 /**

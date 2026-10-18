@@ -137,8 +137,11 @@ async function writeReport(report: object): Promise<void> {
 main().catch(async (error: unknown) => {
   const message = error instanceof Error ? error.message : String(error);
   const known = error instanceof DataError;
-  await writeReport({ ok: false, generatedAt: new Date().toISOString(), source, summary: message, messages: [] });
-  console.error(`\n✖ Daten konnten nicht übernommen werden: ${message}\n`);
+  await writeReport({ ok: false, generatedAt: new Date().toISOString(), source, summary: message, messages: known ? error.messages : [] });
+  const messages = known ? error.messages : [];
+  console.error(`\n✖ Daten konnten nicht übernommen werden: ${message}`);
+  for (const m of messages) console.error(`  ⚠ ${m.message}`);
+  console.error('');
   if (!known) console.error(error);
   process.exit(1);
 });

@@ -1,0 +1,89 @@
+---
+import { timeline } from '../data/budget.ts';
+
+// Steps of the budget process. Steps whose date has passed at build time are marked done.
+const today = new Date().toISOString().slice(0, 10);
+const steps = timeline.map((step) => ({ ...step, done: step.isoDate ? step.isoDate <= today : false }));
+const currentIndex = steps.findIndex((s) => !s.done);
+---
+
+<ol class="timeline">
+  {
+    steps.map((step, i) => (
+      <li class:list={['timeline__step', { 'is-done': step.done, 'is-current': i === currentIndex }]}>
+        <p class="timeline__date label">
+          {step.date}
+          {i === currentIndex && <span class="timeline__now">Jetzt</span>}
+        </p>
+        <p class="timeline__title">{step.title}</p>
+        <p class="timeline__text">{step.text}</p>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .timeline {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  @media (min-width: 48em) {
+    .timeline {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .timeline__step {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-5) var(--space-5) 0;
+    border-top: var(--line-strong) solid currentColor;
+  }
+
+  .timeline__step::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--line-strong) * -1 - 0.5rem);
+    left: 0;
+    width: 1rem;
+    height: 1rem;
+    border: var(--line-strong) solid currentColor;
+    background: var(--color-paper);
+  }
+
+  .timeline__step.is-done::before {
+    background: currentColor;
+  }
+
+  .timeline__step.is-current::before {
+    background: var(--color-signal);
+  }
+
+  .timeline__date {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+  }
+
+  .timeline__now {
+    padding: 0.15rem 0.4rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  .timeline__title {
+    font-size: var(--fs-h3);
+    font-weight: 800;
+    font-stretch: var(--stretch-condensed);
+    line-height: 1.1;
+  }
+</style>

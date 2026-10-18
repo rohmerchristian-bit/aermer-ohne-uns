@@ -1,0 +1,19 @@
+---
+import Base from './Base.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+// Public pages: header, footer, notice banner.
+interface Props {
+  title: string;
+  description?: string;
+  noindex?: boolean;
+}
+const props = Astro.props;
+---
+
+<Base {...props}>
+  <SiteHeader slot="header" />
+  <slot />
+  <SiteFooter slot="footer" />
+</Base>

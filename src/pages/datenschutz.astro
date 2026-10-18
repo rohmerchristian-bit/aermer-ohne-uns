@@ -1,0 +1,85 @@
+---
+import Page from '../layouts/Page.astro';
+import P from '../components/Placeholder.astro';
+import TechNote from '../components/TechNote.astro';
+---
+
+<Page title="Datenschutz" description="Datenschutzerklärung der Kampagnen-Website #ÄrmerOhneUns.">
+  <header class="page-head">
+    <div class="container">
+      <p class="label">Rechtliches</p>
+      <h1>Datenschutzerklärung</h1>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container prose">
+      <h2 id="verantwortlich">Verantwortliche Stelle</h2>
+      <p>
+        E-Werk Kulturzentrum GmbH<br />
+        <P text="ADRESSE" /><br />
+        <P text="KONTAKT FÜR DATENSCHUTZANFRAGEN" />
+      </p>
+
+      <h2 id="dsb">Datenschutzbeauftragte*r</h2>
+      <p><P text="NAME UND KONTAKT, FALLS BENANNT – SONST ABSCHNITT ENTFERNEN" /></p>
+
+      <h2 id="hosting">Hosting</h2>
+      <p><P text="TEXT FOLGT: HOSTING AUF DER INFRASTRUKTUR DES E-WERKS" /></p>
+      <TechNote>
+        <p>Die Website besteht nur aus statischen Dateien und wird auf einem Server des E-Werks ausgeliefert.</p>
+      </TechNote>
+
+      <h2 id="logfiles">Server-Logfiles</h2>
+      <p><P text="TEXT FOLGT: WELCHE DATEN DER SERVER PROTOKOLLIERT, ZWECK, RECHTSGRUNDLAGE, SPEICHERDAUER" /></p>
+      <TechNote>
+        <p>Was der Webserver protokolliert (z. B. IP-Adresse, Zeitpunkt, aufgerufene Datei), hängt von dessen
+          Konfiguration beim E-Werk ab und ist dort zu erfragen. Die Website selbst erhebt keine Daten.</p>
+      </TechNote>
+
+      <h2 id="cookies">Keine Cookies, kein Tracking</h2>
+      <p><P text="TEXT FOLGT" /></p>
+      <TechNote>
+        <p>
+          Die Website setzt keine Cookies und nutzt keinen Local Storage für Besucherdaten. Es gibt keine Analyse- oder
+          Tracking-Werkzeuge. Schriften und Bilder werden vom eigenen Server geladen; beim Seitenaufruf entstehen keine
+          Verbindungen zu Google oder anderen Dritten. Bilder der Einrichtungen werden beim Erstellen der Website
+          einmalig aus Google Drive kopiert, nicht beim Besuch.
+        </p>
+      </TechNote>
+
+      <h2 id="newsletter">Newsletter (CleverReach)</h2>
+      <p><P text="TEXT FOLGT: ANBIETER CLEVERREACH, DOUBLE-OPT-IN, ERHOBENE DATEN, RECHTSGRUNDLAGE, WIDERRUF, AUFTRAGSVERARBEITUNG" /></p>
+      <TechNote>
+        <p>
+          Das Anmeldeformular sendet E-Mail-Adresse und optional den Vornamen direkt an CleverReach. Erst beim Absenden
+          entsteht eine Verbindung zu CleverReach. Die Anmeldung wird per E-Mail bestätigt (Double-Opt-in); jede
+          Newsletter-Mail enthält einen Abmeldelink.
+        </p>
+      </TechNote>
+
+      <h2 id="externe-links">Externe Links</h2>
+      <p><P text="TEXT FOLGT: HINWEIS, DASS BEIM KLICK AUF EXTERNE LINKS DIE DATENSCHUTZBESTIMMUNGEN DER JEWEILIGEN ANBIETER GELTEN" /></p>
+      <h3 id="wirwunder">Spenden über WirWunder</h3>
+      <p><P text="TEXT FOLGT" /></p>
+      <h3 id="instagram">Instagram</h3>
+      <p><P text="TEXT FOLGT" /></p>
+      <h3 id="google-formular">Eintragung über Google Formulare</h3>
+      <p><P text="TEXT FOLGT: GOOGLE ALS ANBIETER, WELCHE DATEN IM FORMULAR ERHOBEN WERDEN, WOFÜR, WER ZUGRIFF HAT, LÖSCHUNG" /></p>
+      <TechNote>
+        <p>
+          WirWunder, Instagram und das Google Formular sind nur verlinkt, nicht eingebettet. Eine Verbindung zu diesen
+          Diensten entsteht erst, wenn jemand auf den Link klickt. Externe Links öffnen in einem neuen Tab. Im Google
+          Formular werden auch Ansprechperson und E-Mail-Adresse erfasst; diese Angaben werden nie auf der Website
+          veröffentlicht.
+        </p>
+      </TechNote>
+
+      <h2 id="rechte">Eure Rechte</h2>
+      <p><P text="TEXT FOLGT: AUSKUNFT, BERICHTIGUNG, LÖSCHUNG, EINSCHRÄNKUNG, WIDERSPRUCH, DATENÜBERTRAGBARKEIT, BESCHWERDE BEI DER AUFSICHTSBEHÖRDE" /></p>
+
+      <h2 id="stand">Stand</h2>
+      <p><P text="DATUM" /></p>
+    </div>
+  </section>
+</Page>

@@ -1,0 +1,28 @@
+---
+import IconExternal from './icons/IconExternal.astro';
+
+// Link to another website: opens in a new tab, marked with an icon and a hidden note.
+interface Props {
+  href: string;
+  class?: string;
+  /** Extra hidden context, e.g. "von Theater am Fluss". */
+  context?: string;
+}
+const { href, class: className, context } = Astro.props;
+---
+
+<a href={href} class:list={['ext', className]} target="_blank" rel="noopener"
+  ><slot /><IconExternal /><span class="visually-hidden">{context ? ` ${context}` : ''} (externer Link, öffnet in neuem Tab)</span></a
+>
+
+<style>
+  .ext {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3em;
+  }
+
+  .ext :global(.icon) {
+    align-self: center;
+  }
+</style>

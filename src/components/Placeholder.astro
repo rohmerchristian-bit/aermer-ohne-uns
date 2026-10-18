@@ -1,0 +1,9 @@
+---
+// Marks text the team still has to deliver. Rendered highlighted so it cannot be overlooked.
+interface Props {
+  text: string;
+}
+const { text } = Astro.props;
+---
+
+<mark class="placeholder">[{text}]</mark>

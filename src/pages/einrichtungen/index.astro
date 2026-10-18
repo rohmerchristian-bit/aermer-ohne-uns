@@ -1,0 +1,224 @@
+---
+import Page from '../../layouts/Page.astro';
+import TileGrid from '../../components/TileGrid.astro';
+import JoinCta from '../../components/JoinCta.astro';
+import { areas } from '../../data/areas.ts';
+import { institutionCount, institutions, sortedForGrid, totalAmount } from '../../data/index.ts';
+import { formatEuro } from '../../lib/format.ts';
+
+const usedAreas = areas.filter((a) => institutions.some((i) => i.area === a.slug));
+const initialStatus =
+  totalAmount > 0
+    ? `${institutionCount} ${institutionCount === 1 ? 'Einrichtung' : 'Einrichtungen'}, zusammen ${formatEuro(totalAmount)} pro Jahr`
+    : `${institutionCount} ${institutionCount === 1 ? 'Einrichtung' : 'Einrichtungen'}`;
+---
+
+<Page
+  title="Betroffene Einrichtungen"
+  description="Alle Erlanger Einrichtungen, denen im Haushalt 2027 Mittel gekürzt werden sollen – mit Betrag, Folgen und Stellungnahmen."
+>
+  <section class="section list-head" aria-labelledby="liste-titel">
+    <div class="container">
+      <p class="label">Betroffene</p>
+      <h1 id="liste-titel">Was verloren geht</h1>
+      {
+        institutionCount > 0 && (
+          <p class="lead">
+            Diese Einrichtungen haben sich eingetragen. Jeder Eintrag wurde vom Bündnis geprüft. Dreht die Kacheln um,
+            um die Folgen zu sehen.
+          </p>
+        )
+      }
+    </div>
+  </section>
+
+  {
+    institutionCount === 0 ? (
+      <section class="section">
+        <div class="container">
+          <p class="lead">Die ersten Einträge werden gerade geprüft und erscheinen in Kürze hier.</p>
+        </div>
+      </section>
+    ) : (
+      <section class="list-body" aria-label="Einrichtungen filtern und durchsuchen">
+        <div class="container">
+          <form class="filters" data-filter-controls role="search" aria-label="Einrichtungen filtern">
+            <fieldset class="filters__areas">
+              <legend class="label">Bereich</legend>
+              <ul role="list">
+                {usedAreas.map((area) => (
+                  <li data-area={area.slug}>
+                    <label class="filters__area">
+                      <input type="checkbox" name="bereich" value={area.slug} />
+                      <span class="filters__swatch" aria-hidden="true" />
+                      {area.label}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </fieldset>
+
+            <div class="filters__row">
+              <div class="field filters__search">
+                <label for="filter-suche">Suche</label>
+                <input
+                  class="input"
+                  id="filter-suche"
+                  name="suche"
+                  type="search"
+                  autocomplete="off"
+                  placeholder="Name, Projekt oder Stichwort"
+                />
+              </div>
+              <div class="field filters__sort">
+                <label for="filter-sort">Sortierung</label>
+                <span class="select">
+                  <select class="input" id="filter-sort" name="sort">
+                    <option value="empfohlen">Hervorgehoben zuerst</option>
+                    <option value="betrag">Höchste Kürzung zuerst</option>
+                    <option value="name">Name A–Z</option>
+                  </select>
+                </span>
+              </div>
+              <button type="button" class="btn btn--outline filters__reset" data-filter-reset hidden>
+                Filter zurücksetzen
+              </button>
+            </div>
+          </form>
+
+          <p class="filters__status" data-filter-status role="status" aria-live="polite">
+            {initialStatus}
+          </p>
+
+          <TileGrid institutions={sortedForGrid()} headingLevel={2} filterable />
+
+          <p class="filters__empty lead" data-filter-empty hidden>
+            Keine Einrichtung passt zu dieser Auswahl. Probiert einen anderen Bereich oder ein anderes Stichwort.
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  <JoinCta />
+</Page>
+
+<script>
+  import { initFilter } from '../../scripts/filter.ts';
+  initFilter();
+</script>
+
+<style>
+  .list-head {
+    padding-bottom: var(--space-6);
+  }
+
+  .list-head .lead {
+    margin-top: var(--space-4);
+  }
+
+  .list-body {
+    padding-bottom: var(--space-8);
+  }
+
+  .filters {
+    display: grid;
+    gap: var(--space-5);
+    padding-block: var(--space-5);
+    border-block: var(--line-strong) solid var(--color-ink);
+  }
+
+  .filters__areas {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .filters__areas legend {
+    margin-bottom: var(--space-3);
+  }
+
+  .filters__areas ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Area toggles: colour square + underline when active – no pills. */
+  .filters__area {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding-block: var(--space-1);
+    font-weight: 800;
+    font-stretch: var(--stretch-semi);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    border-bottom: var(--line-strong) solid transparent;
+  }
+
+  .filters__area input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+
+  .filters__swatch {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: var(--line) solid var(--color-ink);
+    background: var(--color-paper);
+    box-shadow: inset 0 0 0 0.3rem var(--color-paper);
+  }
+
+  .filters__area:hover .filters__swatch {
+    background: var(--area-bg);
+  }
+
+  .filters__area:has(input:checked) {
+    border-bottom-color: var(--color-ink);
+  }
+
+  .filters__area:has(input:checked) .filters__swatch {
+    background: var(--area-bg);
+    box-shadow: none;
+  }
+
+  .filters__area:has(input:focus-visible) {
+    outline: var(--focus-width) solid var(--color-ink);
+    outline-offset: 3px;
+  }
+
+  .filters__row {
+    display: grid;
+    gap: var(--space-4);
+    align-items: end;
+  }
+
+  @media (min-width: 48em) {
+    .filters__row {
+      grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr) auto;
+    }
+  }
+
+  .filters__reset[hidden] {
+    display: none;
+  }
+
+  .filters__status {
+    margin-block: var(--space-5);
+    font-size: var(--fs-h3);
+    font-weight: 800;
+    font-stretch: var(--stretch-condensed);
+  }
+
+  .filters__empty {
+    margin-top: var(--space-6);
+  }
+</style>

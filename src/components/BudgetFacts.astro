@@ -1,0 +1,72 @@
+---
+import { budgetFacts } from '../data/budget.ts';
+import { settings } from '../data/index.ts';
+import ExternalLink from './ExternalLink.astro';
+
+interface Props {
+  headingLevel?: 2 | 3;
+}
+const { headingLevel = 3 } = Astro.props;
+const Heading = `h${headingLevel}` as 'h2' | 'h3';
+---
+
+<ul class="facts" role="list">
+  {
+    budgetFacts.map((fact) => (
+      <li class="facts__item">
+        <Heading class="facts__value nobreak">{fact.value}</Heading>
+        <p class="facts__label">{fact.label}</p>
+      </li>
+    ))
+  }
+</ul>
+<p class="facts__source small">
+  Quelle:
+  {settings.sourceUrl ? <ExternalLink href={settings.sourceUrl}>{settings.sourceTitle}</ExternalLink> : settings.sourceTitle}
+</p>
+
+<style>
+  .facts {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: var(--line-strong) solid currentColor;
+  }
+
+  @media (min-width: 48em) {
+    .facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 80em) {
+    .facts {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .facts__item {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-5) var(--space-6) 0;
+    border-bottom: var(--line) solid currentColor;
+  }
+
+  .facts__value {
+    font-size: clamp(2.5rem, 5vw, 4.25rem);
+    font-weight: 900;
+    line-height: var(--lh-tight);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .facts__label {
+    max-width: 30ch;
+  }
+
+  .facts__source {
+    margin-top: var(--space-4);
+  }
+</style>

@@ -1,0 +1,58 @@
+---
+import Page from '../layouts/Page.astro';
+import JoinCta from '../components/JoinCta.astro';
+import DonationBlock from '../components/DonationBlock.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import { settings } from '../data/index.ts';
+---
+
+<Page
+  title="Mitmachen"
+  description="Einrichtung eintragen, Newsletter abonnieren, spenden: So unterstützt ihr das Bündnis #ÄrmerOhneUns in Erlangen."
+>
+  <header class="page-head">
+    <div class="container">
+      <p class="label">Mitmachen</p>
+      <h1>Gemeinsam sind wir schwer zu übersehen.</h1>
+      <p class="lead">Eintragen, informiert bleiben, spenden, weitersagen – jede Stimme macht die Kürzungen sichtbarer.</p>
+    </div>
+  </header>
+
+  <JoinCta />
+
+  <section class="section" id="newsletter" aria-labelledby="newsletter-titel">
+    <div class="container prose">
+      <p class="label">Newsletter</p>
+      <h2 id="newsletter-titel">Auf dem Laufenden bleiben</h2>
+      <!-- CleverReach form follows in Phase 4. -->
+      <p>Der Newsletter des Bündnisses startet in Kürze.</p>
+    </div>
+  </section>
+
+  <DonationBlock />
+
+  <section class="section" aria-labelledby="weitersagen-titel">
+    <div class="container prose">
+      <p class="label">Weitersagen</p>
+      <h2 id="weitersagen-titel">Teilt, was verloren geht</h2>
+      <p>
+        Jede Einrichtung hat eine eigene Seite mit teilbarem Link – für die Instagram-Bio, Pressemitteilungen oder
+        den Elternbrief. Nutzt den Hashtag <strong class="nobreak">#ÄrmerOhneUns</strong>.
+      </p>
+      {
+        settings.instagramUrl && (
+          <p>
+            <ExternalLink href={settings.instagramUrl}>Das Bündnis auf Instagram</ExternalLink>
+          </p>
+        )
+      }
+      {
+        settings.contactEmail && (
+          <p>
+            Fragen an das Bündnis: <a href={`mailto:${settings.contactEmail}`}>{settings.contactEmail}</a>
+          </p>
+        )
+      }
+    </div>
+  </section>
+</Page>

@@ -1,0 +1,381 @@
+---
+import Page from '../../layouts/Page.astro';
+import TileGrid from '../../components/TileGrid.astro';
+import ExternalLink from '../../components/ExternalLink.astro';
+import DonationBlock from '../../components/DonationBlock.astro';
+import IconArrow from '../../components/icons/IconArrow.astro';
+import { getArea } from '../../data/areas.ts';
+import { institutions, settings, sortedForGrid } from '../../data/index.ts';
+import type { Institution } from '../../data/types.ts';
+import { amountSourceLabel } from '../../lib/amount-label.ts';
+import { formatCut, initials, truncate } from '../../lib/format.ts';
+
+export function getStaticPaths() {
+  return institutions.map((institution) => ({ params: { slug: institution.slug }, props: { institution } }));
+}
+
+interface Props {
+  institution: Institution;
+}
+
+const { institution: inst } = Astro.props;
+const area = getArea(inst.area);
+const sourceLabel = amountSourceLabel(inst);
+const related = sortedForGrid(institutions.filter((i) => i.area === inst.area && i.slug !== inst.slug)).slice(0, 3);
+const paragraphs = (text: string | null) => (text ? text.split(/\n{2,}/).map((p) => p.split('\n')) : []);
+const socialLinks = inst.links.filter((l) => l !== inst.website);
+const linkLabel = (url: string) => new URL(url).hostname.replace(/^www\./, '');
+const pageUrl = new URL(`/einrichtungen/${inst.slug}/`, Astro.site).toString();
+
+const description = truncate(
+  [inst.amount !== null ? `${formatCut(inst.amount)} pro Jahr.` : null, inst.project, inst.consequences]
+    .filter(Boolean)
+    .join(' '),
+  160,
+);
+
+const sections = [
+  { id: 'folgen', title: 'Was die Kürzung bedeutet', text: inst.consequences },
+  { id: 'gekuerzt', title: 'Was gekürzt werden soll', text: inst.cutDescription },
+  { id: 'arbeit', title: 'Was wir tun', text: inst.description },
+  { id: 'reichweite', title: 'Wen wir erreichen', text: inst.reach },
+].filter((s) => s.text);
+---
+
+<Page title={inst.name} description={description}>
+  <article class="detail" data-area={area.slug} aria-labelledby="detail-titel">
+    <header class="detail__head">
+      <div class="container detail__head-inner">
+        <p class="detail__back">
+          <a href="/einrichtungen/">Alle Einrichtungen</a>
+        </p>
+        <p class="label">{area.label}</p>
+        <h1 id="detail-titel" class="detail__name">{inst.name}</h1>
+        {inst.project && <p class="detail__project">{inst.project}</p>}
+        <div class="detail__money">
+          {
+            inst.amount !== null ? (
+              <p class="detail__amount">
+                <span class="nobreak">{formatCut(inst.amount)}</span> <span class="detail__per">pro Jahr</span>
+              </p>
+            ) : (
+              <p class="detail__amount detail__amount--pending">Betrag folgt</p>
+            )
+          }
+          {sourceLabel && <p class="detail__source">{sourceLabel}</p>}
+        </div>
+      </div>
+    </header>
+
+    <div class="container detail__body">
+      <figure class:list={['detail__media', inst.image && `detail__media--${inst.image.kind}`]}>
+        {
+          inst.image ? (
+            <picture>
+              {inst.image.sources.map((source) => (
+                <source type={source.type} srcset={source.srcset} sizes="(min-width: 64em) 40vw, 92vw" />
+              ))}
+              <img
+                src={inst.image.src}
+                width={inst.image.width}
+                height={inst.image.height}
+                alt={inst.image.alt}
+                decoding="async"
+                fetchpriority="high"
+              />
+            </picture>
+          ) : (
+            <div class="detail__placeholder" aria-hidden="true">
+              {initials(inst.name)}
+            </div>
+          )
+        }
+        {
+          inst.image?.credit && (
+            <figcaption class="detail__credit small">
+              {inst.image.kind === 'logo' ? 'Bild' : 'Foto'}: {inst.image.credit}
+            </figcaption>
+          )
+        }
+      </figure>
+
+      <div class="detail__text">
+        {
+          inst.quote && (
+            <blockquote class="detail__quote">
+              <p>„{inst.quote}“</p>
+              <footer class="label">{inst.name}</footer>
+            </blockquote>
+          )
+        }
+
+        {
+          sections.map((section) => (
+            <section class="detail__section" aria-labelledby={`abschnitt-${section.id}`}>
+              <h2 id={`abschnitt-${section.id}`} class="h3">
+                {section.title}
+              </h2>
+              {paragraphs(section.text).map((lines) => (
+                <p>
+                  {lines.map((line, i) => (
+                    <>
+                      {i > 0 && <br />}
+                      {line}
+                    </>
+                  ))}
+                </p>
+              ))}
+            </section>
+          ))
+        }
+
+        <section class="detail__section" aria-labelledby="abschnitt-kontakt">
+          <h2 id="abschnitt-kontakt" class="h3">Mehr erfahren</h2>
+          {inst.address && <p>{inst.address}</p>}
+          <ul class="detail__links" role="list">
+            {
+              inst.infoLink && (
+                <li>
+                  <ExternalLink href={inst.infoLink} context={`von ${inst.name}`}>
+                    Stellungnahme / weitere Informationen
+                  </ExternalLink>
+                </li>
+              )
+            }
+            {
+              inst.website && (
+                <li>
+                  <ExternalLink href={inst.website} context={`von ${inst.name}`}>
+                    Website ({linkLabel(inst.website)})
+                  </ExternalLink>
+                </li>
+              )
+            }
+            {
+              socialLinks.map((url) => (
+                <li>
+                  <ExternalLink href={url} context={`von ${inst.name}`}>
+                    {linkLabel(url)}
+                  </ExternalLink>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        <section class="detail__share" aria-labelledby="abschnitt-teilen">
+          <h2 id="abschnitt-teilen" class="label">Diese Seite teilen</h2>
+          <div class="detail__share-row">
+            <input class="input" id="share-url" type="text" readonly value={pageUrl} aria-label="Link zu dieser Seite" />
+            <button type="button" class="btn" data-copy-target="share-url" data-copied-label="Kopiert">
+              Link kopieren
+            </button>
+          </div>
+          <p class="small detail__hashtags">{settings.hashtags.join(' ')}</p>
+        </section>
+      </div>
+    </div>
+  </article>
+
+  {
+    related.length > 0 && (
+      <section class="section" aria-labelledby="weitere-titel">
+        <div class="container">
+          <div class="section__head">
+            <p class="label">Ebenfalls betroffen</p>
+            <h2 id="weitere-titel">Mehr aus dem Bereich {area.label}</h2>
+          </div>
+          <TileGrid institutions={related} />
+          <p class="detail__all">
+            <a href={`/einrichtungen/?bereich=${area.slug}`}>
+              Alle aus dem Bereich {area.label} <IconArrow />
+            </a>
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  <DonationBlock />
+</Page>
+
+<script>
+  import { initCopyButtons } from '../../scripts/copy-link.ts';
+  initCopyButtons();
+</script>
+
+<style>
+  .detail__head {
+    background: var(--area-bg);
+    color: var(--area-fg);
+    border-bottom: var(--line-strong) solid var(--color-ink);
+    --focus-color: var(--color-ink);
+  }
+
+  .detail__head-inner {
+    display: grid;
+    gap: var(--space-4);
+    padding-block: var(--space-6) var(--space-8);
+  }
+
+  .detail__back {
+    margin-bottom: var(--space-4);
+    font-weight: 800;
+  }
+
+  .detail__back a::before {
+    content: '← ' / '';
+  }
+
+  .detail__name {
+    font-size: clamp(2.5rem, 7vw, 6.5rem);
+    font-weight: 900;
+    line-height: 0.95;
+    max-width: 18ch;
+  }
+
+  .detail__project {
+    font-size: var(--fs-lead);
+    font-weight: 700;
+    max-width: 40ch;
+  }
+
+  .detail__money {
+    margin-top: var(--space-5);
+  }
+
+  .detail__amount {
+    font-size: clamp(3rem, 10vw, 8rem);
+    font-weight: 900;
+    font-stretch: var(--stretch-condensed);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-tight);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .detail__per {
+    font-size: 0.3em;
+    letter-spacing: 0;
+  }
+
+  .detail__amount--pending {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .detail__source {
+    margin-top: var(--space-3);
+    font-weight: 500;
+  }
+
+  .detail__body {
+    display: grid;
+    gap: var(--space-7);
+    padding-block: var(--space-8);
+  }
+
+  @media (min-width: 64em) {
+    .detail__body {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
+
+    .detail__media {
+      position: sticky;
+      top: var(--space-5);
+    }
+  }
+
+  .detail__media img {
+    width: 100%;
+    height: auto;
+    border: var(--line-strong) solid var(--color-ink);
+  }
+
+  .detail__media--logo img {
+    padding: var(--space-6);
+    background: var(--color-white);
+  }
+
+  .detail__placeholder {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    background: var(--area-bg);
+    color: var(--area-fg);
+    border: var(--line-strong) solid var(--color-ink);
+    font-size: clamp(5rem, 16vw, 12rem);
+    font-weight: 900;
+    font-stretch: var(--stretch-condensed);
+    line-height: 1;
+  }
+
+  .detail__credit {
+    margin-top: var(--space-2);
+    color: var(--color-muted);
+  }
+
+  .detail__text {
+    display: grid;
+    gap: var(--space-7);
+  }
+
+  .detail__quote {
+    padding-left: var(--space-5);
+    border-left: 0.5rem solid var(--area-bg);
+  }
+
+  .detail__quote p {
+    font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+    font-weight: 800;
+    font-stretch: var(--stretch-semi);
+    line-height: 1.12;
+    max-width: 28ch;
+  }
+
+  .detail__quote footer {
+    margin-top: var(--space-4);
+  }
+
+  .detail__section {
+    display: grid;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: var(--line-strong) solid var(--color-ink);
+  }
+
+  .detail__links {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-weight: 700;
+  }
+
+  .detail__share {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    border: var(--line-strong) solid var(--color-ink);
+  }
+
+  .detail__share-row {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 40em) {
+    .detail__share-row {
+      grid-template-columns: 1fr auto;
+    }
+  }
+
+  .detail__hashtags {
+    color: var(--color-muted);
+  }
+
+  .detail__all {
+    margin-top: var(--space-6);
+    font-weight: 800;
+  }
+</style>

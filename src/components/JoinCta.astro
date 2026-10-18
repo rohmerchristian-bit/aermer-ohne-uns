@@ -1,0 +1,78 @@
+---
+import { settings } from '../data/index.ts';
+import IconExternal from './icons/IconExternal.astro';
+
+// "Eure Einrichtung ist betroffen?" – link to the Google Form, with a note that Google is used.
+interface Props {
+  headingLevel?: 2 | 3;
+}
+const { headingLevel = 2 } = Astro.props;
+const Heading = `h${headingLevel}` as 'h2' | 'h3';
+---
+
+<section class="join" aria-labelledby="mitmachen-titel">
+  <div class="container join__inner">
+    <div>
+      <p class="label">Mitmachen</p>
+      <Heading id="mitmachen-titel" class="join__title">Eure Einrichtung ist betroffen? Tragt euch ein.</Heading>
+    </div>
+    <div class="join__action">
+      <p>
+        Kultur, Bildung, Soziales, Jugend, Sport, Umwelt: Jede Einrichtung, der Mittel gekürzt werden sollen, kann
+        sich eintragen. Das Bündnis prüft jeden Eintrag, bevor er hier erscheint.
+      </p>
+      {
+        settings.formUrl ? (
+          <>
+            <a class="btn" href={settings.formUrl} target="_blank" rel="noopener">
+              Zum Eintragungsformular <IconExternal />
+              <span class="visually-hidden"> (externer Link zu Google Formulare, öffnet in neuem Tab)</span>
+            </a>
+            <p class="join__note small">
+              Das Formular läuft über Google Formulare. Beim Öffnen gelten die Datenschutzbestimmungen von Google.
+              Mehr dazu in unserer <a href="/datenschutz/#google-formular">Datenschutzerklärung</a>.
+            </p>
+          </>
+        ) : (
+          <p class="join__note">Das Eintragungsformular ist in Kürze hier verlinkt.</p>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .join {
+    padding-block: var(--space-8);
+    border-bottom: var(--line-strong) solid var(--color-ink);
+  }
+
+  .join__inner {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 64em) {
+    .join__inner {
+      grid-template-columns: 1fr 1fr;
+      align-items: end;
+    }
+  }
+
+  .join__title {
+    margin-top: var(--space-3);
+    font-size: var(--fs-h1);
+    font-weight: 900;
+    line-height: var(--lh-tight);
+  }
+
+  .join__action {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .join__note {
+    color: var(--color-muted);
+  }
+</style>

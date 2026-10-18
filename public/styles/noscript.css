@@ -37,3 +37,13 @@
 .tile__links {
   padding-right: var(--tile-pad, 1.5rem) !important;
 }
+
+/* Donation progress bar is sized by script – hide it when scripts are off. */
+.donate__bar {
+  display: none !important;
+}
+
+/* Filter controls need JavaScript. */
+[data-filter-controls] {
+  display: none !important;
+}

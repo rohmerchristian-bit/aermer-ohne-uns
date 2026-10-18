@@ -1,0 +1,56 @@
+---
+import { areas } from '../data/areas.ts';
+import type { Institution } from '../data/types.ts';
+
+// Area "filter bar" on the start page: links into the filtered list.
+interface Props {
+  institutions: Institution[];
+}
+const { institutions } = Astro.props;
+const used = areas.filter((a) => institutions.some((i) => i.area === a.slug));
+---
+
+{
+  used.length > 1 && (
+    <nav class="area-links" aria-label="Nach Bereich ansehen">
+      <ul role="list">
+        {used.map((area) => (
+          <li data-area={area.slug}>
+            <a href={`/einrichtungen/?bereich=${area.slug}`}>
+              <span class="area-links__swatch" aria-hidden="true" />
+              {area.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  .area-links ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-weight: 800;
+    font-stretch: var(--stretch-semi);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .area-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .area-links__swatch {
+    width: 1rem;
+    height: 1rem;
+    border: var(--line) solid var(--color-ink);
+    background: var(--area-bg);
+  }
+</style>

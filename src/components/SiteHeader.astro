@@ -1,0 +1,127 @@
+---
+import { settings } from '../data/index.ts';
+
+// Main navigation. Works without JavaScript: links wrap below the logo on small screens.
+const path = Astro.url.pathname;
+const items = [
+  { href: '/einrichtungen/', label: 'Betroffene' },
+  { href: '/hintergrund/', label: 'Hintergrund' },
+  { href: '/mitmachen/', label: 'Mitmachen' },
+];
+const isCurrent = (href: string) => path === href || path.startsWith(href);
+---
+
+{
+  settings.notice && (
+    <aside class="notice" aria-label="Aktueller Hinweis">
+      <p class="container notice__text">{settings.notice}</p>
+    </aside>
+  )
+}
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="site-header__logo" href="/" aria-current={path === '/' ? 'page' : undefined}>
+      Ärmer ohne uns<span class="visually-hidden"> – Startseite</span>
+    </a>
+    <nav aria-label="Hauptnavigation">
+      <ul class="site-nav" role="list">
+        {
+          items.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <a class="btn btn--signal site-header__donate" href="/#spenden">Spenden</a>
+  </div>
+</header>
+
+<style>
+  .notice {
+    background: var(--color-signal);
+    color: var(--color-signal-text);
+    border-bottom: var(--line-strong) solid var(--color-ink);
+  }
+
+  .notice__text {
+    max-width: var(--page-max);
+    padding-block: var(--space-3);
+    font-weight: 800;
+    font-stretch: var(--stretch-semi);
+  }
+
+  .site-header {
+    border-bottom: var(--line-strong) solid var(--color-ink);
+    background: var(--color-paper);
+  }
+
+  /* Phones: logo + donate button in one row, navigation below. Wider: everything in one row. */
+  .site-header__inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'logo donate'
+      'nav nav';
+    align-items: center;
+    gap: var(--space-3) var(--space-5);
+    padding-block: var(--space-3) var(--space-4);
+  }
+
+  @media (min-width: 48em) {
+    .site-header__inner {
+      grid-template-columns: 1fr auto auto;
+      grid-template-areas: 'logo nav donate';
+      padding-block: var(--space-4);
+    }
+  }
+
+  .site-header__inner nav {
+    grid-area: nav;
+  }
+
+  .site-header__donate {
+    grid-area: donate;
+    min-height: 2.75rem;
+    padding-block: var(--space-2);
+  }
+
+  .site-header__logo {
+    grid-area: logo;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 900;
+    font-stretch: var(--stretch-condensed);
+    line-height: 1;
+    letter-spacing: var(--tracking-tight);
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-weight: 800;
+    font-stretch: var(--stretch-semi);
+  }
+
+  .site-nav a:not(.btn) {
+    text-decoration-thickness: 0;
+    text-decoration-color: transparent;
+  }
+
+  .site-nav a:not(.btn):hover,
+  .site-nav a[aria-current='page'] {
+    text-decoration-color: currentColor;
+    text-decoration-thickness: var(--line-strong);
+  }
+
+</style>

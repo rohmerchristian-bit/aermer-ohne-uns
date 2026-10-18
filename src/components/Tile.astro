@@ -2,6 +2,7 @@
 import type { Institution } from '../data/types';
 import { getArea } from '../data/areas';
 import { formatCut, initials, truncate } from '../lib/format';
+import { amountSourceLabel } from '../lib/amount-label';
 import IconFlip from './icons/IconFlip.astro';
 import IconArrow from './icons/IconArrow.astro';
 import IconExternal from './icons/IconExternal.astro';
@@ -26,14 +27,7 @@ const QUOTE_MAX = 110;
 // Tile width per breakpoint (see .tile-grid in src/styles/layout.css).
 const IMAGE_SIZES = '(min-width: 96em) 22rem, (min-width: 64em) 30vw, (min-width: 40em) 46vw, 92vw';
 
-const sourceLabel =
-  inst.amount === null
-    ? null
-    : inst.amountKind === 'verified'
-      ? inst.amountSource
-        ? `Quelle: ${inst.amountSource}`
-        : 'Vom Bündnis geprüft'
-      : 'Angabe der Einrichtung';
+const sourceLabel = amountSourceLabel(inst);
 
 const externalUrl = inst.infoLink ?? inst.website;
 const externalLabel = inst.infoLink ? 'Stellungnahme' : 'Website';

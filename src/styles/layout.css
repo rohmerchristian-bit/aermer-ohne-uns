@@ -41,3 +41,51 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+/* Running text pages (Hintergrund, Impressum, Datenschutz). */
+.prose {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 46rem;
+}
+
+.prose h2 {
+  margin-top: var(--space-6);
+  font-size: var(--fs-h3);
+  line-height: 1.1;
+}
+
+.prose h3 {
+  margin-top: var(--space-4);
+  font-size: 1.25rem;
+}
+
+.prose ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+/* Text the team still has to deliver. Must be visible at a glance. */
+.placeholder {
+  padding: 0 0.2em;
+  background: var(--color-signal);
+  color: var(--color-signal-text);
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.page-head {
+  padding-block: var(--space-7) var(--space-6);
+  border-bottom: var(--line-strong) solid var(--color-ink);
+}
+
+.page-head h1 {
+  margin-top: var(--space-3);
+  max-width: 20ch;
+}
+
+.page-head .lead {
+  margin-top: var(--space-4);
+}

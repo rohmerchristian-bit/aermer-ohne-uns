@@ -1,0 +1,42 @@
+---
+import Page from '../layouts/Page.astro';
+import IconArrow from '../components/icons/IconArrow.astro';
+---
+
+<Page title="Seite nicht gefunden" noindex>
+  <section class="nf">
+    <div class="container nf__inner">
+      <p class="label">Fehler 404</p>
+      <h1 class="display nf__title">Hier fehlt etwas.</h1>
+      <p class="lead">
+        Diese Seite gibt es nicht (mehr). So fühlt es sich an, wenn ein Angebot plötzlich weg ist – nur dass sich diese
+        Lücke leicht schließen lässt.
+      </p>
+      <div class="nf__actions">
+        <a class="btn" href="/">Zur Startseite <IconArrow /></a>
+        <a class="btn btn--outline" href="/einrichtungen/">Betroffene ansehen</a>
+      </div>
+    </div>
+  </section>
+</Page>
+
+<style>
+  .nf {
+    padding-block: var(--space-9);
+  }
+
+  .nf__inner {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .nf__title {
+    max-width: 10ch;
+  }
+
+  .nf__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+</style>

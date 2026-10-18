@@ -1,0 +1,53 @@
+---
+import Page from '../layouts/Page.astro';
+import P from '../components/Placeholder.astro';
+---
+
+<Page title="Impressum" description="Impressum der Kampagnen-Website #ÄrmerOhneUns.">
+  <header class="page-head">
+    <div class="container">
+      <p class="label">Rechtliches</p>
+      <h1>Impressum</h1>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container prose">
+      <h2>Angaben gemäß § 5 DDG</h2>
+      <p>
+        E-Werk Kulturzentrum GmbH<br />
+        <P text="STRASSE UND HAUSNUMMER" /><br />
+        <P text="PLZ" /> Erlangen
+      </p>
+
+      <h2>Vertreten durch</h2>
+      <p><P text="GESCHÄFTSFÜHRUNG" /></p>
+
+      <h2>Kontakt</h2>
+      <p>
+        Telefon: <P text="TELEFON" /><br />
+        E-Mail: <P text="E-MAIL" />
+      </p>
+
+      <h2>Registereintrag</h2>
+      <p>
+        Registergericht: <P text="REGISTERGERICHT" /><br />
+        Registernummer: <P text="HRB-NUMMER" />
+      </p>
+
+      <h2>Umsatzsteuer-ID</h2>
+      <p><P text="UMSATZSTEUER-IDENTIFIKATIONSNUMMER, FALLS VORHANDEN – SONST ABSCHNITT ENTFERNEN" /></p>
+
+      <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
+      <p><P text="NAME UND ANSCHRIFT" /></p>
+
+      <h2>Über diese Website</h2>
+      <p>
+        Eine Initiative des Bündnisses <span class="nobreak">#ÄrmerOhneUns</span>, verantwortlich: E-Werk
+        Kulturzentrum GmbH, Erlangen. Für die Einträge der Einrichtungen sind die jeweiligen Einrichtungen
+        verantwortlich; das Bündnis prüft jeden Eintrag vor der Veröffentlichung.
+      </p>
+      <p><P text="WEITERE ANGABEN DES TEAMS, Z. B. HAFTUNG FÜR LINKS, BILDNACHWEISE ALLGEMEIN" /></p>
+    </div>
+  </section>
+</Page>

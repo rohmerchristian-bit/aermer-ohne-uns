@@ -1,0 +1,57 @@
+---
+import ExternalLink from './ExternalLink.astro';
+import { settings } from '../data/index.ts';
+---
+
+<footer class="site-footer on-dark">
+  <div class="container site-footer__inner">
+    <p class="site-footer__claim">Ärmer ohne uns</p>
+    <nav aria-label="Rechtliches und Kontakt">
+      <ul class="site-footer__links" role="list">
+        <li><a href="/impressum/">Impressum</a></li>
+        <li><a href="/datenschutz/">Datenschutz</a></li>
+        {settings.contactEmail && <li><a href={`mailto:${settings.contactEmail}`}>Kontakt</a></li>}
+        {settings.instagramUrl && <li><ExternalLink href={settings.instagramUrl}>Instagram</ExternalLink></li>}
+      </ul>
+    </nav>
+    <p class="site-footer__note small">
+      Eine Initiative des Bündnisses <span class="nobreak">#ÄrmerOhneUns</span>, verantwortlich: E-Werk Kulturzentrum
+      GmbH, Erlangen.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--space-9);
+    padding-block: var(--space-8) var(--space-6);
+  }
+
+  .site-footer__inner {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .site-footer__claim {
+    font-size: var(--fs-h1);
+    font-weight: 900;
+    font-stretch: var(--stretch-condensed);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-tight);
+    text-transform: uppercase;
+  }
+
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-weight: 800;
+  }
+
+  .site-footer__note {
+    color: var(--color-paper);
+  }
+</style>

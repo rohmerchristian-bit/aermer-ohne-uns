@@ -137,3 +137,30 @@
 .checkbox input:checked::before {
   transform: scale(1);
 }
+
+/* Native selects are rounded in Safari unless appearance is reset. Wrap them in .select;
+   the arrow is drawn with two hard lines. */
+.select {
+  position: relative;
+  display: block;
+}
+
+.select select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 3rem;
+  cursor: pointer;
+}
+
+.select::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 1.25rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-right: var(--line-strong) solid var(--color-ink);
+  border-bottom: var(--line-strong) solid var(--color-ink);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}

@@ -1,0 +1,155 @@
+---
+import { settings } from '../data/index.ts';
+import { getDonationStatus } from '../data/donations.ts';
+import { formatEuro } from '../lib/format.ts';
+import IconExternal from './icons/IconExternal.astro';
+
+// Big signal-coloured block for the joint WirWunder campaign. No embedded widget.
+interface Props {
+  headingLevel?: 2 | 3;
+}
+const { headingLevel = 2 } = Astro.props;
+const Heading = `h${headingLevel}` as 'h2' | 'h3';
+const status = getDonationStatus(settings);
+---
+
+<section class="donate" id="spenden" aria-labelledby="spenden-titel">
+  <div class="container donate__inner">
+    <div class="donate__text">
+      <p class="label">Gemeinsam spenden</p>
+      <Heading id="spenden-titel" class="donate__title">Was wegfällt, fangen wir gemeinsam auf.</Heading>
+      <p class="lead">
+        Ein gemeinsamer Spendenaufruf aller Einrichtungen auf WirWunder – für die Angebote, die sonst verloren gehen.
+      </p>
+    </div>
+
+    <div class="donate__status">
+      {
+        status.current !== null && (
+          <>
+            <p class="donate__amount">
+              <span class="visually-hidden">Bisher gespendet: </span>
+              {formatEuro(status.current)}
+            </p>
+            {status.goal && (
+              <p class="donate__goal">
+                von {formatEuro(status.goal)} Ziel
+                {status.asOf && <span class="donate__asof"> · Stand {status.asOf}</span>}
+              </p>
+            )}
+            {status.percent !== null && (
+              <div
+                class="donate__bar"
+                role="progressbar"
+                aria-label="Spendenstand"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow={status.percent}
+                aria-valuetext={`${status.percent} Prozent des Spendenziels`}
+              >
+                <span class="donate__bar-fill" data-percent={status.percent} />
+              </div>
+            )}
+          </>
+        )
+      }
+      {
+        status.url ? (
+          <a class="btn donate__btn" href={status.url} target="_blank" rel="noopener">
+            Jetzt spenden <IconExternal />
+            <span class="visually-hidden"> bei WirWunder (externer Link, öffnet in neuem Tab)</span>
+          </a>
+        ) : (
+          <p class="donate__soon">Spendenaktion startet in Kürze.</p>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  // Width of the progress bar without inline styles (CSP): set via CSSOM.
+  document.querySelectorAll<HTMLElement>('.donate__bar-fill[data-percent]').forEach((el) => {
+    el.style.width = `${el.dataset.percent}%`;
+  });
+</script>
+
+<style>
+  .donate {
+    --focus-color: var(--color-ink);
+    background: var(--color-signal);
+    color: var(--color-signal-text);
+    border-block: var(--line-strong) solid var(--color-ink);
+  }
+
+  .donate__inner {
+    display: grid;
+    gap: var(--space-7);
+    padding-block: var(--space-8);
+  }
+
+  @media (min-width: 64em) {
+    .donate__inner {
+      grid-template-columns: 3fr 2fr;
+      align-items: end;
+    }
+  }
+
+  .donate__text {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .donate__title {
+    font-size: var(--fs-h1);
+    font-weight: 900;
+    line-height: var(--lh-tight);
+  }
+
+  .donate__status {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+  }
+
+  .donate__amount {
+    font-size: var(--fs-number);
+    font-weight: 900;
+    font-stretch: var(--stretch-condensed);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-tight);
+    font-variant-numeric: tabular-nums lining-nums;
+    white-space: nowrap;
+  }
+
+  .donate__goal {
+    font-weight: 700;
+  }
+
+  .donate__bar {
+    width: 100%;
+    height: 1.5rem;
+    margin-block: var(--space-2) var(--space-4);
+    border: var(--line-strong) solid var(--color-ink);
+    background: var(--color-paper);
+  }
+
+  /* Sized by script; hidden without JavaScript (public/styles/noscript.css). */
+  .donate__bar-fill {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: var(--color-ink);
+  }
+
+  .donate__btn {
+    --btn-block: var(--color-paper);
+  }
+
+  .donate__soon {
+    padding: var(--space-3) var(--space-4);
+    border: var(--line-strong) solid var(--color-ink);
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+</style>

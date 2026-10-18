@@ -1,15 +1,182 @@
 ---
-import Base from '../layouts/Base.astro';
+import Page from '../layouts/Page.astro';
+import BudgetFacts from '../components/BudgetFacts.astro';
+import Timeline from '../components/Timeline.astro';
+import TileGrid from '../components/TileGrid.astro';
+import AreaLinks from '../components/AreaLinks.astro';
+import DonationBlock from '../components/DonationBlock.astro';
+import JoinCta from '../components/JoinCta.astro';
+import IconArrow from '../components/icons/IconArrow.astro';
+import { institutionCount, institutions, settings, sortedForGrid, totalAmount } from '../data/index.ts';
+import { formatEuro } from '../lib/format.ts';
 
-// Temporary start page until Phase 3.
+const HOME_TILES = 8;
+const tiles = sortedForGrid().slice(0, HOME_TILES);
+const withAmount = institutions.filter((i) => i.amount !== null).length;
 ---
 
-<Base title="Ärmer ohne uns" noindex>
-  <section class="section">
-    <div class="container">
-      <p class="label nobreak">#ÄrmerOhneUns</p>
-      <h1 class="display">Ärmer ohne uns</h1>
-      <p class="lead">Diese Seite ist im Aufbau.</p>
+<Page
+  title="Ärmer ohne uns"
+  description="Erlangen muss im Haushalt 2027 sparen. Hier zeigen Kultur-, Bildungs- und Sozialeinrichtungen, was durch die Kürzungen verloren geht."
+>
+  <section class="hero" aria-labelledby="hero-titel">
+    <div class="container hero__inner">
+      <h1 id="hero-titel" class="display hero__claim">Ärmer<br />ohne uns</h1>
+
+      {
+        totalAmount > 0 ? (
+          <div class="hero__total">
+            <p class="hero__number" aria-hidden="true">
+              <span data-count-to={totalAmount}>{formatEuro(totalAmount)}</span>
+            </p>
+            <p class="hero__subtitle">
+              <span class="visually-hidden">{formatEuro(totalAmount)} </span>
+              {settings.heroSubtitle}
+            </p>
+            <p class="hero__basis small">
+              Summe der Kürzungen bei den {withAmount} Einrichtungen
+              {withAmount < institutionCount && ` mit Betragsangabe (von ${institutionCount})`} auf dieser Plattform, pro
+              Jahr.
+            </p>
+          </div>
+        ) : (
+          <div class="hero__total">
+            <p class="hero__subtitle">
+              Welche Angebote in Erlangen durch die Kürzungen im Haushalt 2027 verloren gehen – die ersten Einrichtungen
+              tragen sich gerade ein.
+            </p>
+          </div>
+        )
+      }
+
+      <div class="hero__actions">
+        {
+          institutionCount > 0 && (
+            <a class="btn" href="/einrichtungen/">
+              {institutionCount} Betroffene ansehen <IconArrow />
+            </a>
+          )
+        }
+        <a class="btn btn--signal" href="#spenden">Jetzt spenden <IconArrow /></a>
+      </div>
     </div>
   </section>
-</Base>
+
+  <section class="section" aria-labelledby="worum-titel">
+    <div class="container">
+      <div class="section__head">
+        <p class="label">Worum es geht</p>
+        <h2 id="worum-titel">Erlangen muss sparen. Die Frage ist, wo.</h2>
+        <p class="lead">
+          Die Stadt muss im Haushalt 2027 Millionen einsparen. Die Vorschläge der Verwaltung treffen viele Angebote, die
+          die Stadt lebenswert machen.
+        </p>
+      </div>
+      <BudgetFacts />
+      <h3 class="home__timeline-title">So geht es weiter</h3>
+      <Timeline />
+      <p class="home__more">
+        <a href="/hintergrund/">Alle Zahlen und Quellen <IconArrow /></a>
+      </p>
+    </div>
+  </section>
+
+  {
+    institutionCount > 0 && (
+      <section class="section" aria-labelledby="betroffene-titel">
+        <div class="container">
+          <div class="section__head home__grid-head">
+            <p class="label">Betroffene</p>
+            <h2 id="betroffene-titel">Was verloren geht</h2>
+            <AreaLinks institutions={institutions} />
+          </div>
+          <TileGrid institutions={tiles} />
+          <p class="home__more">
+            <a class="btn btn--outline" href="/einrichtungen/">
+              Alle {institutionCount} Einrichtungen <IconArrow />
+            </a>
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  <DonationBlock />
+
+  <JoinCta />
+</Page>
+
+<script>
+  import { initCountUp } from '../scripts/count-up.ts';
+  initCountUp();
+</script>
+
+<style>
+  .hero {
+    padding-block: var(--space-7) var(--space-8);
+    border-bottom: var(--line-strong) solid var(--color-ink);
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .hero__claim {
+    font-size: clamp(3.5rem, 15vw, 13rem);
+    line-height: 0.82;
+  }
+
+  .hero__total {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 60rem;
+  }
+
+  .hero__number {
+    font-size: clamp(3rem, 11vw, 9rem);
+    font-weight: 900;
+    font-stretch: var(--stretch-condensed);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-tight);
+    font-variant-numeric: tabular-nums lining-nums;
+    white-space: nowrap;
+  }
+
+  .hero__number span {
+    display: inline-block;
+    background: var(--color-signal);
+    padding-inline: 0.08em;
+  }
+
+  .hero__subtitle {
+    font-size: clamp(1.375rem, 2.6vw, 2.25rem);
+    font-weight: 800;
+    font-stretch: var(--stretch-semi);
+    line-height: 1.15;
+    max-width: 30ch;
+  }
+
+  .hero__basis {
+    color: var(--color-muted);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .home__timeline-title {
+    margin-block: var(--space-8) var(--space-6);
+  }
+
+  .home__more {
+    margin-top: var(--space-6);
+    font-weight: 800;
+  }
+
+  .home__grid-head {
+    gap: var(--space-5);
+  }
+</style>

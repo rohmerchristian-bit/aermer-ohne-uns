@@ -1,0 +1,93 @@
+---
+import Page from '../layouts/Page.astro';
+import BudgetFacts from '../components/BudgetFacts.astro';
+import Timeline from '../components/Timeline.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import { budgetDetails } from '../data/budget.ts';
+import { institutionCount, institutions, settings, totalAmount } from '../data/index.ts';
+import { formatEuro } from '../lib/format.ts';
+
+const withAmount = institutions.filter((i) => i.amount !== null);
+const verified = withAmount.filter((i) => i.amountKind === 'verified').length;
+---
+
+<Page
+  title="Worum es geht"
+  description="Die offiziellen Zahlen zur Haushaltskonsolidierung der Stadt Erlangen 2027, der Zeitplan bis zum Beschluss und die Quellen."
+>
+  <header class="page-head">
+    <div class="container">
+      <p class="label">Hintergrund</p>
+      <h1>Worum es geht</h1>
+      <p class="lead">
+        Die Stadt Erlangen muss im Haushalt 2027 stark sparen. Hier stehen die offiziellen Zahlen, der Zeitplan – und
+        wie die Summe auf dieser Seite zustande kommt.
+      </p>
+    </div>
+  </header>
+
+  <section class="section" aria-labelledby="zahlen-titel">
+    <div class="container">
+      <div class="section__head">
+        <h2 id="zahlen-titel">Die offiziellen Zahlen</h2>
+      </div>
+      <BudgetFacts />
+      <div class="prose bg__details">
+        <ul>{budgetDetails.map((line) => <li>{line}</li>)}</ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="zeitplan-titel">
+    <div class="container">
+      <div class="section__head">
+        <h2 id="zeitplan-titel">Der Zeitplan</h2>
+        <p>
+          Noch ist nichts beschlossen. Die Einsparvorschläge werden in den Fachausschüssen und im Haushalts-HFPA einzeln
+          abgestimmt.
+        </p>
+      </div>
+      <Timeline />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="summe-titel">
+    <div class="container prose">
+      <h2 id="summe-titel">So entsteht die Summe auf dieser Seite</h2>
+      <p>
+        Die Summe auf der Startseite ist keine Hochrechnung und keine Schätzung. Sie ist die Summe der Kürzungsbeträge
+        der Einrichtungen, die sich auf dieser Plattform eingetragen haben – pro Jahr.
+      </p>
+      {
+        institutionCount > 0 && (
+          <p>
+            Aktuell: <strong class="nobreak">{formatEuro(totalAmount)}</strong> bei {withAmount.length} von{' '}
+            {institutionCount} Einrichtungen mit Betragsangabe. Davon {verified} vom Bündnis geprüft (mit Quelle), die
+            übrigen als „Angabe der Einrichtung“ gekennzeichnet.
+          </p>
+        )
+      }
+      <p>
+        Jeder Eintrag wird vom Bündnis geprüft, bevor er erscheint. Wo ein Betrag in den Unterlagen der Stadt belegt
+        ist, nennen wir die Quelle direkt am Betrag.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="quellen-titel">
+    <div class="container prose">
+      <h2 id="quellen-titel">Quellen</h2>
+      <ul>
+        <li>
+          {settings.sourceUrl ? <ExternalLink href={settings.sourceUrl}>{settings.sourceTitle}</ExternalLink> : settings.sourceTitle}
+        </li>
+      </ul>
+    </div>
+  </section>
+</Page>
+
+<style>
+  .bg__details {
+    margin-top: var(--space-6);
+  }
+</style>

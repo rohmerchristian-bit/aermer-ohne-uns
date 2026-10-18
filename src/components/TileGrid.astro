@@ -1,0 +1,32 @@
+---
+import Tile from './Tile.astro';
+import type { Institution } from '../data/types.ts';
+
+// List of tiles. Each item carries data attributes for the client-side filter.
+interface Props {
+  institutions: Institution[];
+  headingLevel?: 2 | 3 | 4;
+  id?: string;
+  /** Marks the list for src/scripts/filter.ts. */
+  filterable?: boolean;
+}
+const { institutions, headingLevel = 3, id, filterable = false } = Astro.props;
+const searchText = (i: Institution) =>
+  [i.name, i.project, i.description, i.address].filter(Boolean).join(' ').toLocaleLowerCase('de');
+---
+
+<ul class="tile-grid" role="list" id={id} data-filter-list={filterable ? '' : undefined}>
+  {
+    institutions.map((inst) => (
+      <li
+        data-area={inst.area}
+        data-amount={inst.amount ?? ''}
+        data-name={inst.name}
+        data-featured={inst.featured ? 'true' : undefined}
+        data-search={searchText(inst)}
+      >
+        <Tile institution={inst} headingLevel={headingLevel} />
+      </li>
+    ))
+  }
+</ul>

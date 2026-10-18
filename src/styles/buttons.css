@@ -1,0 +1,139 @@
+/*
+ * Buttons: hard edges, solid fills. On hover the button jumps up-left by --offset
+ * and a hard contrast block appears behind it.
+ */
+
+.btn {
+  --btn-bg: var(--color-ink);
+  --btn-fg: var(--color-paper);
+  --btn-border: var(--color-ink);
+  --btn-block: var(--color-signal);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 3.25rem;
+  padding: var(--space-3) var(--space-5);
+  border: var(--line-strong) solid var(--btn-border);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-size: 1.0625rem;
+  font-weight: 800;
+  font-stretch: var(--stretch-semi);
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 0 0 var(--btn-block);
+  transition:
+    transform var(--duration-fast) ease-out,
+    box-shadow var(--duration-fast) ease-out;
+}
+
+.btn:hover {
+  transform: translate(calc(var(--offset) * -1), calc(var(--offset) * -1));
+  box-shadow: var(--offset) var(--offset) 0 var(--btn-block);
+}
+
+.btn:active {
+  transform: none;
+  box-shadow: 0 0 0 var(--btn-block);
+}
+
+.btn .icon {
+  width: 1.15em;
+  height: 1.15em;
+}
+
+.btn--signal {
+  --btn-bg: var(--color-signal);
+  --btn-fg: var(--color-signal-text);
+  --btn-border: var(--color-ink);
+  --btn-block: var(--color-ink);
+}
+
+.btn--outline {
+  --btn-bg: transparent;
+  --btn-fg: var(--color-ink);
+  --btn-border: var(--color-ink);
+  --btn-block: var(--color-ink);
+}
+
+.on-dark .btn--outline {
+  --btn-fg: var(--color-paper);
+  --btn-border: var(--color-paper);
+  --btn-block: var(--color-signal);
+}
+
+.on-dark .btn:not(.btn--signal, .btn--outline) {
+  --btn-bg: var(--color-paper);
+  --btn-fg: var(--color-ink);
+  --btn-border: var(--color-paper);
+}
+
+.on-dark .btn--signal {
+  --btn-border: var(--color-signal);
+  --btn-block: var(--color-paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+}
+
+/* Form elements in the same language */
+.field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.field label {
+  font-weight: 700;
+}
+
+.input {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: var(--space-3) var(--space-4);
+  border: var(--line-strong) solid var(--color-ink);
+  background: var(--color-white);
+  color: var(--color-ink);
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+.checkbox {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.checkbox input {
+  appearance: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0.1rem 0 0;
+  border: var(--line-strong) solid var(--color-ink);
+  background: var(--color-white);
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+}
+
+.checkbox input::before {
+  content: '';
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--color-ink);
+  transform: scale(0);
+}
+
+.checkbox input:checked::before {
+  transform: scale(1);
+}

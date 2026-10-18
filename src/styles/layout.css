@@ -1,0 +1,43 @@
+/* Page sections and grids. */
+
+.section {
+  padding-block: var(--space-8);
+}
+
+.section + .section {
+  border-top: var(--line-strong) solid var(--color-ink);
+}
+
+.section__head {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-7);
+}
+
+/* Tile grid: 1 column on phones, 2 on tablets, 3–4 on desktops. */
+.tile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--grid-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 40em) {
+  .tile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64em) {
+  .tile-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 96em) {
+  .tile-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

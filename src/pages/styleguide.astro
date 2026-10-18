@@ -1,0 +1,281 @@
+---
+import Base from '../layouts/Base.astro';
+import Tile from '../components/Tile.astro';
+import IconArrow from '../components/icons/IconArrow.astro';
+import IconExternal from '../components/icons/IconExternal.astro';
+import IconFlip from '../components/icons/IconFlip.astro';
+import { base, signal, textCandidates } from '../design/colors';
+import { areas } from '../data/areas';
+import { contrastRatio, pickTextColor } from '../lib/contrast';
+import { formatCompact, formatCut, formatEuro } from '../lib/format';
+import { styleguideSamples } from '../data/styleguide-samples';
+
+// Internal page for design approval. Not linked, not indexed.
+
+const swatches = [
+  { name: 'Ink (Text, Linien)', token: '--color-ink', hex: base.ink, kind: 'ink', area: undefined },
+  { name: 'Paper (Hintergrund)', token: '--color-paper', hex: base.paper, kind: 'paper', area: undefined },
+  { name: 'Muted (Nebentext)', token: '--color-muted', hex: base.muted, kind: 'muted', area: undefined },
+  { name: 'Signal (nur Spenden)', token: '--color-signal', hex: signal, kind: 'signal', area: undefined },
+  ...areas.map((a) => ({ name: `Bereich: ${a.label}`, token: `--area-${a.slug}`, hex: a.color, kind: 'area', area: a.slug })),
+].map((s) => {
+  const text = pickTextColor(s.hex, textCandidates);
+  return { ...s, text: text.color, ratio: text.ratio };
+});
+
+const mutedOnPaper = contrastRatio(base.muted, base.paper);
+// Separate slugs so element ids stay unique on this page.
+const frontSample = { ...styleguideSamples[1]!, slug: 'beispiel-lernwerkstatt-vorderseite' };
+const flippedSample = { ...styleguideSamples[1]!, slug: 'beispiel-lernwerkstatt-rueckseite' };
+---
+
+<Base title="Styleguide" noindex>
+  <header class="sg-top on-dark">
+    <div class="container">
+      <p class="label">Intern · nicht verlinkt · noindex</p>
+      <h1 class="display">Styleguide</h1>
+      <p class="lead">Farben, Schrift, Buttons und Kachel für <span class="nobreak">#ÄrmerOhneUns</span> – zur Abnahme durch das Team.</p>
+    </div>
+  </header>
+
+  <section class="section" aria-labelledby="sg-farben">
+    <div class="container">
+      <div class="section__head">
+        <p class="label">01</p>
+        <h2 id="sg-farben">Farben</h2>
+        <p>
+          Textfarbe auf Farbflächen wird automatisch nach Kontrast gewählt (Ink oder Paper). Alle Werte erreichen
+          mindestens WCAG AA (4,5 : 1). Nebentext „Muted“ auf Paper: {mutedOnPaper.toFixed(2).replace('.', ',')} : 1.
+        </p>
+      </div>
+      <ul class="sg-swatches" role="list">
+        {
+          swatches.map((s) => (
+            <li class={`sg-swatch sg-swatch--${s.kind}`} data-area={s.area}>
+              <span class="label">{s.name}</span>
+              <span class="sg-swatch__hex">{s.hex}</span>
+              <span class="small">
+                {s.token} · Text {s.text === base.ink ? 'Ink' : 'Paper'} · {s.ratio.toFixed(2).replace('.', ',')} : 1
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="sg-typo">
+    <div class="container sg-stack">
+      <div class="section__head">
+        <p class="label">02</p>
+        <h2 id="sg-typo">Typografie</h2>
+        <p>Archivo, variabel, selbst gehostet. Headlines schmal und schwer (Breite 72 %), Fließtext normal breit.</p>
+      </div>
+
+      <p class="sg-spec label">Display · clamp(3rem, 10vw, 9rem) · 900 · Versalien</p>
+      <p class="display">Ärmer ohne uns</p>
+
+      <p class="sg-spec label">H1 · clamp(2.5rem, 6vw, 5.5rem) · 800</p>
+      <p class="h1">Was in Erlangen verloren geht</p>
+
+      <p class="sg-spec label">H2 · clamp(2rem, 4.5vw, 4rem) · 800</p>
+      <p class="h2">Worum es geht</p>
+
+      <p class="sg-spec label">H3 · 1.375–1.75rem · 800</p>
+      <p class="h3">Haushalts-Stadtrat im Januar 2027</p>
+
+      <p class="sg-spec label">Zahl · clamp(2.75rem, 7vw, 6.5rem) · 900</p>
+      <p class="number">{formatCut(10800000)}</p>
+      <p class="number">{formatCompact(10800000)}</p>
+
+      <p class="sg-spec label">Lead · 1.25–1.5rem</p>
+      <p class="lead">
+        Die Stadt muss 2027 rund {formatCompact(10800000)} einsparen. Wir zeigen, was das für Kultur, Bildung und
+        Soziales bedeutet.
+      </p>
+
+      <p class="sg-spec label">Fließtext · 1.125rem / 1.5 · Silbentrennung automatisch</p>
+      <p>
+        Die Einsparvorschläge gehen zur Einzelabstimmung in die Fachausschüsse – beschlossen wird im
+        Haushalts-Stadtrat. Lange Wörter wie Haushaltskonsolidierungsmaßnahmen oder Jugendkulturförderungsrichtlinie
+        werden sauber getrennt. Beträge brechen nie um: {formatEuro(45000)}, {formatEuro(1250000)}.
+      </p>
+
+      <p class="sg-spec label">Label · 0.8125rem · Versalien · Sperrung 0.08em</p>
+      <p class="label">Kultur · Bildung · Soziales</p>
+
+      <p class="sg-spec label">Links</p>
+      <p>
+        <a href="/styleguide/">Interner Link mit Unterstreichung</a> ·
+        <a href="https://example.org" target="_blank" rel="noopener">
+          Externer Link <IconExternal /><span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
+        </a>
+      </p>
+
+      <p class="sg-spec label">Icons (eigene SVGs)</p>
+      <p class="sg-icons" aria-hidden="true"><IconFlip /> <IconArrow /> <IconExternal /></p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="sg-buttons">
+    <div class="container">
+      <div class="section__head">
+        <p class="label">03</p>
+        <h2 id="sg-buttons">Buttons und Formulare</h2>
+        <p>Beim Hover springt der Button 4 px nach oben links, dahinter erscheint eine harte Kontrastfläche.</p>
+      </div>
+      <div class="sg-row">
+        <a class="btn" href="#sg-kachel">Betroffene ansehen <IconArrow /></a>
+        <a class="btn btn--signal" href="#sg-buttons">Jetzt spenden <IconArrow /></a>
+        <a class="btn btn--outline" href="#sg-buttons">Eintragen</a>
+      </div>
+    </div>
+    <div class="on-dark sg-dark">
+      <div class="container sg-row">
+        <a class="btn" href="#sg-kachel">Betroffene ansehen <IconArrow /></a>
+        <a class="btn btn--signal" href="#sg-buttons">Jetzt spenden <IconArrow /></a>
+        <a class="btn btn--outline" href="#sg-buttons">Eintragen</a>
+      </div>
+    </div>
+    <div class="container">
+      <form class="sg-form" action="#">
+        <div class="field">
+          <label for="sg-email">E-Mail-Adresse</label>
+          <input class="input" id="sg-email" type="email" autocomplete="email" placeholder="name@beispiel.de" />
+        </div>
+        <label class="checkbox">
+          <input type="checkbox" />
+          <span class="small">Ich bin einverstanden, dass … (Beispieltext für die Einwilligung).</span>
+        </label>
+      </form>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="sg-kachel">
+    <div class="container">
+      <div class="section__head">
+        <p class="label">04</p>
+        <h2 id="sg-kachel">Kachel</h2>
+        <p>
+          Klick, Tap, Enter oder Leertaste dreht die Kachel um, Escape dreht zurück. Bei reduzierter Bewegung wird
+          überblendet. Ohne JavaScript stehen beide Seiten untereinander. Beispiele: geprüfter Betrag, Angabe der
+          Einrichtung, sehr langer Text, kein Betrag.
+        </p>
+      </div>
+      <ul class="tile-grid" role="list">
+        {
+          styleguideSamples.map((inst) => (
+            <li>
+              <Tile institution={inst} />
+            </li>
+          ))
+        }
+      </ul>
+
+      <h3 class="sg-subhead">Vorder- und Rückseite nebeneinander</h3>
+      <ul class="tile-grid" role="list">
+        <li><Tile institution={frontSample} headingLevel={4} /></li>
+        <li><Tile institution={flippedSample} headingLevel={4} flipped /></li>
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .sg-top {
+    padding-block: var(--space-8) var(--space-7);
+  }
+
+  .sg-top .display {
+    margin-block: var(--space-4);
+  }
+
+  .sg-swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: var(--grid-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sg-swatch {
+    display: grid;
+    align-content: end;
+    gap: var(--space-2);
+    min-height: 11rem;
+    padding: var(--space-4);
+    border: var(--line) solid var(--color-ink);
+  }
+
+  .sg-swatch--ink {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  .sg-swatch--paper {
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  .sg-swatch--muted {
+    background: var(--color-muted);
+    color: var(--color-paper);
+  }
+
+  .sg-swatch--signal {
+    background: var(--color-signal);
+    color: var(--color-signal-text);
+  }
+
+  .sg-swatch--area {
+    background: var(--area-bg);
+    color: var(--area-fg);
+  }
+
+  .sg-swatch__hex {
+    font-size: 2rem;
+    font-weight: 900;
+    font-stretch: var(--stretch-condensed);
+    line-height: 1;
+  }
+
+  .sg-stack {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .sg-spec {
+    margin-top: var(--space-6);
+    padding-top: var(--space-2);
+    border-top: var(--line) solid var(--color-ink);
+    color: var(--color-muted);
+  }
+
+  .sg-icons {
+    display: flex;
+    gap: var(--space-5);
+    font-size: 2.5rem;
+  }
+
+  .sg-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+  }
+
+  .sg-dark {
+    margin-block: var(--space-7);
+    padding-block: var(--space-7);
+  }
+
+  .sg-form {
+    display: grid;
+    gap: var(--space-5);
+    max-width: 32rem;
+  }
+
+  .sg-subhead {
+    margin-block: var(--space-8) var(--space-5);
+  }
+</style>

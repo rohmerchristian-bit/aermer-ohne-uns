@@ -1,0 +1,39 @@
+/* Loaded only when JavaScript is off: show both tile sides stacked, no flipping. */
+.tile {
+  height: auto !important;
+  perspective: none !important;
+}
+
+.tile__card {
+  transform: none !important;
+  transition: none !important;
+}
+
+.tile__face {
+  position: static !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+.tile__back {
+  border-top: 0 !important;
+}
+
+.tile__media {
+  height: 12rem !important;
+}
+
+.tile__flip,
+.tile__close {
+  display: none !important;
+}
+
+.tile__money {
+  padding-bottom: 0 !important;
+}
+
+.tile__links {
+  padding-right: var(--tile-pad, 1.5rem) !important;
+}

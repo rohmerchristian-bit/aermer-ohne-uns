@@ -1,0 +1,72 @@
+/*
+ * Non-colour design tokens. Colours live in src/design/colors.ts (generated as /tokens.css).
+ */
+
+:root {
+  /* Typography */
+  --font-sans: 'Archivo', 'Arial Narrow', Arial, sans-serif;
+
+  --stretch-condensed: 72%;
+  --stretch-semi: 87%;
+  --stretch-normal: 100%;
+
+  --fs-display: clamp(3rem, 10vw, 9rem);
+  --fs-h1: clamp(2.5rem, 6vw, 5.5rem);
+  --fs-h2: clamp(2rem, 4.5vw, 4rem);
+  --fs-h3: clamp(1.375rem, 2vw, 1.75rem);
+  --fs-number: clamp(2.75rem, 7vw, 6.5rem);
+  --fs-lead: clamp(1.25rem, 1.6vw, 1.5rem);
+  --fs-body: 1.125rem;
+  --fs-small: 0.9375rem;
+  --fs-label: 0.8125rem;
+
+  --lh-tight: 0.9;
+  --lh-heading: 1.02;
+  --lh-body: 1.5;
+
+  --tracking-tight: -0.02em;
+  --tracking-label: 0.08em;
+
+  /* Spacing (4 px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 7rem;
+
+  /* Layout */
+  --page-max: 90rem;
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --grid-gap: clamp(1rem, 2vw, 1.5rem);
+
+  /* Lines and offsets: hard edges only */
+  --radius: 0;
+  --line: 2px;
+  --line-strong: 3px;
+  --offset: 4px;
+  --focus-width: 4px;
+
+  /* Motion */
+  --duration-flip: 0.55s;
+  --duration-fast: 0.15s;
+  --ease-flip: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Tile */
+  --tile-height: 29rem;
+}
+
+@media (min-width: 48em) {
+  :root {
+    --tile-height: 33rem;
+  }
+}
+
+@media (min-width: 80em) {
+  :root {
+    --tile-height: 34rem;
+  }
+}

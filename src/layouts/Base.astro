@@ -1,0 +1,42 @@
+---
+import '../styles/fonts.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/buttons.css';
+import '../styles/layout.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Hide from search engines (admin, styleguide). */
+  noindex?: boolean;
+}
+
+const SITE_NAME = 'Ärmer ohne uns';
+const { title, description = 'Welche Einrichtungen in Erlangen von den Kürzungen im Haushalt 2027 betroffen sind – und was verloren geht.', noindex = false } = Astro.props;
+const fullTitle = title === SITE_NAME ? `${SITE_NAME} – #ÄrmerOhneUns` : `${title} – ${SITE_NAME}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex, nofollow" /> : <link rel="canonical" href={canonical} />}
+    <meta name="theme-color" content="#111111" />
+    <link rel="preload" href="/fonts/archivo/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/tokens.css" />
+    <noscript><link rel="stylesheet" href="/styles/noscript.css" /></noscript>
+  </head>
+  <body>
+    <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+    <slot name="header" />
+    <main id="inhalt">
+      <slot />
+    </main>
+    <slot name="footer" />
+  </body>
+</html>

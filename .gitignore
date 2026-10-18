@@ -1,0 +1,22 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# image cache filled at build time
+.cache/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# local tool configuration
+.claude/

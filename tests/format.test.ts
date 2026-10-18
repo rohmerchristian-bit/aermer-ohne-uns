@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { formatCompact, formatCut, formatEuro, initials, truncate } from '../src/lib/format';
 
-const NBSP = ' ';
+const NBSP = '\u00A0';
 
 describe('formatEuro / formatCut / formatCompact', () => {
   it('formats German euro amounts with a non-breaking space', () => {
@@ -14,8 +14,8 @@ describe('formatEuro / formatCut / formatCompact', () => {
   });
 
   it('uses a real minus sign for cuts', () => {
-    expect(formatCut(45000)).toBe(`−45.000${NBSP}€`);
-    expect(formatCut(-45000)).toBe(`−45.000${NBSP}€`);
+    expect(formatCut(45000)).toBe(`\u221245.000${NBSP}€`);
+    expect(formatCut(-45000)).toBe(`\u221245.000${NBSP}€`);
   });
 
   it('shortens millions', () => {

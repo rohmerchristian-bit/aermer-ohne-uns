@@ -1,7 +1,7 @@
 // German number and text formatting. All amounts are euros per year.
 
-const NBSP = ' ';
-const MINUS = '−';
+const NBSP = '\u00A0';
+const MINUS = '\u2212';
 
 const euro = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 const decimal1 = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 1 });

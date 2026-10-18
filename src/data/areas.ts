@@ -1,5 +1,5 @@
-import { areaColors, textCandidates, type AreaColorKey } from '../design/colors';
-import { pickTextColor } from '../lib/contrast';
+import { areaColors, textCandidates, type AreaColorKey } from '../design/colors.ts';
+import { pickTextColor } from '../lib/contrast.ts';
 
 // Placeholder names until the team delivers the final seven areas.
 // To rename an area, change `label` (and `matches` for the CSV values); keep `slug` stable

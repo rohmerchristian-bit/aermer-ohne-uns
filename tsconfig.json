@@ -1,5 +1,10 @@
 {
   "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    // The data script runs with Node's built-in TypeScript support: only erasable syntax,
+    // relative imports with explicit .ts extensions.
+    "erasableSyntaxOnly": true
+  },
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"]
 }

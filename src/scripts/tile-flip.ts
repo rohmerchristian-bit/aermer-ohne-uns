@@ -24,6 +24,12 @@ function setup(tile: HTMLElement): void {
 
   setFlipped(tile, tile.classList.contains('is-flipped'), false);
 
+  // The back image is lazy-loaded; start loading as soon as someone approaches the tile,
+  // so it is ready when the card turns.
+  const preload = () => tile.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((img) => (img.loading = 'eager'));
+  tile.addEventListener('pointerenter', preload, { once: true });
+  tile.addEventListener('focusin', preload, { once: true });
+
   tile.querySelector('[data-tile-open]')?.addEventListener('click', () => setFlipped(tile, true, true));
   tile.querySelector('[data-tile-close]')?.addEventListener('click', () => setFlipped(tile, false, true));
   tile.addEventListener('keydown', (event) => {

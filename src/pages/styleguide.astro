@@ -8,7 +8,7 @@ import { base, signal, textCandidates } from '../design/colors';
 import { areas } from '../data/areas';
 import { contrastRatio, pickTextColor } from '../lib/contrast';
 import { formatCompact, formatCut, formatEuro } from '../lib/format';
-import { styleguideSamples } from '../data/styleguide-samples';
+import { institutions, sortedForGrid } from '../data/index.ts';
 
 // Internal page for design approval. Not linked, not indexed.
 
@@ -24,9 +24,7 @@ const swatches = [
 });
 
 const mutedOnPaper = contrastRatio(base.muted, base.paper);
-// Separate slugs so element ids stay unique on this page.
-const frontSample = { ...styleguideSamples[1]!, slug: 'beispiel-lernwerkstatt-vorderseite' };
-const flippedSample = { ...styleguideSamples[1]!, slug: 'beispiel-lernwerkstatt-rueckseite' };
+const demo = institutions.find((i) => i.image) ?? institutions[0]!;
 ---
 
 <Base title="Styleguide" noindex>
@@ -158,13 +156,14 @@ const flippedSample = { ...styleguideSamples[1]!, slug: 'beispiel-lernwerkstatt-
         <h2 id="sg-kachel">Kachel</h2>
         <p>
           Klick, Tap, Enter oder Leertaste dreht die Kachel um, Escape dreht zurück. Bei reduzierter Bewegung wird
-          überblendet. Ohne JavaScript stehen beide Seiten untereinander. Beispiele: geprüfter Betrag, Angabe der
-          Einrichtung, sehr langer Text, kein Betrag.
+          überblendet. Ohne JavaScript stehen beide Seiten untereinander. Die Kacheln kommen aus den Beispieldaten
+          (data/sample/): mit und ohne Bild, Logo, geprüfter Betrag, Angabe der Einrichtung, sehr langer Text,
+          unlesbarer Betrag.
         </p>
       </div>
       <ul class="tile-grid" role="list">
         {
-          styleguideSamples.map((inst) => (
+          sortedForGrid().map((inst) => (
             <li>
               <Tile institution={inst} />
             </li>
@@ -174,8 +173,8 @@ const flippedSample = { ...styleguideSamples[1]!, slug: 'beispiel-lernwerkstatt-
 
       <h3 class="sg-subhead">Vorder- und Rückseite nebeneinander</h3>
       <ul class="tile-grid" role="list">
-        <li><Tile institution={frontSample} headingLevel={4} /></li>
-        <li><Tile institution={flippedSample} headingLevel={4} flipped /></li>
+        <li><Tile institution={demo} headingLevel={4} idSuffix="-vorn" /></li>
+        <li><Tile institution={demo} headingLevel={4} idSuffix="-hinten" flipped /></li>
       </ul>
     </div>
   </section>

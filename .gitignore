@@ -20,3 +20,7 @@ node_modules/
 
 # local tool configuration
 .claude/
+
+# generated at build time
+src/generated/
+public/media/

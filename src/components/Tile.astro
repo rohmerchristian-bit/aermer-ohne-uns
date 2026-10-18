@@ -12,15 +12,19 @@ interface Props {
   headingLevel?: 2 | 3 | 4;
   /** Static demo state for the styleguide: render the back side. */
   flipped?: boolean;
+  /** Keeps element ids unique when the same institution appears twice on a page. */
+  idSuffix?: string;
 }
 
-const { institution: inst, headingLevel = 3, flipped = false } = Astro.props;
+const { institution: inst, headingLevel = 3, flipped = false, idSuffix = '' } = Astro.props;
 const area = getArea(inst.area);
-const id = `tile-${inst.slug}`;
+const id = `tile-${inst.slug}${idSuffix}`;
 const Heading = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
 
 const CONSEQUENCES_MAX = 280;
 const QUOTE_MAX = 110;
+// Tile width per breakpoint (see .tile-grid in src/styles/layout.css).
+const IMAGE_SIZES = '(min-width: 96em) 22rem, (min-width: 64em) 30vw, (min-width: 40em) 46vw, 92vw';
 
 const sourceLabel =
   inst.amount === null
@@ -79,21 +83,32 @@ const externalLabel = inst.infoLink ? 'Stellungnahme' : 'Website';
       <figure class="tile__media">
         {
           inst.image ? (
-            <img
-              src={inst.image.src}
-              width={inst.image.width}
-              height={inst.image.height}
-              alt={inst.image.alt}
-              loading="lazy"
-              decoding="async"
-            />
+            <picture class:list={['tile__picture', `tile__picture--${inst.image.kind}`]}>
+              {inst.image.sources.map((source) => (
+                <source type={source.type} srcset={source.srcset} sizes={IMAGE_SIZES} />
+              ))}
+              <img
+                src={inst.image.src}
+                width={inst.image.width}
+                height={inst.image.height}
+                alt={inst.image.alt}
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
           ) : (
             <div class="tile__placeholder" aria-hidden="true">
               {initials(inst.name)}
             </div>
           )
         }
-        {inst.image?.credit && <figcaption class="tile__credit">Foto: {inst.image.credit}</figcaption>}
+        {
+          inst.image?.credit && (
+            <figcaption class="tile__credit">
+              {inst.image.kind === 'logo' ? 'Bild' : 'Foto'}: {inst.image.credit}
+            </figcaption>
+          )
+        }
       </figure>
 
       <div class="tile__back-body">
@@ -321,10 +336,24 @@ const externalLabel = inst.infoLink ? 'Stellungnahme' : 'Website';
     background: var(--area-bg);
   }
 
-  .tile__media img {
+  .tile__picture,
+  .tile__picture img {
     width: 100%;
     height: 100%;
+  }
+
+  .tile__picture--photo img {
     object-fit: cover;
+  }
+
+  /* Logos are never cropped: shown whole on white. */
+  .tile__picture--logo {
+    padding: var(--space-4);
+    background: var(--color-white);
+  }
+
+  .tile__picture--logo img {
+    object-fit: contain;
   }
 
   .tile__placeholder {

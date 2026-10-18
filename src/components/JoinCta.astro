@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/paths.ts';
 import { settings } from '../data/index.ts';
 import IconExternal from './icons/IconExternal.astro';
 
@@ -30,7 +31,7 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
             </a>
             <p class="join__note small">
               Das Formular läuft über Google Formulare. Beim Öffnen gelten die Datenschutzbestimmungen von Google.
-              Mehr dazu in unserer <a href="/datenschutz/#google-formular">Datenschutzerklärung</a>.
+              Mehr dazu in unserer <a href={url('/datenschutz/#google-formular')}>Datenschutzerklärung</a>.
             </p>
           </>
         ) : (

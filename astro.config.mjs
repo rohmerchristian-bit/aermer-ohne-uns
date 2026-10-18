@@ -6,6 +6,8 @@ const env = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), '');
 
 export default defineConfig({
   site: env.SITE_URL || 'https://aermer-ohne-uns.example',
+  // Sub-folder for the GitHub Pages preview (e.g. /aermer-ohne-uns). Leave empty for the domain root.
+  base: env.BASE_PATH || '/',
   trailingSlash: 'always',
   build: {
     format: 'directory',

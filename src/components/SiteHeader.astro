@@ -1,8 +1,9 @@
 ---
+import { stripBase, url } from '../lib/paths.ts';
 import { settings } from '../data/index.ts';
 
 // Main navigation. Works without JavaScript: links wrap below the logo on small screens.
-const path = Astro.url.pathname;
+const path = stripBase(Astro.url.pathname);
 const items = [
   { href: '/einrichtungen/', label: 'Betroffene' },
   { href: '/hintergrund/', label: 'Hintergrund' },
@@ -20,7 +21,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
 }
 <header class="site-header">
   <div class="container site-header__inner">
-    <a class="site-header__logo" href="/" aria-current={path === '/' ? 'page' : undefined}>
+    <a class="site-header__logo" href={url('/')} aria-current={path === '/' ? 'page' : undefined}>
       Ärmer ohne uns<span class="visually-hidden"> – Startseite</span>
     </a>
     <nav aria-label="Hauptnavigation">
@@ -28,7 +29,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
         {
           items.map((item) => (
             <li>
-              <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+              <a href={url(item.href)} aria-current={isCurrent(item.href) ? 'page' : undefined}>
                 {item.label}
               </a>
             </li>
@@ -36,7 +37,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
         }
       </ul>
     </nav>
-    <a class="btn btn--signal site-header__donate" href="/#spenden">Spenden</a>
+    <a class="btn btn--signal site-header__donate" href={url('/#spenden')}>Spenden</a>
   </div>
 </header>
 

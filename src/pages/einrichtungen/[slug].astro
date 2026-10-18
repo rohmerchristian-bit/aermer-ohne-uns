@@ -1,4 +1,5 @@
 ---
+import { srcsetUrl, url } from '../../lib/paths.ts';
 import Page from '../../layouts/Page.astro';
 import TileGrid from '../../components/TileGrid.astro';
 import ExternalLink from '../../components/ExternalLink.astro';
@@ -25,7 +26,7 @@ const related = sortedForGrid(institutions.filter((i) => i.area === inst.area &&
 const paragraphs = (text: string | null) => (text ? text.split(/\n{2,}/).map((p) => p.split('\n')) : []);
 const socialLinks = inst.links.filter((l) => l !== inst.website);
 const linkLabel = (url: string) => new URL(url).hostname.replace(/^www\./, '');
-const pageUrl = new URL(`/einrichtungen/${inst.slug}/`, Astro.site).toString();
+const pageUrl = new URL(url(`/einrichtungen/${inst.slug}/`), Astro.site).toString();
 
 const description = truncate(
   [inst.amount !== null ? `${formatCut(inst.amount)} pro Jahr.` : null, inst.project, inst.consequences]
@@ -47,7 +48,7 @@ const sections = [
     <header class="detail__head">
       <div class="container detail__head-inner">
         <p class="detail__back">
-          <a href="/einrichtungen/">Alle Einrichtungen</a>
+          <a href={url('/einrichtungen/')}>Alle Einrichtungen</a>
         </p>
         <p class="label">{area.label}</p>
         <h1 id="detail-titel" class="detail__name">{inst.name}</h1>
@@ -73,10 +74,10 @@ const sections = [
           inst.image ? (
             <picture>
               {inst.image.sources.map((source) => (
-                <source type={source.type} srcset={source.srcset} sizes="(min-width: 64em) 40vw, 92vw" />
+                <source type={source.type} srcset={srcsetUrl(source.srcset)} sizes="(min-width: 64em) 40vw, 92vw" />
               ))}
               <img
-                src={inst.image.src}
+                src={url(inst.image.src)}
                 width={inst.image.width}
                 height={inst.image.height}
                 alt={inst.image.alt}
@@ -187,7 +188,7 @@ const sections = [
           </div>
           <TileGrid institutions={related} />
           <p class="detail__all">
-            <a href={`/einrichtungen/?bereich=${area.slug}`}>
+            <a href={url(`/einrichtungen/?bereich=${area.slug}`)}>
               Alle aus dem Bereich {area.label} <IconArrow />
             </a>
           </p>

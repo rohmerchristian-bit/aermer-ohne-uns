@@ -210,3 +210,15 @@ a:hover {
     scroll-behavior: auto !important;
   }
 }
+
+/* Shown only in preview builds (PREVIEW=1). */
+.preview-banner {
+  max-width: none;
+  margin: 0;
+  padding: var(--space-2) var(--gutter);
+  background: var(--color-ink);
+  color: var(--color-signal);
+  font-size: var(--fs-small);
+  font-weight: 800;
+  text-align: center;
+}

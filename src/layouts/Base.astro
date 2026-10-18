@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/paths.ts';
 import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/base.css';
@@ -16,6 +17,9 @@ const SITE_NAME = 'Ärmer ohne uns';
 const { title, description = 'Welche Einrichtungen in Erlangen von den Kürzungen im Haushalt 2027 betroffen sind – und was verloren geht.', noindex = false } = Astro.props;
 const fullTitle = title === SITE_NAME ? `${SITE_NAME} – #ÄrmerOhneUns` : `${title} – ${SITE_NAME}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+// PREVIEW=1: public preview build (GitHub Pages) – never indexed, clearly labelled.
+const isPreview = process.env.PREVIEW === '1';
+const robotsNoindex = noindex || isPreview;
 ---
 
 <!doctype html>
@@ -25,7 +29,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    {noindex ? <meta name="robots" content="noindex, nofollow" /> : <link rel="canonical" href={canonical} />}
+    {robotsNoindex ? <meta name="robots" content="noindex, nofollow" /> : <link rel="canonical" href={canonical} />}
     <meta name="theme-color" content="#111111" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="de_DE" />
@@ -34,12 +38,20 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <slot name="head" />
-    <link rel="preload" href="/fonts/archivo/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="/tokens.css" />
-    <noscript><link rel="stylesheet" href="/styles/noscript.css" /></noscript>
+    <link rel="preload" href={url('/fonts/archivo/archivo-latin-wdth-normal.woff2')} as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href={url('/tokens.css')} />
+    <noscript><link rel="stylesheet" href={url('/styles/noscript.css')} /></noscript>
   </head>
   <body>
     <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+    {
+      isPreview && (
+        <p class="preview-banner">
+          Vorschau mit Beispieldaten – noch nicht veröffentlicht. Alle Einrichtungen und Zahlen auf den Kacheln sind
+          erfunden.
+        </p>
+      )
+    }
     <slot name="header" />
     <main id="inhalt">
       <slot />

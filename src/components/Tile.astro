@@ -1,4 +1,5 @@
 ---
+import { srcsetUrl, url } from '../lib/paths.ts';
 import type { Institution } from '../data/types';
 import { getArea } from '../data/areas';
 import { formatCut, initials, truncate } from '../lib/format';
@@ -79,10 +80,10 @@ const externalLabel = inst.infoLink ? 'Stellungnahme' : 'Website';
           inst.image ? (
             <picture class:list={['tile__picture', `tile__picture--${inst.image.kind}`]}>
               {inst.image.sources.map((source) => (
-                <source type={source.type} srcset={source.srcset} sizes={IMAGE_SIZES} />
+                <source type={source.type} srcset={srcsetUrl(source.srcset)} sizes={IMAGE_SIZES} />
               ))}
               <img
-                src={inst.image.src}
+                src={url(inst.image.src)}
                 width={inst.image.width}
                 height={inst.image.height}
                 alt={inst.image.alt}
@@ -118,7 +119,7 @@ const externalLabel = inst.infoLink ? 'Stellungnahme' : 'Website';
 
       <ul class="tile__links" role="list">
         <li>
-          <a href={`/einrichtungen/${inst.slug}/`}>
+          <a href={url(`/einrichtungen/${inst.slug}/`)}>
             Mehr erfahren <IconArrow />
             <span class="visually-hidden"> über {inst.name}</span>
           </a>

@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/paths.ts';
 import { areas } from '../data/areas.ts';
 import type { Institution } from '../data/types.ts';
 
@@ -16,7 +17,7 @@ const used = areas.filter((a) => institutions.some((i) => i.area === a.slug));
       <ul role="list">
         {used.map((area) => (
           <li data-area={area.slug}>
-            <a href={`/einrichtungen/?bereich=${area.slug}`}>
+            <a href={url(`/einrichtungen/?bereich=${area.slug}`)}>
               <span class="area-links__swatch" aria-hidden="true" />
               {area.label}
             </a>

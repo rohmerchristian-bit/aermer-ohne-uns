@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/paths.ts';
 import Base from '../layouts/Base.astro';
 import Tile from '../components/Tile.astro';
 import IconArrow from '../components/icons/IconArrow.astro';
@@ -104,7 +105,7 @@ const demo = institutions.find((i) => i.image) ?? institutions[0]!;
 
       <p class="sg-spec label">Links</p>
       <p>
-        <a href="/styleguide/">Interner Link mit Unterstreichung</a> ·
+        <a href={url('/styleguide/')}>Interner Link mit Unterstreichung</a> ·
         <a href="https://example.org" target="_blank" rel="noopener">
           Externer Link <IconExternal /><span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
         </a>

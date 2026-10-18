@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/paths.ts';
 import Page from '../layouts/Page.astro';
 import IconArrow from '../components/icons/IconArrow.astro';
 ---
@@ -13,8 +14,8 @@ import IconArrow from '../components/icons/IconArrow.astro';
         Lücke leicht schließen lässt.
       </p>
       <div class="nf__actions">
-        <a class="btn" href="/">Zur Startseite <IconArrow /></a>
-        <a class="btn btn--outline" href="/einrichtungen/">Betroffene ansehen</a>
+        <a class="btn" href={url('/')}>Zur Startseite <IconArrow /></a>
+        <a class="btn btn--outline" href={url('/einrichtungen/')}>Betroffene ansehen</a>
       </div>
     </div>
   </section>

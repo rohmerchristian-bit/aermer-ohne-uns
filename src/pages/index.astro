@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/paths.ts';
 import Page from '../layouts/Page.astro';
 import BudgetFacts from '../components/BudgetFacts.astro';
 import Timeline from '../components/Timeline.astro';
@@ -52,7 +53,7 @@ const withAmount = institutions.filter((i) => i.amount !== null).length;
       <div class="hero__actions">
         {
           institutionCount > 0 && (
-            <a class="btn" href="/einrichtungen/">
+            <a class="btn" href={url('/einrichtungen/')}>
               {institutionCount} Betroffene ansehen <IconArrow />
             </a>
           )
@@ -76,7 +77,7 @@ const withAmount = institutions.filter((i) => i.amount !== null).length;
       <h3 class="home__timeline-title">So geht es weiter</h3>
       <Timeline />
       <p class="home__more">
-        <a href="/hintergrund/">Alle Zahlen und Quellen <IconArrow /></a>
+        <a href={url('/hintergrund/')}>Alle Zahlen und Quellen <IconArrow /></a>
       </p>
     </div>
   </section>
@@ -92,7 +93,7 @@ const withAmount = institutions.filter((i) => i.amount !== null).length;
           </div>
           <TileGrid institutions={tiles} />
           <p class="home__more">
-            <a class="btn btn--outline" href="/einrichtungen/">
+            <a class="btn btn--outline" href={url('/einrichtungen/')}>
               Alle {institutionCount} Einrichtungen <IconArrow />
             </a>
           </p>

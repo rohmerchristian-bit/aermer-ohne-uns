@@ -4,7 +4,7 @@ Gesammelte Erweiterungen, die noch nicht eingeplant sind.
 
 ## Karte der betroffenen Einrichtungen (OpenStreetMap)
 
-*Vorschlag vom 18.10.2026*
+*Vorschlag vom 18.10.2026 – eingeplant nach Phase 7 (wenn die Grundseite steht)*
 
 Alle betroffenen Einrichtungen auf einer Karte von Erlangen zeigen, platziert über die Angabe
 „Standort / Adresse“ – damit sichtbar wird, wie sich die Kürzungen über die Stadt verteilen.

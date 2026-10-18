@@ -117,7 +117,7 @@ export const columns: readonly ColumnDef[] = [
     headerStartsWith: ['Mit dem Hochladen bestätigen wir, dass wir die erforderlichen Nutzungsrechte'],
   },
   { key: 'mailingList', header: 'Aufnahme in den Bündnis-Verteiler', visibility: 'private' },
-  { key: 'approved', header: 'Freigegeben', visibility: 'filter', required: true },
+  { key: 'approved', header: 'Freigegeben', visibility: 'filter', required: true, aliases: ['Freigeben'] },
   { key: 'amountVerified', header: 'Betrag_geprüft', visibility: 'public' },
   { key: 'featured', header: 'Hervorheben', visibility: 'public' },
 ];

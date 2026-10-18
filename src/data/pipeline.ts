@@ -37,6 +37,15 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
   const [header, ...rows] = table;
   if (!header) throw new DataError('Die Tabelle „Öffentlich“ ist leer – es wurde keine Kopfzeile gefunden.');
 
+  // Google Sheets formula errors (#REF!, #NAME?, #N/A, #VALUE!, #ERROR!) end up in the header row.
+  const formulaError = header.find((h) => /^#(REF!|NAME\?|N\/A|VALUE!|ERROR!|DIV\/0!)/i.test(h.trim()));
+  if (formulaError) {
+    throw new DataError(
+      `Die Formel im Blatt „Öffentlich“ liefert den Fehler „${formulaError.trim()}“. ` +
+        'Meist stimmt der Name des Quellblatts nicht (z. B. „Formularantworten 1“ – dann in Anführungszeichen: \'Formularantworten 1\'!A:Y).',
+    );
+  }
+
   // Map column index -> key, allowlisted keys only.
   const indexOf = new Map<ColumnKey, number>();
   header.forEach((title, index) => {

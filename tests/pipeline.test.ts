@@ -31,6 +31,7 @@ describe('column mapping', () => {
   it('knows the titles used in the live form', () => {
     expect(findColumn('Betroffenes Projekt / Angebot: Welche konkreten Folgen hat die Kürzung?')?.key).toBe('project');
     expect(findColumn('Absagen von Angeboten, Stellenabbau, Schließzeiten, etc.')?.key).toBe('consequences');
+    expect(findColumn('Freigeben')?.key).toBe('approved');
   });
 
   it('has unique keys and unique headers', () => {
@@ -48,6 +49,10 @@ describe('column mapping', () => {
     const table = sheet(['name', 'area', 'approved'], [{ name: 'A', area: 'Kultur', approved: 'TRUE' }]);
     expect(() => runPipeline(table, OPTIONS)).toThrow(DataError);
     expect(() => runPipeline(table, OPTIONS)).toThrow(/Pflichtspalten: „Freigabe zur Veröffentlichung“/);
+  });
+
+  it('explains formula errors in the published sheet', () => {
+    expect(() => runPipeline([['#REF!']], OPTIONS)).toThrow(/Formel im Blatt „Öffentlich“ liefert den Fehler „#REF!“/);
   });
 
   it('warns about unknown columns and ignores them', () => {

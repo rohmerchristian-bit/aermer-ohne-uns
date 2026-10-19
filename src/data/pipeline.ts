@@ -101,6 +101,13 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
     };
     const text = (key: ColumnKey): string | null => cleanText(read(key));
 
+    // A copy of the header row (e.g. from a faulty sheet formula) is never an entry.
+    const nameIndex = indexOf.get('name')!;
+    if ((row[nameIndex] ?? '').trim() === (header[nameIndex] ?? '').trim()) {
+      warn(`Zeile ${line} wiederholt die Kopfzeile und wird ignoriert – bitte die Formel im Blatt „Öffentlich“ prüfen.`);
+      return;
+    }
+
     if (!isChecked(read('approved'))) {
       stats.notApproved++;
       return;

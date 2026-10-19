@@ -59,6 +59,14 @@ describe('column mapping', () => {
     expect(() => runPipeline([['#REF!']], OPTIONS)).toThrow(/Formel im Blatt „Öffentlich“ liefert den Fehler „#REF!“/);
   });
 
+  it('ignores a repeated header row', () => {
+    const table = sheet(BASE_KEYS, [{ name: 'A', area: 'Kultur', ...ok }]);
+    table.splice(1, 0, [...table[0]!]);
+    const result = runPipeline(table, OPTIONS);
+    expect(result.entries.map((e) => e.institution.name)).toEqual(['A']);
+    expect(result.messages.some((m) => m.message.includes('wiederholt die Kopfzeile'))).toBe(true);
+  });
+
   it('warns about unknown columns and ignores them', () => {
     const table = sheet(BASE_KEYS, [{ name: 'A', area: 'Kultur', ...ok }]);
     table[0]!.push('Neue Frage');

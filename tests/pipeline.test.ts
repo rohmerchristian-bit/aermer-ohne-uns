@@ -35,7 +35,9 @@ describe('column mapping', () => {
     expect(findColumn('Logo-Upload für euer Profil auf der Plattform')?.key).toBe('imageUrls');
     // New private questions must be recognised as private, not as "unknown".
     expect(findColumn('E-Mail-Adresse')?.visibility).toBe('private');
-    expect(findColumn('Ich möchte dabei sein und als Teil des Bündnis "ÄrmerOhneUns" an dem Dialog teilnehmen …')?.visibility).toBe('private');
+    expect(findColumn('Ich möchte dabei sein und als Teil des Bündnis "ÄrmerOhneUns" an dem Demo mit meiner Organisation teilnehmen (kostenlos).')?.key).toBe('demo');
+    expect(findColumn('Wie könnte man Euch helfen, wenn es zur Einsparung kommt?')?.visibility).toBe('private');
+    expect(findColumn(' Aufnahme in den Bündnis-Verteiler')?.key).toBe('mailingList');
   });
 
   it('has unique keys and unique headers', () => {
@@ -86,6 +88,8 @@ describe('privacy allowlist', () => {
     actions: 'GEHEIM-AKTION am Rathaus',
     rooms: 'GEHEIM-RAUM Keller',
     mailingList: 'GEHEIM-VERTEILER ja',
+    demo: 'GEHEIM-DEMO Redebeitrag',
+    help: 'GEHEIM-HILFE Spende',
   };
   const row = {
     ...SECRET,
@@ -186,6 +190,21 @@ describe('field rules', () => {
     const result = runPipeline(sheet(keys, [{ name: 'A', area: 'Kunst & Soziales', ...ok }]), OPTIONS);
     expect(result.entries[0]!.institution.area).toBe('sonstiges');
     expect(result.messages.some((m) => m.message.includes('Unbekannter Bereich „Kunst & Soziales“'))).toBe(true);
+  });
+
+  it('maps the area answers exactly as offered in the form', () => {
+    const answers = [
+      ['Kultur & Kunst', 'kultur'],
+      ['Bildung & Schule / Weiterbildung', 'bildung'],
+      ['Soziales, Familie & Senioren', 'soziales'],
+      ['Kinder & Jugend', 'jugend'],
+      ['Sport & Freizeit', 'sport'],
+      ['Umwelt & Nachhaltigkeit', 'umwelt'],
+      ['Sonstiges', 'sonstiges'],
+    ];
+    const result = runPipeline(sheet(keys, answers.map(([area], i) => ({ name: `E${i}`, area, ...ok }))), OPTIONS);
+    expect(result.entries.map((e) => e.institution.area)).toEqual(answers.map(([, slug]) => slug));
+    expect(result.messages.filter((m) => m.message.includes('Unbekannter Bereich'))).toHaveLength(0);
   });
 
   it('matches areas case-insensitively', () => {

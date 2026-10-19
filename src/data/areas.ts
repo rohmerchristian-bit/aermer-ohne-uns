@@ -1,8 +1,8 @@
 import { areaColors, textCandidates, type AreaColorKey } from '../design/colors.ts';
 import { pickTextColor } from '../lib/contrast.ts';
 
-// Placeholder names until the team delivers the final seven areas.
-// To rename an area, change `label` (and `matches` for the CSV values); keep `slug` stable
+// The seven areas exactly as offered in the Google Form ("Zu welchem Bereich gehört …?").
+// To rename an area: change `label` and add the new form wording to `matches`; keep `slug` stable,
 // because it appears in URLs (?bereich=kultur) and in the colour tokens.
 
 export interface Area {
@@ -16,12 +16,12 @@ export interface Area {
 }
 
 const definitions: Array<Omit<Area, 'color' | 'textColor'>> = [
-  { slug: 'kultur', label: 'Kultur', matches: ['kultur'] },
-  { slug: 'bildung', label: 'Bildung', matches: ['bildung'] },
-  { slug: 'soziales', label: 'Soziales', matches: ['soziales'] },
-  { slug: 'jugend', label: 'Jugend', matches: ['jugend'] },
-  { slug: 'sport', label: 'Sport', matches: ['sport'] },
-  { slug: 'umwelt', label: 'Umwelt', matches: ['umwelt'] },
+  { slug: 'kultur', label: 'Kultur & Kunst', matches: ['kultur & kunst', 'kultur'] },
+  { slug: 'bildung', label: 'Bildung & Schule / Weiterbildung', matches: ['bildung & schule / weiterbildung', 'bildung'] },
+  { slug: 'soziales', label: 'Soziales, Familie & Senioren', matches: ['soziales, familie & senioren', 'soziales'] },
+  { slug: 'jugend', label: 'Kinder & Jugend', matches: ['kinder & jugend', 'jugend'] },
+  { slug: 'sport', label: 'Sport & Freizeit', matches: ['sport & freizeit', 'sport'] },
+  { slug: 'umwelt', label: 'Umwelt & Nachhaltigkeit', matches: ['umwelt & nachhaltigkeit', 'umwelt'] },
   { slug: 'sonstiges', label: 'Sonstiges', matches: ['sonstiges'] },
 ];
 

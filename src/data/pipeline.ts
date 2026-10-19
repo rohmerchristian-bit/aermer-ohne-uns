@@ -172,7 +172,7 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
 }
 
 function resolveArea(raw: string, warn: (msg: string) => void): Institution['area'] {
-  const value = raw.trim().toLowerCase();
+  const value = raw.replace(/\s+/g, ' ').trim().toLowerCase();
   const match = areas.find((a) => a.matches.includes(value) || a.label.toLowerCase() === value);
   if (match) return match.slug;
   warn(value ? `Unbekannter Bereich „${raw.trim()}“ – wird unter „Sonstiges“ einsortiert.` : 'Kein Bereich angegeben – wird unter „Sonstiges“ einsortiert.');

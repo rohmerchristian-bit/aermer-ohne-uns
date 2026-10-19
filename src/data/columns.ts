@@ -25,6 +25,8 @@ export type ColumnKey =
   | 'imageCredit'
   | 'actions'
   | 'rooms'
+  | 'help'
+  | 'demo'
   | 'consentPublish'
   | 'consentImages'
   | 'mailingList'
@@ -57,7 +59,13 @@ export interface ColumnDef {
 export const columns: readonly ColumnDef[] = [
   { key: 'submittedAt', header: 'Zeitstempel', visibility: 'private' },
   { key: 'name', header: 'Name der Institution / Einrichtung', visibility: 'public', required: true },
-  { key: 'area', header: 'Zu welchem Bereich gehört eure Einrichtung?', visibility: 'public', required: true },
+  {
+    key: 'area',
+    header: 'Zu welchem Bereich gehört eure Einrichtung?',
+    visibility: 'public',
+    required: true,
+    aliases: ['Zu welchem Bereich gehört das Projekt / Angebot?'],
+  },
   { key: 'address', header: 'Standort / Adresse', visibility: 'public' },
   {
     key: 'contact',
@@ -88,7 +96,12 @@ export const columns: readonly ColumnDef[] = [
     header: 'Welche Zuschüsse / Mittel sollen gestrichen oder gekürzt werden?',
     visibility: 'public',
   },
-  { key: 'amountReported', header: 'Geplante Kürzung in Euro pro Jahr', visibility: 'public' },
+  {
+    key: 'amountReported',
+    header: 'Geplante Kürzung in Euro pro Jahr',
+    visibility: 'public',
+    aliases: ['Geplante Kürzung 2027 in Euro'],
+  },
   { key: 'amountSource', header: 'Quelle des Betrags', visibility: 'public' },
   {
     key: 'consequences',
@@ -106,9 +119,14 @@ export const columns: readonly ColumnDef[] = [
     key: 'imageUrls',
     header: 'Bild-/Logo-Upload für euer Profil auf der Plattform',
     visibility: 'public',
-    aliases: ['Logo-Upload für euer Profil auf der Plattform'],
+    aliases: ['Logo-Upload für euer Profil auf der Plattform', 'Logo der Einrichtung'],
   },
-  { key: 'imageCredit', header: 'Bildnachweis (Fotograf*in / Rechteinhaber)', visibility: 'public' },
+  {
+    key: 'imageCredit',
+    header: 'Bildnachweis (Fotograf*in / Rechteinhaber)',
+    visibility: 'public',
+    aliases: ['Bildnachweis zum Logo'],
+  },
   {
     key: 'actions',
     header: 'Plant ihr eigene Aktionen, Proteste oder Veranstaltungen zur Kürzungswelle? Wenn ja, welche?',
@@ -126,11 +144,19 @@ export const columns: readonly ColumnDef[] = [
     visibility: 'filter',
     headerStartsWith: ['Mit dem Hochladen bestätigen wir, dass wir die erforderlichen Nutzungsrechte'],
   },
+  { key: 'mailingList', header: 'Aufnahme in den Bündnis-Verteiler', visibility: 'private' },
   {
-    key: 'mailingList',
-    header: 'Aufnahme in den Bündnis-Verteiler',
+    // Demo registration (section "Demo // 18.11.2026"): internal only.
+    key: 'demo',
+    header: 'Ich möchte dabei sein und als Teil des Bündnis "ÄrmerOhneUns" an dem Demo mit meiner Organisation teilnehmen (kostenlos).',
     visibility: 'private',
     headerStartsWith: ['Ich möchte dabei sein und als Teil des Bündnis'],
+  },
+  {
+    // Private until the initiative decides whether help offers are shown on the website.
+    key: 'help',
+    header: 'Wie könnte man Euch helfen, wenn es zur Einsparung kommt?',
+    visibility: 'private',
   },
   { key: 'approved', header: 'Freigegeben', visibility: 'filter', required: true, aliases: ['Freigeben'] },
   { key: 'amountVerified', header: 'Betrag_geprüft', visibility: 'public' },

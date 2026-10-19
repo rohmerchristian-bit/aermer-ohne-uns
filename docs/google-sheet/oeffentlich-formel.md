@@ -8,7 +8,7 @@ In das Blatt „Öffentlich“, Zelle **A1** (alles andere im Blatt leer lassen)
 
 ```
 =LET(
-  daten; 'Formularantworten 1'!A1:AZ;
+  daten; Formularantworten!A1:AZ;
   kopf; CHOOSEROWS(daten; 1);
   spalten; XMATCH({"*Name der Institution*"\"*Zu welchem Bereich*"\"*Standort*"\"*Website*"\"*Was tut eure Institution*"\"*Wen erreicht*"\"*Geplante Kürzung*"\"*Welche Zuschüsse*"\"*Betroffenes Projekt*"\"*Absagen von Angeboten*"\"*Prägnantes Zitat*"\"*Link zu weiterführenden*"\"*Bildnachweis*"\"*Logo-Upload*"\"*Freigabe zur Veröffentlichung*"\"*Mit dem Hochladen*"\"*Freigeben*"\"*Betrag_geprüft*"\"*Hervorheben*"}; kopf; 2);
   freigegeben; FILTER(daten; CHOOSECOLS(daten; XMATCH("*Freigeben*"; kopf; 2)) = TRUE);
@@ -16,7 +16,8 @@ In das Blatt „Öffentlich“, Zelle **A1** (alles andere im Blatt leer lassen)
 )
 ```
 
-- `'Formularantworten 1'` durch den genauen Namen eures Antwort-Tabs ersetzen (in einfachen Anführungszeichen).
+- `Formularantworten` ist der Name eures Antwort-Tabs. Wird er umbenannt, hier anpassen; enthält der neue
+  Name Leerzeichen, muss er in einfache Anführungszeichen (`'Neuer Name'!A1:AZ`).
 - Die Formel ist für deutsche Spracheinstellung geschrieben (`;` zwischen Argumenten, `\` zwischen
   Spalten im `{…}`-Block).
 - Sie übernimmt nur Zeilen, in denen „Freigeben“ angehakt ist.

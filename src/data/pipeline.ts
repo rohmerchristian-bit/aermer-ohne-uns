@@ -47,7 +47,8 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
   if (formulaError) {
     throw new DataError(
       `Die Formel im Blatt „Öffentlich“ liefert den Fehler „${formulaError.trim()}“. ` +
-        'Meist stimmt der Name des Quellblatts nicht (z. B. „Formularantworten 1“ – dann in Anführungszeichen: \'Formularantworten 1\'!A:Y).',
+        'Meist stimmt der Name des Quellblatts in der Formel nicht (aktuell: „Formularantworten“) oder eine Überschrift ' +
+        'wurde im Formular umbenannt. Siehe docs/google-sheet/oeffentlich-formel.md.',
     );
   }
 

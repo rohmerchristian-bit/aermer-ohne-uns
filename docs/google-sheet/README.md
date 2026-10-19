@@ -5,19 +5,19 @@ Sheet und schickt dem Prüf-Team eine E-Mail. Es läuft in Google, nicht auf der
 
 ## Einrichtung (einmalig, ca. 10 Minuten)
 
-1. **Zwei Spalten anlegen.** Im Blatt mit den Formularantworten ganz rechts zwei neue Spaltenköpfe in
-   Zeile 1 eintragen: `Status` und `Zuletzt eingegangen`. Das Skript findet sie über die Überschrift,
-   die Lage ist egal. Die Formel im Blatt „Öffentlich“ ([oeffentlich-formel.md](oeffentlich-formel.md))
-   übernimmt sie nicht.
-2. **Skript einfügen.** Im Sheet: *Erweiterungen → Apps Script*. Den Inhalt von `benachrichtigung.gs`
+1. **Skript einfügen.** Im Sheet: *Erweiterungen → Apps Script*. Den Inhalt von `benachrichtigung.gs`
    hineinkopieren, oben bei `EMPFAENGER` die E-Mail-Adresse(n) des Prüf-Teams eintragen, speichern.
-3. **Trigger anlegen.** In Apps Script links auf das Uhr-Symbol (*Trigger*) → *Trigger hinzufügen*:
+2. **Einrichten ausführen.** Oben in der Funktionsauswahl `einrichten` wählen → *Ausführen*. Beim ersten
+   Mal fragt Google nach Berechtigungen (Tabelle bearbeiten, E-Mails senden) – mit dem Konto bestätigen,
+   dem das Sheet gehört. Das legt die Spalten `Status` und `Zuletzt eingegangen` ganz rechts an und prüft
+   die übrigen Überschriften. Im *Ausführungsprotokoll* steht „Alles bereit“ oder, was fehlt.
+   Die beiden Spalten übernimmt das Blatt „Öffentlich“ nicht ([oeffentlich-formel.md](oeffentlich-formel.md)).
+3. **Trigger anlegen.** Links auf das Uhr-Symbol (*Trigger*) → *Trigger hinzufügen*:
    - Funktion: `beiFormularAntwort`
    - Ereignisquelle: *Aus Tabelle*
    - Ereignistyp: *Bei Formularübermittlung*
-   Speichern und den Zugriff mit dem Google-Konto erlauben, dem das Sheet gehört.
-4. **Testen.** Das Formular einmal selbst ausfüllen. In der neuen Zeile steht dann
-   „Neu – bitte prüfen“, und die E-Mail kommt an. Den Testeintrag danach löschen.
+4. **Testen ohne Formular.** `probelauf` auswählen → *Ausführen*. Es kommt eine Mail mit „[TEST]“ im
+   Betreff zur letzten Antwortzeile; im Sheet wird dabei nichts verändert.
 
 ## Neue Zeilen farbig markieren (ohne Skript)
 

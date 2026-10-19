@@ -16,7 +16,14 @@ class MockItem {
   required = false;
   goTo: MockItem | null = null;
   choices: Choice[] | null = null;
-  constructor(public type: string, public title: string, private list: MockItem[]) {}
+  type: string;
+  title: string;
+  private list: MockItem[];
+  constructor(type: string, title: string, list: MockItem[]) {
+    this.type = type;
+    this.title = title;
+    this.list = list;
+  }
   getTitle() { return this.title; }
   setTitle(t: string) { this.title = t; return this; }
   setHelpText(h: string) { this.help = h; return this; }

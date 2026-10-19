@@ -41,6 +41,9 @@ jobs:
 
       - run: npm test
 
+      - name: Typprüfung
+        run: npm run check
+
       - name: Website bauen (Beispieldaten)
         run: npm run build
 

@@ -214,3 +214,18 @@ function umbauAusfuehren() {
   console.log('Umbau fertig. Jetzt von Hand: Datei-Upload-Frage „Bild oder Logo für dieses Projekt“ vor „Bildnachweis zum Projektbild“.');
   aktualisiereEinrichtungslisteSicher_();
 }
+
+// ---- Nachtrag: „Absagen von Angeboten …“ ------------------------------------
+
+/**
+ * Setzt die ältere Frage „Absagen von Angeboten, Stellenabbau, Schließzeiten, etc.“ direkt hinter
+ * „Welche konkreten Folgen hat die Kürzung?“ (Projekt-Abschnitt). Ändert sonst nichts.
+ */
+function absagenHinterFolgen() {
+  const form = formular_();
+  const absagen = finde_(form, 'Absagen von Angeboten');
+  const folgen = genau_(form, 'Welche konkreten Folgen hat die Kürzung?');
+  if (!absagen || !folgen) throw new Error('Frage „Absagen von Angeboten …“ oder „Welche konkreten Folgen …“ nicht gefunden.');
+  hinter_(form, absagen, folgen);
+  console.log('„Absagen von Angeboten …“ steht jetzt hinter „Welche konkreten Folgen hat die Kürzung?“.');
+}

@@ -58,6 +58,7 @@ function liveForm() {
   q(T.PARAGRAPH_TEXT, 'Was tut eure Institution in Kürze? (Kurzbeschreibung der Arbeit)', true);
   q(T.PARAGRAPH_TEXT, 'Wen erreicht eure Arbeit? (Zielgruppen & Reichweite in Zahlen)');
   q(T.PAGE_BREAK, 'Geplante Kürzungen & Konkrete Folgen');
+  q(T.TEXT, 'Absagen von Angeboten, Stellenabbau, Schließzeiten, etc.');
   q(T.TEXT, 'Geplante Kürzung in Euro pro Jahr');
   q(T.PARAGRAPH_TEXT, 'Welche Zuschüsse / Mittel sollen gestrichen oder gekürzt werden?');
   q(T.PARAGRAPH_TEXT, 'Betroffenes Projekt / Angebot: Welche konkreten Folgen hat die Kürzung?');
@@ -98,8 +99,8 @@ function runScripts(form: unknown) {
     console: quiet,
   };
   // eslint-disable-next-line @typescript-eslint/no-implied-eval
-  const fns = new Function(...Object.keys(env), `${code}\nreturn { umbauAusfuehren, umbauPruefen };`)(...Object.values(env));
-  return { ...fns, logs } as { umbauAusfuehren: () => void; umbauPruefen: () => void; logs: string[] };
+  const fns = new Function(...Object.keys(env), `${code}\nreturn { umbauAusfuehren, umbauPruefen, absagenHinterFolgen };`)(...Object.values(env));
+  return { ...fns, logs } as { umbauAusfuehren: () => void; umbauPruefen: () => void; absagenHinterFolgen: () => void; logs: string[] };
 }
 
 /** Sections as [title, [question titles]] after the rebuild. */
@@ -151,6 +152,19 @@ describe('form rebuild script (docs/google-sheet/formular-umbau.gs)', () => {
     const weiteres = items.find((i) => i.title === 'Weiteres Projekt für eine eingetragene Einrichtung')!;
     expect(weiteres.goTo!.title).toBe('Betroffenes Projekt / Angebot');
     expect(items.find((i) => i.title.startsWith('Mit dem Hochladen'))!.required).toBe(false);
+  });
+
+  it('absagenHinterFolgen() puts the older question right after the consequences', () => {
+    const { items, form } = liveForm();
+    const s = runScripts(form);
+    s.umbauAusfuehren();
+    s.absagenHinterFolgen();
+    const titles = items.map((i) => i.title.trim());
+    const folgen = titles.indexOf('Welche konkreten Folgen hat die Kürzung?');
+    expect(titles[folgen + 1]).toBe('Absagen von Angeboten, Stellenabbau, Schließzeiten, etc.');
+    expect(sections(items).find(([t]) => t === 'Betroffenes Projekt / Angebot')![1]).toContain(
+      'Absagen von Angeboten, Stellenabbau, Schließzeiten, etc.',
+    );
   });
 
   it('does nothing when run a second time', () => {

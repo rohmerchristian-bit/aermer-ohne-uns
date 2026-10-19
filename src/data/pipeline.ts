@@ -35,7 +35,12 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
   const warn = (message: string) => messages.push({ severity: 'warning', message });
 
   const [header, ...rows] = table;
-  if (!header) throw new DataError('Die Tabelle „Öffentlich“ ist leer – es wurde keine Kopfzeile gefunden.');
+  if (!header || header.every((h) => h.trim() === '')) {
+    throw new DataError(
+      'Das Blatt „Öffentlich“ ist leer – es wurde keine Kopfzeile gefunden. Meist liefert die Formel in A1 einen Fehler, ' +
+        'der von IFNA ausgeblendet wird (z. B. eine umbenannte Überschrift). Siehe docs/google-sheet/oeffentlich-formel.md.',
+    );
+  }
 
   // Google Sheets formula errors (#REF!, #NAME?, #N/A, #VALUE!, #ERROR!) end up in the header row.
   const formulaError = header.find((h) => /^#(REF!|NAME\?|N\/A|VALUE!|ERROR!|DIV\/0!)/i.test(h.trim()));

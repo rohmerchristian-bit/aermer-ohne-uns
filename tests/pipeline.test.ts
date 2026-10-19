@@ -32,6 +32,10 @@ describe('column mapping', () => {
     expect(findColumn('Betroffenes Projekt / Angebot: Welche konkreten Folgen hat die Kürzung?')?.key).toBe('project');
     expect(findColumn('Absagen von Angeboten, Stellenabbau, Schließzeiten, etc.')?.key).toBe('consequences');
     expect(findColumn('Freigeben')?.key).toBe('approved');
+    expect(findColumn('Logo-Upload für euer Profil auf der Plattform')?.key).toBe('imageUrls');
+    // New private questions must be recognised as private, not as "unknown".
+    expect(findColumn('E-Mail-Adresse')?.visibility).toBe('private');
+    expect(findColumn('Ich möchte dabei sein und als Teil des Bündnis "ÄrmerOhneUns" an dem Dialog teilnehmen …')?.visibility).toBe('private');
   });
 
   it('has unique keys and unique headers', () => {

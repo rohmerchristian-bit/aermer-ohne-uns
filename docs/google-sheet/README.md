@@ -5,9 +5,10 @@ Sheet und schickt dem Prüf-Team eine E-Mail. Es läuft in Google, nicht auf der
 
 ## Einrichtung (einmalig, ca. 10 Minuten)
 
-1. **Zwei Spalten anlegen.** Im Blatt mit den Formularantworten rechts neben „Hervorheben“
-   zwei neue Spaltenköpfe in Zeile 1 eintragen: `Status` und `Zuletzt eingegangen`.
-   Sie liegen hinter Spalte Y und werden deshalb vom Blatt „Öffentlich“ nicht übernommen.
+1. **Zwei Spalten anlegen.** Im Blatt mit den Formularantworten ganz rechts zwei neue Spaltenköpfe in
+   Zeile 1 eintragen: `Status` und `Zuletzt eingegangen`. Das Skript findet sie über die Überschrift,
+   die Lage ist egal. Die Formel im Blatt „Öffentlich“ ([oeffentlich-formel.md](oeffentlich-formel.md))
+   übernimmt sie nicht.
 2. **Skript einfügen.** Im Sheet: *Erweiterungen → Apps Script*. Den Inhalt von `benachrichtigung.gs`
    hineinkopieren, oben bei `EMPFAENGER` die E-Mail-Adresse(n) des Prüf-Teams eintragen, speichern.
 3. **Trigger anlegen.** In Apps Script links auf das Uhr-Symbol (*Trigger*) → *Trigger hinzufügen*:
@@ -25,7 +26,8 @@ Sheet und schickt dem Prüf-Team eine E-Mail. Es läuft in Google, nicht auf der
 - `=LEFT($Z2;3)="Neu"` → gelb
 - `=LEFT($Z2;3)="Geä"` → orange
 
-(Spalte Z = „Status“; bei anderer Lage den Buchstaben anpassen.)
+(`$Z` durch den Buchstaben der Spalte „Status“ ersetzen. Achtung: Kommen im Formular neue Fragen dazu,
+verschiebt Google die Spalten – dann den Buchstaben hier anpassen. Das Skript selbst ist davon nicht betroffen.)
 
 Nach der Prüfung: „Freigeben“ anhaken und in „Status“ z. B. „Geprüft“ eintragen – dann verschwindet
 die Markierung.

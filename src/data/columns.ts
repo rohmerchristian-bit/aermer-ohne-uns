@@ -64,7 +64,12 @@ export const columns: readonly ColumnDef[] = [
     header: 'Ansprechperson für das Bündnis (Format: Vorname, Nachname, Funktion)',
     visibility: 'private',
   },
-  { key: 'email', header: 'E-Mail-Adresse für Rückfragen & Bündnisarbeit', visibility: 'private' },
+  {
+    key: 'email',
+    header: 'E-Mail-Adresse für Rückfragen & Bündnisarbeit',
+    visibility: 'private',
+    aliases: ['E-Mail-Adresse'],
+  },
   { key: 'links', header: 'Website / Social-Media-Kanäle', visibility: 'public' },
   {
     key: 'description',
@@ -97,7 +102,12 @@ export const columns: readonly ColumnDef[] = [
     header: 'Link zu weiterführenden Informationen / Stellungnahmen / Petitionen',
     visibility: 'public',
   },
-  { key: 'imageUrls', header: 'Bild-/Logo-Upload für euer Profil auf der Plattform', visibility: 'public' },
+  {
+    key: 'imageUrls',
+    header: 'Bild-/Logo-Upload für euer Profil auf der Plattform',
+    visibility: 'public',
+    aliases: ['Logo-Upload für euer Profil auf der Plattform'],
+  },
   { key: 'imageCredit', header: 'Bildnachweis (Fotograf*in / Rechteinhaber)', visibility: 'public' },
   {
     key: 'actions',
@@ -116,7 +126,12 @@ export const columns: readonly ColumnDef[] = [
     visibility: 'filter',
     headerStartsWith: ['Mit dem Hochladen bestätigen wir, dass wir die erforderlichen Nutzungsrechte'],
   },
-  { key: 'mailingList', header: 'Aufnahme in den Bündnis-Verteiler', visibility: 'private' },
+  {
+    key: 'mailingList',
+    header: 'Aufnahme in den Bündnis-Verteiler',
+    visibility: 'private',
+    headerStartsWith: ['Ich möchte dabei sein und als Teil des Bündnis'],
+  },
   { key: 'approved', header: 'Freigegeben', visibility: 'filter', required: true, aliases: ['Freigeben'] },
   { key: 'amountVerified', header: 'Betrag_geprüft', visibility: 'public' },
   { key: 'featured', header: 'Hervorheben', visibility: 'public' },

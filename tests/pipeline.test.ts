@@ -29,7 +29,8 @@ describe('column mapping', () => {
   });
 
   it('knows the titles used in the live form', () => {
-    expect(findColumn('Betroffenes Projekt / Angebot: Welche konkreten Folgen hat die Kürzung?')?.key).toBe('project');
+    expect(findColumn('Betroffenes Projekt / Angebot: Welche konkreten Folgen hat die Kürzung?')?.key).toBe('consequences');
+    expect(findColumn('Betroffenes Projekt / Angebot')?.key).toBe('project');
     expect(findColumn('Absagen von Angeboten, Stellenabbau, Schließzeiten, etc.')?.key).toBe('consequences');
     expect(findColumn('Freigeben')?.key).toBe('approved');
     expect(findColumn('Logo-Upload für euer Profil auf der Plattform')?.key).toBe('imageUrls');
@@ -67,6 +68,18 @@ describe('column mapping', () => {
     const result = runPipeline(table, OPTIONS);
     expect(result.projects.map((e) => e.project.name)).toEqual(['A']);
     expect(result.messages.some((m) => m.message.includes('wiederholt die Kopfzeile'))).toBe(true);
+  });
+
+  it('merges several columns of the same field: first non-empty value per row', () => {
+    const table = [
+      ['Name der Institution / Einrichtung', 'Zu welchem Bereich gehört eure Einrichtung?', 'Freigabe zur Veröffentlichung', 'Freigeben',
+        'Absagen von Angeboten, Stellenabbau, Schließzeiten, etc.', 'Welche konkreten Folgen hat die Kürzung?'],
+      ['A', 'Kultur & Kunst', 'ja', 'TRUE', 'alt', ''],
+      ['B', 'Kultur & Kunst', 'ja', 'TRUE', '', 'neu'],
+    ];
+    const result = runPipeline(table, OPTIONS);
+    expect(result.projects.map((e) => e.project.consequences)).toEqual(['alt', 'neu']);
+    expect(result.messages.some((m) => m.message.includes('doppelt'))).toBe(false);
   });
 
   it('warns about unknown columns and ignores them', () => {

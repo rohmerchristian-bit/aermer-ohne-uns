@@ -65,8 +65,9 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
     );
   }
 
-  // Map column index -> key, allowlisted keys only.
-  const indexOf = new Map<ColumnKey, number>();
+  // Map key -> column indexes, allowlisted keys only. A key can have several columns (e.g. an old and a
+  // renamed question both still in the sheet); per row the first non-empty value counts.
+  const indexOf = new Map<ColumnKey, number[]>();
   header.forEach((title, index) => {
     if (title.trim() === '') return;
     const column = findColumn(title);
@@ -80,11 +81,7 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
       );
       return;
     }
-    if (indexOf.has(column.key)) {
-      warn(`Die Spalte „${column.header}“ kommt doppelt vor; verwendet wird die erste.`);
-      return;
-    }
-    indexOf.set(column.key, index);
+    indexOf.set(column.key, [...(indexOf.get(column.key) ?? []), index]);
   });
 
   const missingRequired = columns.filter((c) => c.required && !indexOf.has(c.key));
@@ -111,13 +108,16 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
     const line = i + 2; // row number as shown in Google Sheets
     const read = (key: ColumnKey): string => {
       if (!READABLE_KEYS.has(key)) throw new Error(`Interner Fehler: privates Feld ${key} angefragt.`);
-      const index = indexOf.get(key);
-      return index === undefined ? '' : (row[index] ?? '').trim();
+      for (const index of indexOf.get(key) ?? []) {
+        const value = (row[index] ?? '').trim();
+        if (value !== '') return value;
+      }
+      return '';
     };
     const text = (key: ColumnKey): string | null => cleanText(read(key));
 
     // A copy of the header row (e.g. from a faulty sheet formula) is never an entry.
-    const nameIndex = indexOf.get('name')!;
+    const nameIndex = indexOf.get('name')![0]!;
     if ((row[nameIndex] ?? '').trim() === (header[nameIndex] ?? '').trim()) {
       warn(`Zeile ${line} wiederholt die Kopfzeile und wird ignoriert – bitte die Formel im Blatt „Öffentlich“ prüfen.`);
       return;

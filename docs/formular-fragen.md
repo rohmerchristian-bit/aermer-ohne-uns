@@ -1,6 +1,9 @@
 # Formular „#ÄrmerOhneUns“ – Umbau für mehrere Projekte pro Einrichtung
 
-*Stand: 19.10.2026 · Entwurf zur Abstimmung · Grundlage: das aktuelle Formular mit 7 Abschnitten*
+*Stand: 19.10.2026 · abgestimmt · Grundlage: das aktuelle Formular mit 7 Abschnitten*
+
+> **Umsetzung:** per Skript [`docs/google-sheet/formular-umbau.gs`](google-sheet/formular-umbau.gs)
+> (`umbauPruefen()` → `umbauAusfuehren()`), danach von Hand nur die Upload-Frage „Bild oder Logo für dieses Projekt“.
 
 ## Ziel
 
@@ -109,7 +112,7 @@ Beschreibung (Vorschlag): *„Ein Projekt = eine Kachel. Für weitere Projekte d
 
 | Frage | Pflicht | Änderung | öffentlich |
 |---|---|---|---|
-| **Betroffenes Projekt / Angebot** | ja | umbenennen aus „Betroffenes Projekt / Angebot: Welche konkreten Folgen hat die Kürzung?“; Typ Kurzantwort | ja |
+| **Betroffenes Projekt / Angebot** | ja | **NEU** (Kurzantwort, z. B. „Jugendtreff Fuxx“) | ja |
 | **Zu welchem Bereich gehört das Projekt / Angebot?** | ja | aus Abschnitt 2 **hierher verschieben** und umbenennen; die 7 Antworten bleiben gleich | ja |
 | Welche Zuschüsse / Mittel sollen gestrichen oder gekürzt werden? | ja | – | ja |
 | **Geplante Kürzung 2027 in Euro** | nein | umbenennen aus „Geplante Kürzung in Euro pro Jahr“ | ja |
@@ -117,7 +120,7 @@ Beschreibung (Vorschlag): *„Ein Projekt = eine Kachel. Für weitere Projekte d
 | **Kürzung in Prozent** | nein | **NEU** | ja |
 | **Falls es nicht um einen Geldbetrag geht: Was fällt weg?** | nein | **NEU** | ja |
 | **Quelle des Betrags** | nein | **NEU** | ja |
-| **Welche konkreten Folgen hat die Kürzung?** | ja | umbenennen aus „Absagen von Angeboten, Stellenabbau, Schließzeiten, etc.“; den alten Titel als Beschreibung | ja |
+| **Welche konkreten Folgen hat die Kürzung?** | ja | umbenennen aus „Betroffenes Projekt / Angebot: Welche konkreten Folgen hat die Kürzung?“ – die bisherigen Antworten beschreiben Folgen und bleiben so richtig zugeordnet; „Absagen von Angeboten, Stellenabbau, Schließzeiten“ als Beschreibung | ja |
 | Prägnantes Zitat / Statement zur Lage (Short Quote) | nein | – | ja |
 | Wie könnte man Euch helfen, wenn es zur Einsparung kommt? | nein | – | **offen** (siehe unten) |
 | Link zu weiterführenden Informationen / Stellungnahmen / Petitionen | nein | – | ja |
@@ -150,7 +153,15 @@ Unverändert: „Freigabe zur Veröffentlichung“ (Pflicht) · „Aufnahme in d
 Nach dem Umbau passe ich die Formel für das Blatt „Öffentlich“ an (neue Spalten) und ergänze das Skript
 um die automatische Einrichtungsliste in Abschnitt 7.
 
-## Offene Fragen an die Initiative
+## Entscheidungen der Initiative (19.10.2026)
+
+1. Auswahlliste: nur freigegebene Einrichtungen – **ja**
+2. Summe: Betrag 2027 – **ja**
+3. Kachelfarbe nach Bereich des Projekts – **ja**
+4. „Wie könnte man Euch helfen …?“ – **vorerst nicht öffentlich**
+5. Bildrechte-Frage ohne Pflicht – **ja**
+
+## Ursprünglich offene Fragen
 
 1. **Auswahlliste in Abschnitt 7:** nur **freigegebene** Einrichtungen (empfohlen – sonst sieht jede Person
    mit dem Formular-Link auch ungeprüfte Namen) oder alle?

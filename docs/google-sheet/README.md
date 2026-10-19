@@ -51,3 +51,20 @@ die Markierung.
 - **Ganz ohne Skript** geht es auch: *Tools → Benachrichtigungseinstellungen → Benachrichtigungen bearbeiten*
   → „Ein Nutzer sendet ein Formular“ → sofort per E-Mail. Das muss jede Person selbst einschalten und
   markiert keine Zeilen.
+
+## Einmaliger Umbau des Formulars (mehrere Projekte pro Einrichtung)
+
+Plan: [`../formular-fragen.md`](../formular-fragen.md). Das Skript [`formular-umbau.gs`](formular-umbau.gs)
+setzt ihn um, ohne eine Frage zu löschen – bisherige Antworten bleiben erhalten.
+
+1. Im Apps-Script-Editor links neben „Dateien“ auf **+ → Skript** klicken, Name `formular-umbau`, den Inhalt
+   von `formular-umbau.gs` hineinkopieren, speichern. (`benachrichtigung.gs` muss in derselben Liste stehen.)
+2. **Zuerst `umbauPruefen` ausführen.** Das ändert nichts, sondern listet im Protokoll alle gefundenen Fragen
+   und die geplanten Änderungen. Bricht es mit „nicht gefunden“ ab, bitte die Meldung schicken.
+3. **Dann `umbauAusfuehren` ausführen.** Ein zweiter Aufruf ändert nichts mehr.
+4. **Von Hand ergänzen** (Google erlaubt das nicht per Skript): im Abschnitt „Betroffenes Projekt / Angebot“
+   vor „Bildnachweis zum Projektbild“ eine Frage vom Typ *Datei hochladen* mit dem Titel
+   `Bild oder Logo für dieses Projekt` (1 Datei, nur Bilder, keine Pflicht).
+5. Das Formular einmal über die Vorschau (Augen-Symbol) durchklicken – beide Wege.
+
+Wichtig: Änderungen an einem Google Formular gelten sofort. Am besten zu einer ruhigen Zeit ausführen.

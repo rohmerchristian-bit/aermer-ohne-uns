@@ -106,12 +106,9 @@ export const columns: readonly ColumnDef[] = [
     visibility: 'public',
   },
   { key: 'reach', header: 'Wen erreicht eure Arbeit? (Zielgruppen & Reichweite in Zahlen)', visibility: 'public' },
-  {
-    key: 'project',
-    header: 'Betroffenes Projekt / Angebot',
-    visibility: 'public',
-    aliases: ['Betroffenes Projekt / Angebot: Welche konkreten Folgen hat die Kürzung?'],
-  },
+  // New short question. The old combined question „Betroffenes Projekt / Angebot: Welche konkreten Folgen …?“
+  // was answered with consequences, so it maps to `consequences` (it gets renamed in the form).
+  { key: 'project', header: 'Betroffenes Projekt / Angebot', visibility: 'public' },
   {
     key: 'cutDescription',
     header: 'Welche Zuschüsse / Mittel sollen gestrichen oder gekürzt werden?',
@@ -135,7 +132,10 @@ export const columns: readonly ColumnDef[] = [
     key: 'consequences',
     header: 'Welche konkreten Folgen hat die Kürzung?',
     visibility: 'public',
-    aliases: ['Absagen von Angeboten, Stellenabbau, Schließzeiten, etc.'],
+    aliases: [
+      'Betroffenes Projekt / Angebot: Welche konkreten Folgen hat die Kürzung?',
+      'Absagen von Angeboten, Stellenabbau, Schließzeiten, etc.',
+    ],
   },
   { key: 'quote', header: 'Prägnantes Zitat / Statement zur Lage (Short Quote)', visibility: 'public' },
   {

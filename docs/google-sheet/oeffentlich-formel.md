@@ -13,7 +13,7 @@ In das Blatt „Öffentlich“, Zelle **A1** (alles andere im Blatt leer lassen)
   spalten; ARRAYFORMULA(XMATCH({"*Name der Institution*"\"*Zu welchem Bereich*"\"*Standort*"\"*Website*"\"*Was tut eure Institution*"\"*Wen erreicht*"\"*Geplante Kürzung*"\"*Welche Zuschüsse*"\"*Betroffenes Projekt*"\"*Absagen von Angeboten*"\"*Prägnantes Zitat*"\"*Link zu weiterführenden*"\"*Bildnachweis*"\"*Logo-Upload*"\"*Freigabe zur Veröffentlichung*"\"*Mit dem Hochladen*"\"Freigeben"\"Betrag_geprüft"\"Hervorheben"}; kopf; 2));
   kopfzeile; CHOOSECOLS(kopf; spalten);
   treffer; FILTER(werte; CHOOSECOLS(werte; XMATCH("Freigeben"; kopf; 0)) = TRUE);
-  IFERROR(VSTACK(kopfzeile; CHOOSECOLS(treffer; spalten)); kopfzeile)
+  IF(ISERROR(ROWS(treffer)); kopfzeile; VSTACK(kopfzeile; CHOOSECOLS(treffer; spalten)))
 )
 ```
 
@@ -24,7 +24,8 @@ In das Blatt „Öffentlich“, Zelle **A1** (alles andere im Blatt leer lassen)
 - Überschriften (Zeile 1) und Antworten (ab Zeile 2) werden getrennt gelesen; die Admin-Spalten
   „Freigeben“, „Betrag_geprüft“ und „Hervorheben“ werden exakt (ohne `*`) gesucht.
 - Sie übernimmt nur Zeilen, in denen „Freigeben“ angehakt ist. Ist noch nichts freigegeben, steht nur
-  die Kopfzeile im Blatt (kein Fehler).
+  die Kopfzeile im Blatt (kein Fehler). Bewusst `IF(ISERROR(ROWS(…)))` statt `IFERROR(…)`: IFERROR
+  arbeitet zellweise und würde sonst die Kopfzeile in Zeile 2 kopieren.
 
 ## Wenn eine Frage dazukommt, die öffentlich sein soll
 

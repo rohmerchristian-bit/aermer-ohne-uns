@@ -10,7 +10,7 @@ In das Blatt „Öffentlich“, Zelle **A1** (alles andere im Blatt leer lassen)
 =LET(
   daten; Formularantworten!A1:AZ;
   kopf; CHOOSEROWS(daten; 1);
-  spalten; XMATCH({"*Name der Institution*"\"*Zu welchem Bereich*"\"*Standort*"\"*Website*"\"*Was tut eure Institution*"\"*Wen erreicht*"\"*Geplante Kürzung*"\"*Welche Zuschüsse*"\"*Betroffenes Projekt*"\"*Absagen von Angeboten*"\"*Prägnantes Zitat*"\"*Link zu weiterführenden*"\"*Bildnachweis*"\"*Logo-Upload*"\"*Freigabe zur Veröffentlichung*"\"*Mit dem Hochladen*"\"*Freigeben*"\"*Betrag_geprüft*"\"*Hervorheben*"}; kopf; 2);
+  spalten; ARRAYFORMULA(XMATCH({"*Name der Institution*"\"*Zu welchem Bereich*"\"*Standort*"\"*Website*"\"*Was tut eure Institution*"\"*Wen erreicht*"\"*Geplante Kürzung*"\"*Welche Zuschüsse*"\"*Betroffenes Projekt*"\"*Absagen von Angeboten*"\"*Prägnantes Zitat*"\"*Link zu weiterführenden*"\"*Bildnachweis*"\"*Logo-Upload*"\"*Freigabe zur Veröffentlichung*"\"*Mit dem Hochladen*"\"*Freigeben*"\"*Betrag_geprüft*"\"*Hervorheben*"}; kopf; 2));
   kopfzeile; CHOOSECOLS(kopf; spalten);
   treffer; FILTER(daten; CHOOSECOLS(daten; XMATCH("*Freigeben*"; kopf; 2)) = TRUE);
   IFERROR(VSTACK(kopfzeile; CHOOSECOLS(treffer; spalten)); kopfzeile)

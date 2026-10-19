@@ -1,4 +1,4 @@
-# Benachrichtigung bei neuen und geänderten Einträgen
+# Benachrichtigung und Einrichtungsliste
 
 Das Skript [`benachrichtigung.gs`](benachrichtigung.gs) markiert neue und geänderte Formular-Antworten im
 Sheet und schickt dem Prüf-Team eine E-Mail. Es läuft in Google, nicht auf der Website.
@@ -16,7 +16,14 @@ Sheet und schickt dem Prüf-Team eine E-Mail. Es läuft in Google, nicht auf der
    - Funktion: `beiFormularAntwort`
    - Ereignisquelle: *Aus Tabelle*
    - Ereignistyp: *Bei Formularübermittlung*
-4. **Testen ohne Formular.** `probelauf` auswählen → *Ausführen*. Es kommt eine Mail mit „[TEST]“ im
+4. **Zweiten Trigger anlegen** (für die Auswahlliste „Für welche Einrichtung …?“):
+   - Funktion: `beiBearbeitung`
+   - Ereignisquelle: *Aus Tabelle*
+   - Ereignistyp: *Bei Bearbeitung*
+   Danach einmal `aktualisiereEinrichtungsliste` ausführen. Beim ersten Mal fragt Google zusätzlich nach
+   der Berechtigung, das Formular zu bearbeiten. Solange es die Frage im Formular noch nicht gibt, steht im
+   Protokoll nur ein Hinweis – das ist kein Fehler.
+5. **Testen ohne Formular.** `probelauf` auswählen → *Ausführen*. Es kommt eine Mail mit „[TEST]“ im
    Betreff zur letzten Antwortzeile; im Sheet wird dabei nichts verändert.
 
 ## Neue Zeilen farbig markieren (ohne Skript)
@@ -33,6 +40,9 @@ Nach der Prüfung: „Freigeben“ anhaken und in „Status“ z. B. „Geprüft
 die Markierung.
 
 ## Gut zu wissen
+
+- **Auswahlliste:** Sobald bei einer Einrichtung „Freigeben“ angehakt (oder wieder entfernt) wird, schreibt
+  das Skript die Liste im Formular neu. Darin stehen nur freigegebene Einrichtungen, alphabetisch.
 
 - **Geänderte Einträge** (wenn Einrichtungen ihre Antwort nachträglich bearbeiten) werden erkannt.
   Das Skript nimmt dann das Häkchen „Freigeben“ heraus, damit die Änderung nicht ungeprüft online geht.

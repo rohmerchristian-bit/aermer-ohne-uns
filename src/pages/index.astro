@@ -8,12 +8,11 @@ import AreaLinks from '../components/AreaLinks.astro';
 import DonationBlock from '../components/DonationBlock.astro';
 import JoinCta from '../components/JoinCta.astro';
 import IconArrow from '../components/icons/IconArrow.astro';
-import { institutionCount, institutions, settings, sortedForGrid, totalAmount } from '../data/index.ts';
+import { count, organisationCount, projectCount, projects, projectsWithAmount, settings, sortedForGrid, totalAmount } from '../data/index.ts';
 import { formatEuro } from '../lib/format.ts';
 
 const HOME_TILES = 8;
 const tiles = sortedForGrid().slice(0, HOME_TILES);
-const withAmount = institutions.filter((i) => i.amount !== null).length;
 ---
 
 <Page
@@ -35,9 +34,9 @@ const withAmount = institutions.filter((i) => i.amount !== null).length;
               {settings.heroSubtitle}
             </p>
             <p class="hero__basis small">
-              Summe der Kürzungen bei den {withAmount} Einrichtungen
-              {withAmount < institutionCount && ` mit Betragsangabe (von ${institutionCount})`} auf dieser Plattform, pro
-              Jahr.
+              Summe der für 2027 geplanten Kürzungen bei {count(projectsWithAmount, 'Projekt', 'Projekten')}
+              {projectsWithAmount < projectCount && ` mit Betragsangabe (von ${projectCount})`} aus{' '}
+              {count(organisationCount, 'Einrichtung', 'Einrichtungen')} auf dieser Plattform.
             </p>
           </div>
         ) : (
@@ -52,9 +51,9 @@ const withAmount = institutions.filter((i) => i.amount !== null).length;
 
       <div class="hero__actions">
         {
-          institutionCount > 0 && (
+          projectCount > 0 && (
             <a class="btn" href={url('/einrichtungen/')}>
-              {institutionCount} Betroffene ansehen <IconArrow />
+              {count(projectCount, 'betroffenes Projekt', 'betroffene Projekte')} ansehen <IconArrow />
             </a>
           )
         }
@@ -83,18 +82,18 @@ const withAmount = institutions.filter((i) => i.amount !== null).length;
   </section>
 
   {
-    institutionCount > 0 && (
+    projectCount > 0 && (
       <section class="section" aria-labelledby="betroffene-titel">
         <div class="container">
           <div class="section__head home__grid-head">
             <p class="label">Betroffene</p>
             <h2 id="betroffene-titel">Was verloren geht</h2>
-            <AreaLinks institutions={institutions} />
+            <AreaLinks projects={projects} />
           </div>
-          <TileGrid institutions={tiles} />
+          <TileGrid projects={tiles} />
           <p class="home__more">
             <a class="btn btn--outline" href={url('/einrichtungen/')}>
-              Alle {institutionCount} Einrichtungen <IconArrow />
+              Alle {count(projectCount, 'Projekt', 'Projekte')} von {count(organisationCount, 'Einrichtung', 'Einrichtungen')} <IconArrow />
             </a>
           </p>
         </div>

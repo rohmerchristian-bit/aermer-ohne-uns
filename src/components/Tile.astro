@@ -1,26 +1,28 @@
 ---
 import { srcsetUrl, url } from '../lib/paths.ts';
-import type { Institution } from '../data/types';
-import { getArea } from '../data/areas';
-import { formatCut, initials, truncate } from '../lib/format';
-import { amountSourceLabel } from '../lib/amount-label';
+import type { Project } from '../data/types.ts';
+import { getArea } from '../data/areas.ts';
+import { getOrganisation } from '../data/index.ts';
+import { formatCut, initials, truncate } from '../lib/format.ts';
+import { amountSourceLabel, percentLabel } from '../lib/amount-label.ts';
 import IconFlip from './icons/IconFlip.astro';
 import IconArrow from './icons/IconArrow.astro';
 import IconExternal from './icons/IconExternal.astro';
 
+// One affected project = one tile.
 interface Props {
-  institution: Institution;
-  /** Heading level of the institution name, so the tile fits the page outline. */
+  project: Project;
+  /** Heading level of the project name, so the tile fits the page outline. */
   headingLevel?: 2 | 3 | 4;
   /** Static demo state for the styleguide: render the back side. */
   flipped?: boolean;
-  /** Keeps element ids unique when the same institution appears twice on a page. */
+  /** Keeps element ids unique when the same project appears twice on a page. */
   idSuffix?: string;
 }
 
-const { institution: inst, headingLevel = 3, flipped = false, idSuffix = '' } = Astro.props;
-const area = getArea(inst.area);
-const id = `tile-${inst.slug}${idSuffix}`;
+const { project: p, headingLevel = 3, flipped = false, idSuffix = '' } = Astro.props;
+const area = getArea(p.area);
+const id = `tile-${p.id}${idSuffix}`;
 const Heading = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
 
 const CONSEQUENCES_MAX = 280;
@@ -28,10 +30,12 @@ const QUOTE_MAX = 110;
 // Tile width per breakpoint (see .tile-grid in src/styles/layout.css).
 const IMAGE_SIZES = '(min-width: 96em) 22rem, (min-width: 64em) 30vw, (min-width: 40em) 46vw, 92vw';
 
-const sourceLabel = amountSourceLabel(inst);
-
-const externalUrl = inst.infoLink ?? inst.website;
-const externalLabel = inst.infoLink ? 'Stellungnahme' : 'Website';
+const showOrg = p.name !== p.orgName;
+const notes = [percentLabel(p.amountPercent), amountSourceLabel(p)].filter(Boolean).join(' · ');
+const orgWebsite = getOrganisation(p.orgSlug)?.website ?? null;
+const externalUrl = p.infoLink ?? orgWebsite;
+const externalLabel = p.infoLink ? 'Stellungnahme' : 'Website';
+const fullName = showOrg ? `${p.name} (${p.orgName})` : p.name;
 ---
 
 <article
@@ -43,23 +47,25 @@ const externalLabel = inst.infoLink ? 'Stellungnahme' : 'Website';
   <div class="tile__card">
     <div class="tile__face tile__front" id={`${id}-front`} data-tile-front>
       <p class="tile__area label">{area.label}</p>
-      <Heading class="tile__name" id={`${id}-name`}>{inst.name}</Heading>
-      {inst.project && <p class="tile__project">{inst.project}</p>}
+      <Heading class="tile__name" id={`${id}-name`}>{p.name}</Heading>
+      {showOrg && <p class="tile__project">{p.orgName}</p>}
 
       <div class="tile__money">
         {
-          inst.amount !== null ? (
+          p.amount !== null ? (
             <p class="tile__amount">
-              <span class:list={['tile__amount-value', { 'tile__amount-value--long': inst.amount >= 1_000_000 }]}>
-                {formatCut(inst.amount)}
+              <span class:list={['tile__amount-value', { 'tile__amount-value--long': p.amount >= 1_000_000 }]}>
+                {formatCut(p.amount)}
               </span>
               <span class="tile__amount-unit">/&nbsp;Jahr</span>
             </p>
+          ) : p.nonMonetary ? (
+            <p class="tile__amount tile__amount--text">{p.nonMonetary}</p>
           ) : (
             <p class="tile__amount tile__amount--pending">Betrag folgt</p>
           )
         }
-        {sourceLabel && <p class="tile__source">{sourceLabel}</p>}
+        {notes && <p class="tile__source">{notes}</p>}
       </div>
 
       <button
@@ -70,37 +76,37 @@ const externalLabel = inst.infoLink ? 'Stellungnahme' : 'Website';
         data-tile-open
       >
         <span class="tile__hint label">Umdrehen <IconFlip /></span>
-        <span class="visually-hidden">: Folgen, Zitat und Links zu {inst.name} anzeigen</span>
+        <span class="visually-hidden">: Folgen, Zitat und Links zu {fullName} anzeigen</span>
       </button>
     </div>
 
     <div class="tile__face tile__back" id={`${id}-back`} data-tile-back>
       <figure class="tile__media">
         {
-          inst.image ? (
-            <picture class:list={['tile__picture', `tile__picture--${inst.image.kind}`]}>
-              {inst.image.sources.map((source) => (
+          p.image ? (
+            <picture class:list={['tile__picture', `tile__picture--${p.image.kind}`]}>
+              {p.image.sources.map((source) => (
                 <source type={source.type} srcset={srcsetUrl(source.srcset)} sizes={IMAGE_SIZES} />
               ))}
               <img
-                src={url(inst.image.src)}
-                width={inst.image.width}
-                height={inst.image.height}
-                alt={inst.image.alt}
+                src={url(p.image.src)}
+                width={p.image.width}
+                height={p.image.height}
+                alt={p.image.alt}
                 loading="lazy"
                 decoding="async"
               />
             </picture>
           ) : (
             <div class="tile__placeholder" aria-hidden="true">
-              {initials(inst.name)}
+              {initials(p.orgName)}
             </div>
           )
         }
         {
-          inst.image?.credit && (
+          p.image?.credit && (
             <figcaption class="tile__credit">
-              {inst.image.kind === 'logo' ? 'Bild' : 'Foto'}: {inst.image.credit}
+              {p.image.kind === 'logo' ? 'Bild' : 'Foto'}: {p.image.credit}
             </figcaption>
           )
         }
@@ -108,20 +114,20 @@ const externalLabel = inst.infoLink ? 'Stellungnahme' : 'Website';
 
       <div class="tile__back-body">
         {
-          inst.quote && (
+          p.quote && (
             <blockquote class="tile__quote">
-              <p>„{truncate(inst.quote, QUOTE_MAX)}“</p>
+              <p>„{truncate(p.quote, QUOTE_MAX)}“</p>
             </blockquote>
           )
         }
-        {inst.consequences && <p class="tile__consequences">{truncate(inst.consequences, CONSEQUENCES_MAX)}</p>}
+        {p.consequences && <p class="tile__consequences">{truncate(p.consequences, CONSEQUENCES_MAX)}</p>}
       </div>
 
       <ul class="tile__links" role="list">
         <li>
-          <a href={url(`/einrichtungen/${inst.slug}/`)}>
+          <a href={url(`/einrichtungen/${p.orgSlug}/#${p.anchor}`)}>
             Mehr erfahren <IconArrow />
-            <span class="visually-hidden"> über {inst.name}</span>
+            <span class="visually-hidden"> über {fullName}</span>
           </a>
         </li>
         {
@@ -129,7 +135,7 @@ const externalLabel = inst.infoLink ? 'Stellungnahme' : 'Website';
             <li>
               <a href={externalUrl} target="_blank" rel="noopener">
                 {externalLabel} <IconExternal />
-                <span class="visually-hidden"> von {inst.name} (externer Link, öffnet in neuem Tab)</span>
+                <span class="visually-hidden"> von {p.orgName} (externer Link, öffnet in neuem Tab)</span>
               </a>
             </li>
           )
@@ -137,14 +143,14 @@ const externalLabel = inst.infoLink ? 'Stellungnahme' : 'Website';
       </ul>
 
       <button type="button" class="tile__close label" aria-controls={`${id}-front`} data-tile-close>
-        Zurück<span class="visually-hidden"> zur Vorderseite von {inst.name}</span>
+        Zurück<span class="visually-hidden"> zur Vorderseite von {fullName}</span>
       </button>
     </div>
   </div>
 </article>
 
 <script>
-  import { initTiles } from '../scripts/tile-flip';
+  import { initTiles } from '../scripts/tile-flip.ts';
   initTiles();
 </script>
 
@@ -262,6 +268,16 @@ const externalLabel = inst.infoLink ? 'Stellungnahme' : 'Website';
   .tile__amount-unit {
     font-size: 1.375rem;
     font-weight: 800;
+  }
+
+  .tile__amount--text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    overflow: hidden;
+    font-size: clamp(1.625rem, 9cqi, 2.25rem);
+    line-height: 1;
   }
 
   .tile__amount--pending {

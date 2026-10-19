@@ -4,11 +4,11 @@ import BudgetFacts from '../components/BudgetFacts.astro';
 import Timeline from '../components/Timeline.astro';
 import ExternalLink from '../components/ExternalLink.astro';
 import { budgetDetails } from '../data/budget.ts';
-import { institutionCount, institutions, settings, totalAmount } from '../data/index.ts';
+import { count, organisationCount, projectCount, projects, settings, totalAmount } from '../data/index.ts';
 import { formatEuro } from '../lib/format.ts';
 
-const withAmount = institutions.filter((i) => i.amount !== null);
-const verified = withAmount.filter((i) => i.amountKind === 'verified').length;
+const withAmount = projects.filter((p) => p.amount !== null);
+const verified = withAmount.filter((p) => p.amountKind === 'verified').length;
 ---
 
 <Page
@@ -55,15 +55,17 @@ const verified = withAmount.filter((i) => i.amountKind === 'verified').length;
     <div class="container prose">
       <h2 id="summe-titel">So entsteht die Summe auf dieser Seite</h2>
       <p>
-        Die Summe auf der Startseite ist keine Hochrechnung und keine Schätzung. Sie ist die Summe der Kürzungsbeträge
-        der Einrichtungen, die sich auf dieser Plattform eingetragen haben – pro Jahr.
+        Die Summe auf der Startseite ist keine Hochrechnung und keine Schätzung. Sie addiert die Kürzungen, die für das
+        Jahr 2027 geplant sind, bei allen Projekten auf dieser Plattform. Eine Einrichtung kann mehrere betroffene
+        Projekte eintragen; jedes zählt einzeln. Kürzungen in späteren Jahren stehen bei den Projekten, fließen aber
+        nicht in die Summe ein – ebenso wenig Kürzungen ohne Geldbetrag (z. B. wegfallende Mietzuschüsse).
       </p>
       {
-        institutionCount > 0 && (
+        projectCount > 0 && (
           <p>
             Aktuell: <strong class="nobreak">{formatEuro(totalAmount)}</strong> bei {withAmount.length} von{' '}
-            {institutionCount} Einrichtungen mit Betragsangabe. Davon {verified} vom Bündnis geprüft (mit Quelle), die
-            übrigen als „Angabe der Einrichtung“ gekennzeichnet.
+            {count(projectCount, 'Projekt', 'Projekten')} aus {count(organisationCount, 'Einrichtung', 'Einrichtungen')}.
+            Davon {verified} vom Bündnis geprüft (mit Quelle), die übrigen als „Angabe der Einrichtung“ gekennzeichnet.
           </p>
         )
       }

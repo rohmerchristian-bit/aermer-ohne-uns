@@ -32,6 +32,13 @@ function writeState(state: State): void {
   history.replaceState(null, '', search ? `?${search}` : location.pathname);
 }
 
+/** "3 Projekte von 2 Einrichtungen, zusammen 32.000 € (2027)" – also used for the server-rendered text. */
+export function statusText(projects: number, organisations: number, sum: number): string {
+  const p = `${projects} ${projects === 1 ? 'Projekt' : 'Projekte'}`;
+  const o = `${organisations} ${organisations === 1 ? 'Einrichtung' : 'Einrichtungen'}`;
+  return sum > 0 ? `${p} von ${o}, zusammen ${formatEuro(sum)} (2027)` : `${p} von ${o}`;
+}
+
 /** "Bürgerhaus", "Buergerhaus" and "Burgerhaus" all match each other. */
 export function normalize(text: string): string {
   return text
@@ -72,6 +79,7 @@ export function initFilter(): void {
 
     let count = 0;
     let sum = 0;
+    const orgs = new Set<string>();
     for (const li of items) {
       const areaOk = state.areas.length === 0 || state.areas.includes(li.dataset.area ?? '');
       const haystack = normalize(li.dataset.search ?? '');
@@ -81,6 +89,7 @@ export function initFilter(): void {
       if (visible) {
         count++;
         sum += Number(li.dataset.amount || 0);
+        orgs.add(li.dataset.org ?? '');
       }
     }
 
@@ -92,9 +101,7 @@ export function initFilter(): void {
     // Only touch the DOM if the order actually changed (keeps focus and avoids reflow).
     if (sorted.some((li, i) => list.children[i] !== li)) list.append(...sorted);
 
-    const noun = count === 1 ? 'Einrichtung' : 'Einrichtungen';
-    status.textContent =
-      sum > 0 ? `${count} ${noun}, zusammen ${formatEuro(sum)} pro Jahr` : `${count} ${noun}`;
+    status.textContent = statusText(count, orgs.size, sum);
     if (empty) empty.hidden = count > 0;
     if (reset) reset.hidden = state.areas.length === 0 && !terms.length && state.sort === 'empfohlen';
     if (updateUrl) writeState(state);

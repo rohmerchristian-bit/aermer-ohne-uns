@@ -1,4 +1,6 @@
-// Turns the rows of the published "Öffentlich" sheet into public institution records.
+// Turns the rows of the published "Öffentlich" sheet into organisations and their projects.
+// One row = one project = one tile. Rows of the path "weiteres Projekt" attach to an organisation
+// that was entered (and approved) through the path "neue Einrichtung".
 //
 // Privacy safety net: values are read ONLY through `read()`, which refuses every key that is
 // not on the allowlist (src/data/columns.ts). Even if the sheet accidentally publishes private
@@ -6,7 +8,7 @@
 
 import { areas, FALLBACK_AREA } from './areas.ts';
 import { columns, findColumn, isChecked, isConsent, READABLE_KEYS, type ColumnKey } from './columns.ts';
-import type { BuildMessage, ImageRef, Institution, PipelineEntry } from './types.ts';
+import type { BuildMessage, ImageRef, OrganisationEntry, Project, ProjectEntry } from './types.ts';
 import { parseAmount } from '../lib/amount.ts';
 import { uniqueSlug } from '../lib/slug.ts';
 
@@ -25,10 +27,21 @@ export interface PipelineOptions {
 }
 
 export interface PipelineResult {
-  entries: PipelineEntry[];
+  organisations: OrganisationEntry[];
+  projects: ProjectEntry[];
   messages: BuildMessage[];
-  stats: { rows: number; published: number; notApproved: number; noConsent: number; invalid: number };
+  stats: {
+    rows: number;
+    projects: number;
+    organisations: number;
+    notApproved: number;
+    noConsent: number;
+    invalid: number;
+  };
 }
+
+/** Long project names usually mean the old combined question was answered with the consequences. */
+const PROJECT_NAME_MAX = 90;
 
 export function runPipeline(table: string[][], options: PipelineOptions): PipelineResult {
   const messages: BuildMessage[] = [];
@@ -37,8 +50,8 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
   const [header, ...rows] = table;
   if (!header || header.every((h) => h.trim() === '')) {
     throw new DataError(
-      'Das Blatt „Öffentlich“ ist leer – es wurde keine Kopfzeile gefunden. Meist liefert die Formel in A1 einen Fehler, ' +
-        'der von IFNA ausgeblendet wird (z. B. eine umbenannte Überschrift). Siehe docs/google-sheet/oeffentlich-formel.md.',
+      'Das Blatt „Öffentlich“ ist leer – es wurde keine Kopfzeile gefunden. Meist liefert die Formel in A1 einen Fehler ' +
+        '(z. B. eine umbenannte Überschrift). Siehe docs/google-sheet/oeffentlich-formel.md.',
     );
   }
 
@@ -82,15 +95,17 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
       messages,
     );
   }
-  for (const c of columns) {
-    if (c.visibility !== 'private' && !c.required && !indexOf.has(c.key)) {
-      warn(`Spalte „${c.header}“ fehlt im Blatt „Öffentlich“ – das Feld bleibt leer.`);
-    }
+  const missingOptional = columns.filter((c) => c.visibility !== 'private' && !c.required && !c.legacy && !indexOf.has(c.key));
+  if (missingOptional.length > 0) {
+    warn(`Diese Spalten fehlen im Blatt „Öffentlich“ und bleiben leer: ${missingOptional.map((c) => `„${c.header}“`).join(', ')}.`);
   }
 
-  const stats = { rows: rows.length, published: 0, notApproved: 0, noConsent: 0, invalid: 0 };
-  const taken = new Set<string>();
-  const entries: PipelineEntry[] = [];
+  const stats = { rows: rows.length, projects: 0, organisations: 0, notApproved: 0, noConsent: 0, invalid: 0 };
+  const orgSlugs = new Set<string>();
+  const orgByKey = new Map<string, OrganisationEntry>();
+  const anchorsByOrg = new Map<string, Set<string>>();
+  const projects: ProjectEntry[] = [];
+  const pendingAdditional: Array<() => void> = [];
 
   rows.forEach((row, i) => {
     const line = i + 2; // row number as shown in Google Sheets
@@ -114,64 +129,136 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
     }
     if (!isConsent(read('consentPublish'))) {
       stats.noConsent++;
-      warn(`Zeile ${line}: „Freigegeben“ ist angehakt, aber die Einrichtung hat der Veröffentlichung nicht zugestimmt – Eintrag wird nicht veröffentlicht.`);
+      warn(`Zeile ${line}: „Freigeben“ ist angehakt, aber es fehlt die Zustimmung zur Veröffentlichung – Eintrag wird nicht veröffentlicht.`);
       return;
     }
 
-    const name = text('name');
-    if (!name) {
+    const additional = isAdditionalProject(read('entryType'));
+    const orgName = additional ? text('orgSelect') : text('name');
+    if (!orgName) {
       stats.invalid++;
-      warn(`Zeile ${line}: Name der Einrichtung fehlt – Eintrag übersprungen.`);
+      warn(
+        additional
+          ? `Zeile ${line}: Weiteres Projekt ohne ausgewählte Einrichtung – übersprungen.`
+          : `Zeile ${line}: Name der Einrichtung fehlt – Eintrag übersprungen.`,
+      );
       return;
     }
-    const label = `Zeile ${line} („${name}“)`;
+    const label = `Zeile ${line} („${orgName}“)`;
+    const imagesAllowed = isConsent(read('consentImages'));
 
-    const area = resolveArea(read('area'), (msg) => warn(`${label}: ${msg}`));
-    const amount = resolveAmount(read('amountVerified'), read('amountReported'), (msg) => warn(`${label}: ${msg}`));
-    const links = extractUrls(read('links'));
-    const infoLinks = extractUrls(read('infoLink'));
-    if (read('infoLink') && infoLinks.length === 0) warn(`${label}: Link zu weiterführenden Informationen ist keine gültige Web-Adresse.`);
+    const imageRefFor = (key: 'imageUrls' | 'projectImageUrls'): ImageRef | null => {
+      const raw = read(key);
+      if (!raw) return null;
+      if (!imagesAllowed) {
+        warn(`${label}: Bild vorhanden, aber Bildrechte nicht bestätigt – es wird nicht verwendet.`);
+        return null;
+      }
+      const ref = parseImageRef(raw, options);
+      if (!ref) warn(`${label}: Bild-Link nicht erkannt („${raw.slice(0, 80)}“) – es wird nicht verwendet.`);
+      return ref;
+    };
 
-    let imageRef: ImageRef | null = null;
-    const imageRaw = read('imageUrls');
-    if (imageRaw) {
-      if (!isConsent(read('consentImages'))) {
-        warn(`${label}: Bild vorhanden, aber Bildrechte nicht bestätigt – es wird ein Platzhalter angezeigt.`);
+    // Organisation data only comes from "new organisation" rows.
+    if (!additional) {
+      const key = orgKey(orgName);
+      if (orgByKey.has(key)) {
+        warn(`${label}: Die Einrichtung ist mehrfach als neu eingetragen. Das Projekt wird ihr zugeordnet, die Basisdaten kommen aus dem ersten Eintrag.`);
       } else {
-        imageRef = parseImageRef(imageRaw, options);
-        if (!imageRef) warn(`${label}: Bild-Link nicht erkannt („${imageRaw.slice(0, 80)}“) – es wird ein Platzhalter angezeigt.`);
+        const links = extractUrls(read('links'));
+        orgByKey.set(key, {
+          organisation: {
+            slug: uniqueSlug(orgName, orgSlugs),
+            name: orgName,
+            address: text('address'),
+            description: text('description'),
+            reach: text('reach'),
+            website: links[0] ?? null,
+            links,
+            logo: null,
+          },
+          logoRef: imageRefFor('imageUrls'),
+          logoCredit: text('imageCredit') ?? text('imageCreditLegacy'),
+        });
       }
     }
 
-    const institution: Institution = {
-      slug: uniqueSlug(name, taken),
-      name,
+    const area = resolveArea(read('area'), (msg) => warn(`${label}: ${msg}`));
+    const amount = resolveAmount(read('amountVerified'), read('amountReported'), (msg) => warn(`${label}: ${msg}`));
+    const infoLinks = extractUrls(read('infoLink'));
+    if (read('infoLink') && infoLinks.length === 0) warn(`${label}: Link zu weiterführenden Informationen ist keine gültige Web-Adresse.`);
+    const projectName = text('project');
+    if (projectName && projectName.length > PROJECT_NAME_MAX) {
+      warn(`${label}: Projektname ist sehr lang (${projectName.length} Zeichen) – bitte im Sheet kürzen; er steht groß auf der Kachel.`);
+    }
+    const imageRef = imageRefFor('projectImageUrls');
+    const imageCredit = text('projectImageCredit');
+    const featured = isChecked(read('featured'));
+    const fields = {
       area,
-      address: text('address'),
-      description: text('description'),
-      reach: text('reach'),
-      project: text('project'),
       cutDescription: text('cutDescription'),
       amount: amount?.value ?? null,
       amountKind: amount?.kind ?? null,
       amountSource: amount ? text('amountSource') : null,
+      amountLater: text('amountLater'),
+      amountPercent: text('amountPercent'),
+      nonMonetary: text('nonMonetary'),
       consequences: text('consequences'),
       quote: stripQuotes(text('quote')),
-      website: links[0] ?? null,
-      links,
       infoLink: infoLinks[0] ?? null,
-      image: null,
-      featured: isChecked(read('featured')),
     };
 
-    stats.published++;
-    entries.push({ institution, imageRef, imageCredit: text('imageCredit') });
+    // Additional projects are attached after all organisations are known (row order does not matter).
+    const attach = () => {
+      const org = orgByKey.get(orgKey(orgName));
+      if (!org) {
+        stats.invalid++;
+        warn(`${label}: Weiteres Projekt für eine Einrichtung, die nicht (mehr) freigegeben ist – übersprungen.`);
+        return;
+      }
+      const o = org.organisation;
+      const anchors = anchorsByOrg.get(o.slug) ?? new Set<string>();
+      anchorsByOrg.set(o.slug, anchors);
+      const name = projectName ?? o.name;
+      const anchor = uniqueSlug(projectName ?? 'projekt', anchors);
+      projects.push({
+        project: {
+          id: `${o.slug}--${anchor}`,
+          anchor,
+          orgSlug: o.slug,
+          orgName: o.name,
+          name,
+          ...fields,
+          image: null,
+          ownImage: false,
+          featured,
+        },
+        imageRef,
+        imageCredit,
+      });
+      stats.projects++;
+    };
+    if (additional) pendingAdditional.push(attach);
+    else attach();
   });
 
-  return { entries, messages, stats };
+  pendingAdditional.forEach((attach) => attach());
+
+  const organisations = [...orgByKey.values()].filter((o) => projects.some((p) => p.project.orgSlug === o.organisation.slug));
+  stats.organisations = organisations.length;
+  return { organisations, projects, messages, stats };
 }
 
-function resolveArea(raw: string, warn: (msg: string) => void): Institution['area'] {
+/** "Ein weiteres betroffenes Projekt für eine bereits eingetragene Einrichtung" → true. Empty (old answers) → false. */
+export function isAdditionalProject(value: string): boolean {
+  return /weiteres/i.test(value);
+}
+
+function orgKey(name: string): string {
+  return name.replace(/\s+/g, ' ').trim().toLocaleLowerCase('de');
+}
+
+function resolveArea(raw: string, warn: (msg: string) => void): Project['area'] {
   const value = raw.replace(/\s+/g, ' ').trim().toLowerCase();
   const match = areas.find((a) => a.matches.includes(value) || a.label.toLowerCase() === value);
   if (match) return match.slug;

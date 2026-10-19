@@ -8,35 +8,41 @@ In das Blatt „Öffentlich“, Zelle **A1** (alles andere im Blatt leer lassen)
 
 ```
 =LET(
-  kopf; ARRAYFORMULA(TRIM(Formularantworten!A1:AZ1));
-  werte; Formularantworten!A2:AZ;
-  spalten; ARRAYFORMULA(XMATCH({"*Name der Institution*"\"*Zu welchem Bereich*"\"*Standort*"\"*Website*"\"*Was tut eure Institution*"\"*Wen erreicht*"\"*Geplante Kürzung*"\"*Welche Zuschüsse*"\"*Betroffenes Projekt*"\"*Absagen von Angeboten*"\"*Prägnantes Zitat*"\"*Link zu weiterführenden*"\"*Bildnachweis*"\"*Logo-Upload*"\"*Freigabe zur Veröffentlichung*"\"*Mit dem Hochladen*"\"Freigeben"\"Betrag_geprüft"\"Hervorheben"}; kopf; 2));
+  kopf; ARRAYFORMULA(TRIM(Formularantworten!A1:BZ1));
+  werte; Formularantworten!A2:BZ;
+  gesucht; ARRAYFORMULA(XMATCH({"Was möchtet ihr eintragen*"\"Für welche Einrichtung tragt ihr*"\"Name der Institution*"\"Standort*"\"Website*"\"Was tut eure Institution*"\"Wen erreicht eure Arbeit*"\"Logo der Einrichtung*"\"Logo-Upload für euer Profil*"\"Bildnachweis zum Logo*"\"Bildnachweis (Fotograf*"\"Betroffenes Projekt / Angebot*"\"Zu welchem Bereich*"\"Welche Zuschüsse*"\"Geplante Kürzung*"\"Kürzung in den Folgejahren*"\"Kürzung in Prozent*"\"Falls es nicht um einen Geldbetrag*"\"Quelle des Betrags*"\"Welche konkreten Folgen hat die Kürzung*"\"Absagen von Angeboten*"\"Prägnantes Zitat*"\"Link zu weiterführenden*"\"Bild oder Logo für dieses Projekt*"\"Bildnachweis zum Projektbild*"\"Freigabe zur Veröffentlichung*"\"Mit dem Hochladen bestätigen wir*"\"Freigeben"\"Betrag_geprüft"\"Hervorheben"}; kopf; 2));
+  spalten; FILTER(gesucht; NOT(ISNA(gesucht)));
   kopfzeile; CHOOSECOLS(kopf; spalten);
   treffer; FILTER(werte; CHOOSECOLS(werte; XMATCH("Freigeben"; kopf; 0)) = TRUE);
   IF(ISERROR(ROWS(treffer)); kopfzeile; VSTACK(kopfzeile; CHOOSECOLS(treffer; spalten)))
 )
 ```
 
-- `Formularantworten` ist der Name eures Antwort-Tabs. Wird er umbenannt, hier anpassen; enthält der neue
-  Name Leerzeichen, muss er in einfache Anführungszeichen (`'Neuer Name'!A1:AZ`).
-- Die Formel ist für deutsche Spracheinstellung geschrieben (`;` zwischen Argumenten, `\` zwischen
-  Spalten im `{…}`-Block).
+## Was die Formel tut
+
+- Sie sucht **30 Überschriften**, darunter auch die alten und neuen Titel beim Formular-Umbau
+  (z. B. „Logo-Upload für euer Profil …“ *und* „Logo der Einrichtung“). Was es im Formular (noch) nicht
+  gibt, lässt sie einfach weg – das Formular kann also Schritt für Schritt umgebaut werden.
+- Private Fragen (Ansprechperson, E-Mail, Aktionen, Räume, Demo, Verteiler, „Wie könnte man Euch helfen“)
+  stehen **nicht** in der Liste und kommen deshalb nie ins öffentliche Blatt.
 - Überschriften (Zeile 1) und Antworten (ab Zeile 2) werden getrennt gelesen; die Admin-Spalten
-  „Freigeben“, „Betrag_geprüft“ und „Hervorheben“ werden exakt (ohne `*`) gesucht.
-- Sie übernimmt nur Zeilen, in denen „Freigeben“ angehakt ist. Ist noch nichts freigegeben, steht nur
-  die Kopfzeile im Blatt (kein Fehler). Bewusst `IF(ISERROR(ROWS(…)))` statt `IFERROR(…)`: IFERROR
-  arbeitet zellweise und würde sonst die Kopfzeile in Zeile 2 kopieren.
+  „Freigeben“, „Betrag_geprüft“ und „Hervorheben“ werden exakt gesucht.
+- Sie übernimmt nur Zeilen, in denen „Freigeben“ angehakt ist. Ist noch nichts freigegeben, steht nur die
+  Kopfzeile im Blatt. Bewusst `IF(ISERROR(ROWS(…)))` statt `IFERROR(…)`: IFERROR arbeitet zellweise und
+  würde sonst die Kopfzeile in Zeile 2 kopieren.
+- `Formularantworten` ist der Name des Antwort-Tabs. Wird er umbenannt, hier anpassen; enthält der neue
+  Name Leerzeichen, muss er in einfache Anführungszeichen (`'Neuer Name'!A1:BZ1`).
+- Geschrieben für deutsche Spracheinstellung (`;` zwischen Argumenten, `\` zwischen Spalten im `{…}`-Block).
 
 ## Wenn eine Frage dazukommt, die öffentlich sein soll
 
-Einen weiteren Eintrag in die Liste `{…}` setzen, z. B. `\"*Quelle des Betrags*"` – und in
-`src/data/columns.ts` prüfen, ob der Fragetitel dort bekannt ist.
+Einen weiteren Eintrag in die Liste `{…}` setzen, z. B. `\"Neue Frage*"` – und in `src/data/columns.ts`
+prüfen, ob der Fragetitel dort bekannt ist.
 
 ## Wenn etwas nicht stimmt
 
 - Steht in A1 ein Fehler (`#N/A`, `#REF!`, `#NAME?`), bricht der Build mit einer Meldung ab und die
-  Website bleibt unverändert. Häufigste Ursache: Tab-Name falsch oder eine Überschrift aus der Liste
-  wurde im Formular umbenannt.
-- Ist das Blatt ganz leer, meldet der Build ebenfalls einen Fehler.
-- Diese Formel wurde nicht in eurem Sheet getestet – bitte nach dem Einfügen prüfen, dass in Zeile 1
-  genau die 19 Überschriften stehen und **keine** E-Mail-, Kontakt- oder Verteiler-Spalte dabei ist.
+  Website bleibt unverändert. Häufigste Ursache: Tab-Name falsch.
+- Fehlt eine **Pflichtspalte** (Name, Bereich, Freigabe zur Veröffentlichung, Freigeben), bricht der Build
+  ebenfalls ab und nennt die fehlende Spalte.
+- Nach dem Einfügen prüfen: In Zeile 1 darf **keine** E-Mail-, Kontakt-, Demo- oder Verteiler-Spalte stehen.

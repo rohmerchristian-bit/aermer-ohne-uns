@@ -6,6 +6,15 @@
 
 export type ColumnKey =
   | 'submittedAt'
+  | 'entryType'
+  | 'orgSelect'
+  | 'projectContact'
+  | 'amountLater'
+  | 'amountPercent'
+  | 'nonMonetary'
+  | 'projectImageUrls'
+  | 'projectImageCredit'
+  | 'imageCreditLegacy'
   | 'name'
   | 'area'
   | 'address'
@@ -54,10 +63,22 @@ export interface ColumnDef {
    * consent text as the question title.
    */
   headerStartsWith?: string[];
+  /** Column of a question that no longer exists in the form: no warning when it is missing. */
+  legacy?: boolean;
 }
 
 export const columns: readonly ColumnDef[] = [
   { key: 'submittedAt', header: 'Zeitstempel', visibility: 'private' },
+  // Section 1 (start): which path. Empty for answers given before the form was split.
+  { key: 'entryType', header: 'Was möchtet ihr eintragen?', visibility: 'filter' },
+  // Section 7 (additional project): organisation chosen from the list.
+  { key: 'orgSelect', header: 'Für welche Einrichtung tragt ihr ein weiteres Projekt ein?', visibility: 'public' },
+  {
+    key: 'projectContact',
+    header: 'Ansprechperson für dieses Projekt',
+    visibility: 'private',
+    headerStartsWith: ['Ansprechperson für dieses Projekt'],
+  },
   { key: 'name', header: 'Name der Institution / Einrichtung', visibility: 'public', required: true },
   {
     key: 'area',
@@ -102,6 +123,13 @@ export const columns: readonly ColumnDef[] = [
     visibility: 'public',
     aliases: ['Geplante Kürzung 2027 in Euro'],
   },
+  { key: 'amountLater', header: 'Kürzung in den Folgejahren', visibility: 'public' },
+  { key: 'amountPercent', header: 'Kürzung in Prozent', visibility: 'public' },
+  {
+    key: 'nonMonetary',
+    header: 'Falls es nicht um einen Geldbetrag geht: Was fällt weg?',
+    visibility: 'public',
+  },
   { key: 'amountSource', header: 'Quelle des Betrags', visibility: 'public' },
   {
     key: 'consequences',
@@ -120,13 +148,13 @@ export const columns: readonly ColumnDef[] = [
     header: 'Bild-/Logo-Upload für euer Profil auf der Plattform',
     visibility: 'public',
     aliases: ['Logo-Upload für euer Profil auf der Plattform', 'Logo der Einrichtung'],
+    // NOTE: this is the organisation's logo (section 4); project images are projectImageUrls.
   },
-  {
-    key: 'imageCredit',
-    header: 'Bildnachweis (Fotograf*in / Rechteinhaber)',
-    visibility: 'public',
-    aliases: ['Bildnachweis zum Logo'],
-  },
+  { key: 'imageCredit', header: 'Bildnachweis zum Logo', visibility: 'public' },
+  // The original credit question was removed from the form; its column still holds older answers.
+  { key: 'imageCreditLegacy', header: 'Bildnachweis (Fotograf*in / Rechteinhaber)', visibility: 'public', legacy: true },
+  { key: 'projectImageUrls', header: 'Bild oder Logo für dieses Projekt', visibility: 'public' },
+  { key: 'projectImageCredit', header: 'Bildnachweis zum Projektbild', visibility: 'public' },
   {
     key: 'actions',
     header: 'Plant ihr eigene Aktionen, Proteste oder Veranstaltungen zur Kürzungswelle? Wenn ja, welche?',

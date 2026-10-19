@@ -3,14 +3,11 @@ import Page from '../../layouts/Page.astro';
 import TileGrid from '../../components/TileGrid.astro';
 import JoinCta from '../../components/JoinCta.astro';
 import { areas } from '../../data/areas.ts';
-import { institutionCount, institutions, sortedForGrid, totalAmount } from '../../data/index.ts';
-import { formatEuro } from '../../lib/format.ts';
+import { organisationCount, projectCount, projects, sortedForGrid, totalAmount } from '../../data/index.ts';
+import { statusText } from '../../scripts/filter.ts';
 
-const usedAreas = areas.filter((a) => institutions.some((i) => i.area === a.slug));
-const initialStatus =
-  totalAmount > 0
-    ? `${institutionCount} ${institutionCount === 1 ? 'Einrichtung' : 'Einrichtungen'}, zusammen ${formatEuro(totalAmount)} pro Jahr`
-    : `${institutionCount} ${institutionCount === 1 ? 'Einrichtung' : 'Einrichtungen'}`;
+const usedAreas = areas.filter((a) => projects.some((p) => p.area === a.slug));
+const initialStatus = statusText(projectCount, organisationCount, totalAmount);
 ---
 
 <Page
@@ -22,9 +19,9 @@ const initialStatus =
       <p class="label">Betroffene</p>
       <h1 id="liste-titel">Was verloren geht</h1>
       {
-        institutionCount > 0 && (
+        projectCount > 0 && (
           <p class="lead">
-            Diese Einrichtungen haben sich eingetragen. Jeder Eintrag wurde vom Bündnis geprüft. Dreht die Kacheln um,
+            Jede Kachel ist ein betroffenes Projekt. Alle Einträge wurden vom Bündnis geprüft. Dreht die Kacheln um,
             um die Folgen zu sehen.
           </p>
         )
@@ -33,7 +30,7 @@ const initialStatus =
   </section>
 
   {
-    institutionCount === 0 ? (
+    projectCount === 0 ? (
       <section class="section">
         <div class="container">
           <p class="lead">Die ersten Einträge werden gerade geprüft und erscheinen in Kürze hier.</p>
@@ -90,7 +87,7 @@ const initialStatus =
             {initialStatus}
           </p>
 
-          <TileGrid institutions={sortedForGrid()} headingLevel={2} filterable />
+          <TileGrid projects={sortedForGrid()} headingLevel={2} filterable />
 
           <p class="filters__empty lead" data-filter-empty hidden>
             Keine Einrichtung passt zu dieser Auswahl. Probiert einen anderen Bereich oder ein anderes Stichwort.

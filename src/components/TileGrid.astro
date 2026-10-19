@@ -1,31 +1,32 @@
 ---
 import Tile from './Tile.astro';
-import type { Institution } from '../data/types.ts';
+import type { Project } from '../data/types.ts';
 
-// List of tiles. Each item carries data attributes for the client-side filter.
+// List of project tiles. Each item carries data attributes for the client-side filter.
 interface Props {
-  institutions: Institution[];
+  projects: Project[];
   headingLevel?: 2 | 3 | 4;
   id?: string;
   /** Marks the list for src/scripts/filter.ts. */
   filterable?: boolean;
 }
-const { institutions, headingLevel = 3, id, filterable = false } = Astro.props;
-const searchText = (i: Institution) =>
-  [i.name, i.project, i.description, i.address].filter(Boolean).join(' ').toLocaleLowerCase('de');
+const { projects, headingLevel = 3, id, filterable = false } = Astro.props;
+const searchText = (p: Project) =>
+  [p.name, p.orgName, p.cutDescription, p.consequences, p.nonMonetary].filter(Boolean).join(' ').toLocaleLowerCase('de');
 ---
 
 <ul class="tile-grid" role="list" id={id} data-filter-list={filterable ? '' : undefined}>
   {
-    institutions.map((inst) => (
+    projects.map((p) => (
       <li
-        data-area={inst.area}
-        data-amount={inst.amount ?? ''}
-        data-name={inst.name}
-        data-featured={inst.featured ? 'true' : undefined}
-        data-search={searchText(inst)}
+        data-area={p.area}
+        data-amount={p.amount ?? ''}
+        data-name={p.name}
+        data-org={p.orgSlug}
+        data-featured={p.featured ? 'true' : undefined}
+        data-search={searchText(p)}
       >
-        <Tile institution={inst} headingLevel={headingLevel} />
+        <Tile project={p} headingLevel={headingLevel} />
       </li>
     ))
   }

@@ -12,7 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DataError, runPipeline } from '../src/data/pipeline.ts';
 import { DEFAULT_SETTINGS, parseSettings } from '../src/data/settings.ts';
-import type { BuildMessage, Institution } from '../src/data/types.ts';
+import type { BuildMessage, Organisation, Project } from '../src/data/types.ts';
 import { parseCsv } from '../src/lib/csv.ts';
 import { imagePaths, processImage, pruneOutput } from '../src/lib/images.ts';
 import { formatEuro } from '../src/lib/format.ts';
@@ -77,49 +77,72 @@ async function main(): Promise<void> {
   // Images: failures never stop the build – the tile shows a placeholder instead.
   const paths = imagePaths(root);
   const keep = new Set<string>();
-  const institutions: Institution[] = result.entries.map((e) => e.institution);
-  const queue = result.entries.filter((e) => e.imageRef);
-  async function worker(): Promise<void> {
-    for (let entry = queue.shift(); entry; entry = queue.shift()) {
-      const inst = entry.institution;
+  const imageWarn = (who: string, error: unknown) =>
+    messages.push({ severity: 'warning', message: `„${who}“: Bild nicht verwendet – ${error instanceof Error ? error.message : error}` });
+
+  type Job = () => Promise<void>;
+  const jobs: Job[] = [];
+  for (const entry of result.organisations) {
+    if (!entry.logoRef) continue;
+    const org = entry.organisation;
+    jobs.push(async () => {
+      try {
+        const { image, files } = await processImage(entry.logoRef!, paths);
+        files.forEach((f) => keep.add(f));
+        org.logo = { ...image, alt: `Logo von ${org.name}`, credit: entry.logoCredit };
+      } catch (error) {
+        imageWarn(org.name, error);
+      }
+    });
+  }
+  for (const entry of result.projects) {
+    if (!entry.imageRef) continue;
+    const p = entry.project;
+    jobs.push(async () => {
       try {
         const { image, files } = await processImage(entry.imageRef!, paths);
         files.forEach((f) => keep.add(f));
-        inst.image = {
-          ...image,
-          alt: image.kind === 'logo' ? `Logo von ${inst.name}` : `Foto: ${inst.name}`,
-          credit: entry.imageCredit,
-        };
+        const alt = image.kind === 'logo' ? `Logo von ${p.name}` : `Foto: ${p.name} (${p.orgName})`;
+        p.image = { ...image, alt, credit: entry.imageCredit };
+        p.ownImage = true;
         if (!entry.imageCredit && image.kind === 'photo') {
-          messages.push({ severity: 'warning', message: `„${inst.name}“: Bildnachweis fehlt.` });
+          messages.push({ severity: 'warning', message: `„${p.name}“ (${p.orgName}): Bildnachweis fehlt.` });
         }
       } catch (error) {
-        messages.push({
-          severity: 'warning',
-          message: `„${inst.name}“: Bild nicht verwendet – ${error instanceof Error ? error.message : error}`,
-        });
+        imageWarn(`${p.name} (${p.orgName})`, error);
       }
-    }
+    });
   }
-  await Promise.all(Array.from({ length: IMAGE_CONCURRENCY }, worker));
+  await Promise.all(
+    Array.from({ length: IMAGE_CONCURRENCY }, async () => {
+      for (let job = jobs.shift(); job; job = jobs.shift()) await job();
+    }),
+  );
   await pruneOutput(paths, keep);
 
-  const total = institutions.reduce((sum, i) => sum + (i.amount ?? 0), 0);
-  const withAmount = institutions.filter((i) => i.amount !== null).length;
+  // Projects without their own image show the organisation logo.
+  const organisations: Organisation[] = result.organisations.map((e) => e.organisation);
+  const projects: Project[] = result.projects.map((e) => e.project);
+  for (const p of projects) {
+    if (!p.image) p.image = organisations.find((o) => o.slug === p.orgSlug)?.logo ?? null;
+  }
+
+  const total = projects.reduce((sum, p) => sum + (p.amount ?? 0), 0);
+  const withAmount = projects.filter((p) => p.amount !== null).length;
 
   const generatedDir = path.join(root, 'src/generated');
   await mkdir(generatedDir, { recursive: true });
   const generatedAt = new Date().toISOString();
   await writeFile(
-    path.join(generatedDir, 'institutions.json'),
-    JSON.stringify({ generatedAt, source, total, withAmount, institutions }, null, 2),
+    path.join(generatedDir, 'data.json'),
+    JSON.stringify({ generatedAt, source, total, withAmount, organisations, projects }, null, 2),
   );
   await writeFile(path.join(generatedDir, 'settings.json'), JSON.stringify(settings, null, 2));
 
   const warnings = messages.filter((m) => m.severity === 'warning');
   const summary =
-    `${institutions.length} Einrichtungen veröffentlicht (Summe ${formatEuro(total)} pro Jahr, ` +
-    `${withAmount} mit Betrag), ${warnings.length} Warnung${warnings.length === 1 ? '' : 'en'}. ` +
+    `${projects.length} Projekte von ${organisations.length} Einrichtungen veröffentlicht ` +
+    `(Summe 2027: ${formatEuro(total)}, ${withAmount} mit Betrag), ${warnings.length} Warnung${warnings.length === 1 ? '' : 'en'}. ` +
     `Nicht freigegeben: ${result.stats.notApproved}, ohne Zustimmung: ${result.stats.noConsent}.`;
   await writeReport({ ok: true, generatedAt, source, summary, stats: result.stats, messages });
 

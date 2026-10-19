@@ -48,7 +48,7 @@ describe('column mapping', () => {
 
   it('maps headers with leading spaces', () => {
     const result = runPipeline(sheet([...BASE_KEYS, 'project'], [{ name: 'A', area: 'Kultur', project: 'P', ...ok }], '  '), OPTIONS);
-    expect(result.entries[0]!.institution.project).toBe('P');
+    expect(result.projects[0]!.project.name).toBe('P');
   });
 
   it('stops with a German error when a required column is missing', () => {
@@ -65,7 +65,7 @@ describe('column mapping', () => {
     const table = sheet(BASE_KEYS, [{ name: 'A', area: 'Kultur', ...ok }]);
     table.splice(1, 0, [...table[0]!]);
     const result = runPipeline(table, OPTIONS);
-    expect(result.entries.map((e) => e.institution.name)).toEqual(['A']);
+    expect(result.projects.map((e) => e.project.name)).toEqual(['A']);
     expect(result.messages.some((m) => m.message.includes('wiederholt die Kopfzeile'))).toBe(true);
   });
 
@@ -104,7 +104,7 @@ describe('privacy allowlist', () => {
 
   it('never copies private fields into the output, even if the sheet publishes them', () => {
     const result = runPipeline(sheet(ALL_KEYS, [row]), OPTIONS);
-    expect(result.entries).toHaveLength(1);
+    expect(result.projects).toHaveLength(1);
     const output = JSON.stringify(result);
     for (const [key, secret] of Object.entries(SECRET)) {
       expect(output, `private field ${key} leaked`).not.toContain(secret);
@@ -118,12 +118,15 @@ describe('privacy allowlist', () => {
     expect(privateWarnings).toHaveLength(PRIVATE_KEYS.size);
   });
 
-  it('outputs exactly the public institution fields', () => {
+  it('outputs exactly the public organisation and project fields', () => {
     const result = runPipeline(sheet(ALL_KEYS, [row]), OPTIONS);
-    expect(Object.keys(result.entries[0]!.institution).sort()).toEqual(
+    expect(Object.keys(result.organisations[0]!.organisation).sort()).toEqual(
+      ['address', 'description', 'links', 'logo', 'name', 'reach', 'slug', 'website'].sort(),
+    );
+    expect(Object.keys(result.projects[0]!.project).sort()).toEqual(
       [
-        'address', 'amount', 'amountKind', 'amountSource', 'area', 'consequences', 'cutDescription', 'description',
-        'featured', 'image', 'infoLink', 'links', 'name', 'project', 'quote', 'reach', 'slug', 'website',
+        'id', 'anchor', 'orgSlug', 'orgName', 'name', 'area', 'cutDescription', 'amount', 'amountKind', 'amountSource',
+        'amountLater', 'amountPercent', 'nonMonetary', 'consequences', 'quote', 'infoLink', 'image', 'ownImage', 'featured',
       ].sort(),
     );
   });
@@ -137,26 +140,28 @@ describe('privacy allowlist', () => {
       { name: 'Nein', area: 'Kultur', consentPublish: 'Nein, bitte nicht', approved: 'WAHR' },
     ]);
     const result = runPipeline(table, OPTIONS);
-    expect(result.entries.map((e) => e.institution.name)).toEqual(['Freigegeben']);
-    expect(result.stats).toMatchObject({ published: 1, notApproved: 2, noConsent: 2 });
+    expect(result.projects.map((e) => e.project.name)).toEqual(['Freigegeben']);
+    expect(result.stats).toMatchObject({ projects: 1, organisations: 1, notApproved: 2, noConsent: 2 });
   });
 
   it('accepts German checkbox values (WAHR)', () => {
     const result = runPipeline(sheet(BASE_KEYS, [{ name: 'A', area: 'Kultur', consentPublish: 'x', approved: 'WAHR' }]), OPTIONS);
-    expect(result.entries).toHaveLength(1);
+    expect(result.projects).toHaveLength(1);
   });
 
   it('uses images only with image consent', () => {
-    const keys: ColumnKey[] = [...BASE_KEYS, 'imageUrls', 'consentImages'];
+    const keys: ColumnKey[] = [...BASE_KEYS, 'imageUrls', 'projectImageUrls', 'consentImages'];
     const img = 'https://drive.google.com/open?id=abcdefghijklmnop';
+    const img2 = 'https://drive.google.com/open?id=qrstuvwxyz123456';
     const result = runPipeline(
       sheet(keys, [
-        { name: 'Mit', area: 'Kultur', imageUrls: img, consentImages: 'Mit dem Hochladen bestätigen wir …', ...ok },
-        { name: 'Ohne', area: 'Kultur', imageUrls: img, consentImages: '', ...ok },
+        { name: 'Mit', area: 'Kultur', imageUrls: img, projectImageUrls: img2, consentImages: 'Ja, das bestätigen wir.', ...ok },
+        { name: 'Ohne', area: 'Kultur', imageUrls: img, projectImageUrls: img2, consentImages: '', ...ok },
       ]),
       OPTIONS,
     );
-    expect(result.entries.map((e) => e.imageRef)).toEqual([{ kind: 'drive', id: 'abcdefghijklmnop' }, null]);
+    expect(result.organisations.map((o) => o.logoRef)).toEqual([{ kind: 'drive', id: 'abcdefghijklmnop' }, null]);
+    expect(result.projects.map((p) => p.imageRef)).toEqual([{ kind: 'drive', id: 'qrstuvwxyz123456' }, null]);
   });
 });
 
@@ -167,8 +172,8 @@ describe('field rules', () => {
     const [e] = runPipeline(
       sheet(keys, [{ name: 'A', area: 'Kultur', amountReported: '40.000', amountVerified: '45.000', amountSource: 'Vorlage', ...ok }]),
       OPTIONS,
-    ).entries;
-    expect(e!.institution).toMatchObject({ amount: 45000, amountKind: 'verified', amountSource: 'Vorlage' });
+    ).projects;
+    expect(e!.project).toMatchObject({ amount: 45000, amountKind: 'verified', amountSource: 'Vorlage' });
   });
 
   it('falls back to the reported amount and warns about unreadable values', () => {
@@ -179,7 +184,7 @@ describe('field rules', () => {
       ]),
       OPTIONS,
     );
-    expect(result.entries.map((e) => [e.institution.amount, e.institution.amountKind])).toEqual([
+    expect(result.projects.map((e) => [e.project.amount, e.project.amountKind])).toEqual([
       [25000, 'reported'],
       [null, null],
     ]);
@@ -188,7 +193,7 @@ describe('field rules', () => {
 
   it('sorts unknown areas into Sonstiges with a warning', () => {
     const result = runPipeline(sheet(keys, [{ name: 'A', area: 'Kunst & Soziales', ...ok }]), OPTIONS);
-    expect(result.entries[0]!.institution.area).toBe('sonstiges');
+    expect(result.projects[0]!.project.area).toBe('sonstiges');
     expect(result.messages.some((m) => m.message.includes('Unbekannter Bereich „Kunst & Soziales“'))).toBe(true);
   });
 
@@ -203,31 +208,95 @@ describe('field rules', () => {
       ['Sonstiges', 'sonstiges'],
     ];
     const result = runPipeline(sheet(keys, answers.map(([area], i) => ({ name: `E${i}`, area, ...ok }))), OPTIONS);
-    expect(result.entries.map((e) => e.institution.area)).toEqual(answers.map(([, slug]) => slug));
+    expect(result.projects.map((e) => e.project.area)).toEqual(answers.map(([, slug]) => slug));
     expect(result.messages.filter((m) => m.message.includes('Unbekannter Bereich'))).toHaveLength(0);
   });
 
   it('matches areas case-insensitively', () => {
     const result = runPipeline(sheet(keys, [{ name: 'A', area: ' BILDUNG ', ...ok }]), OPTIONS);
-    expect(result.entries[0]!.institution.area).toBe('bildung');
+    expect(result.projects[0]!.project.area).toBe('bildung');
   });
 
-  it('creates unique slugs for duplicate names', () => {
+  it('creates unique organisation slugs for different names with the same slug', () => {
     const result = runPipeline(
       sheet(keys, [
-        { name: 'Jugendhaus Süd', area: 'Jugend', ...ok },
-        { name: 'Jugendhaus Süd', area: 'Jugend', ...ok },
+        { name: 'Café Mitte', area: 'Kultur', ...ok },
+        { name: 'Cafe Mitte', area: 'Kultur', ...ok },
       ]),
       OPTIONS,
     );
-    expect(result.entries.map((e) => e.institution.slug)).toEqual(['jugendhaus-sued', 'jugendhaus-sued-2']);
+    expect(result.organisations.map((o) => o.organisation.slug)).toEqual(['cafe-mitte', 'cafe-mitte-2']);
+  });
+
+  it('merges an organisation entered twice as new and keeps both projects', () => {
+    const result = runPipeline(
+      sheet([...keys, 'project'], [
+        { name: 'Jugendhaus Süd', area: 'Jugend', project: 'Treff', ...ok },
+        { name: 'Jugendhaus  SÜD', area: 'Jugend', project: 'Treff', ...ok },
+      ]),
+      OPTIONS,
+    );
+    expect(result.organisations).toHaveLength(1);
+    expect(result.projects.map((e) => e.project.id)).toEqual(['jugendhaus-sued--treff', 'jugendhaus-sued--treff-2']);
+    expect(result.messages.some((m) => m.message.includes('mehrfach als neu eingetragen'))).toBe(true);
   });
 
   it('strips quotation marks around quotes and reads featured', () => {
     const [e] = runPipeline(sheet(keys, [{ name: 'A', area: 'Kultur', quote: ' „Wir bleiben.“ ', featured: 'TRUE', ...ok }]), OPTIONS)
-      .entries;
-    expect(e!.institution.quote).toBe('Wir bleiben.');
-    expect(e!.institution.featured).toBe(true);
+      .projects;
+    expect(e!.project.quote).toBe('Wir bleiben.');
+    expect(e!.project.featured).toBe(true);
+  });
+});
+
+describe('several projects per organisation', () => {
+  const NEW = 'Unsere Einrichtung ist neu hier – wir tragen die Einrichtung und ein erstes betroffenes Projekt ein';
+  const MORE = 'Ein weiteres betroffenes Projekt für eine bereits eingetragene Einrichtung';
+  const keys: ColumnKey[] = [
+    ...BASE_KEYS, 'entryType', 'orgSelect', 'project', 'amountReported', 'amountLater', 'amountPercent', 'nonMonetary',
+  ];
+
+  it('attaches additional projects to their organisation, whatever the row order', () => {
+    const result = runPipeline(
+      sheet(keys, [
+        { entryType: MORE, orgSelect: 'E-Werk', project: 'Streetwork', area: 'Soziales, Familie & Senioren', amountReported: '11.000', amountPercent: '10 %', ...ok },
+        { entryType: NEW, name: 'E-Werk', project: 'Kulturzentrum', area: 'Kultur & Kunst', amountReported: '50.000', amountLater: '2028: 85.000 €', ...ok },
+        { entryType: MORE, orgSelect: ' e-werk ', project: 'Saal', area: 'Kultur & Kunst', nonMonetary: 'Wegfall der Mietzuschüsse', ...ok },
+      ]),
+      OPTIONS,
+    );
+    expect(result.organisations.map((o) => o.organisation.name)).toEqual(['E-Werk']);
+    expect(result.projects.map((e) => [e.project.orgSlug, e.project.name, e.project.area, e.project.amount])).toEqual([
+      ['e-werk', 'Kulturzentrum', 'kultur', 50000],
+      ['e-werk', 'Streetwork', 'soziales', 11000],
+      ['e-werk', 'Saal', 'kultur', null],
+    ]);
+    expect(result.projects[0]!.project.amountLater).toBe('2028: 85.000 €');
+    expect(result.projects[1]!.project.amountPercent).toBe('10 %');
+    expect(result.projects[2]!.project.nonMonetary).toBe('Wegfall der Mietzuschüsse');
+  });
+
+  it('skips additional projects for organisations that are not approved', () => {
+    const result = runPipeline(
+      sheet(keys, [
+        { entryType: NEW, name: 'Verein', project: 'A', area: 'Kultur & Kunst', consentPublish: 'ja', approved: 'FALSE' },
+        { entryType: MORE, orgSelect: 'Verein', project: 'B', area: 'Kultur & Kunst', ...ok },
+      ]),
+      OPTIONS,
+    );
+    expect(result.projects).toHaveLength(0);
+    expect(result.organisations).toHaveLength(0);
+    expect(result.messages.some((m) => m.message.includes('nicht (mehr) freigegeben'))).toBe(true);
+  });
+
+  it('treats answers from before the form was split as new organisations', () => {
+    const result = runPipeline(sheet(keys, [{ entryType: '', name: 'Alt', area: 'Kultur & Kunst', ...ok }]), OPTIONS);
+    expect(result.projects.map((e) => [e.project.name, e.project.orgName])).toEqual([['Alt', 'Alt']]);
+  });
+
+  it('warns about very long project names (old combined question)', () => {
+    const result = runPipeline(sheet(keys, [{ name: 'A', area: 'Kultur & Kunst', project: 'x '.repeat(60), ...ok }]), OPTIONS);
+    expect(result.messages.some((m) => m.message.includes('Projektname ist sehr lang'))).toBe(true);
   });
 });
 

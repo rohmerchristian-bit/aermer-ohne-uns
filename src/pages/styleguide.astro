@@ -9,7 +9,7 @@ import { base, signal, textCandidates } from '../design/colors';
 import { areas } from '../data/areas';
 import { contrastRatio, pickTextColor } from '../lib/contrast';
 import { formatCompact, formatCut, formatEuro } from '../lib/format';
-import { institutions, sortedForGrid } from '../data/index.ts';
+import { projects, sortedForGrid } from '../data/index.ts';
 
 // Internal page for design approval. Not linked, not indexed.
 
@@ -25,7 +25,7 @@ const swatches = [
 });
 
 const mutedOnPaper = contrastRatio(base.muted, base.paper);
-const demo = institutions.find((i) => i.image) ?? institutions[0]!;
+const demo = projects.find((p) => p.ownImage) ?? projects[0]!;
 ---
 
 <Base title="Styleguide" noindex>
@@ -164,9 +164,9 @@ const demo = institutions.find((i) => i.image) ?? institutions[0]!;
       </div>
       <ul class="tile-grid" role="list">
         {
-          sortedForGrid().map((inst) => (
+          sortedForGrid().map((p) => (
             <li>
-              <Tile institution={inst} />
+              <Tile project={p} />
             </li>
           ))
         }
@@ -174,8 +174,8 @@ const demo = institutions.find((i) => i.image) ?? institutions[0]!;
 
       <h3 class="sg-subhead">Vorder- und Rückseite nebeneinander</h3>
       <ul class="tile-grid" role="list">
-        <li><Tile institution={demo} headingLevel={4} idSuffix="-vorn" /></li>
-        <li><Tile institution={demo} headingLevel={4} idSuffix="-hinten" flipped /></li>
+        <li><Tile project={demo} headingLevel={4} idSuffix="-vorn" /></li>
+        <li><Tile project={demo} headingLevel={4} idSuffix="-hinten" flipped /></li>
       </ul>
     </div>
   </section>

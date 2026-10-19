@@ -1,14 +1,14 @@
 ---
 import { url } from '../lib/paths.ts';
 import { areas } from '../data/areas.ts';
-import type { Institution } from '../data/types.ts';
+import type { Project } from '../data/types.ts';
 
 // Area "filter bar" on the start page: links into the filtered list.
 interface Props {
-  institutions: Institution[];
+  projects: Project[];
 }
-const { institutions } = Astro.props;
-const used = areas.filter((a) => institutions.some((i) => i.area === a.slug));
+const { projects } = Astro.props;
+const used = areas.filter((a) => projects.some((p) => p.area === a.slug));
 ---
 
 {

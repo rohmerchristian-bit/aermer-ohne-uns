@@ -21,18 +21,21 @@ Konfiguration: `.env.example` nach `.env` kopieren und ausfüllen.
 `npm run data` (läuft automatisch vor `dev`, `build` und `check`) lädt die Tabellen, prüft sie und schreibt
 `src/generated/*.json` sowie die optimierten Bilder nach `public/media/`. Beides ist nicht im Repository.
 
-- `DATA_SOURCE=sample` (Standard): Beispieldaten aus `data/sample/` – zehn fiktive Zeilen, davon acht veröffentlicht,
-  eine nicht freigegeben, eine ohne Zustimmung.
+- `DATA_SOURCE=sample` (Standard): Beispieldaten aus `data/sample/` – 13 fiktive Zeilen im Aufbau des Formulars.
+  Daraus werden 10 Projekte von 7 Einrichtungen (eine Einrichtung mit vier Projekten); je eine Zeile ist nicht
+  freigegeben, ohne Zustimmung bzw. ein weiteres Projekt einer nicht freigegebenen Einrichtung.
 - `DATA_SOURCE=remote`: die veröffentlichten CSV-Links aus `SHEET_PUBLIC_CSV_URL` und `SHEET_SETTINGS_CSV_URL`.
 
-Am Ende steht eine Zusammenfassung („8 Einrichtungen veröffentlicht … 4 Warnungen“), die auch in
+Am Ende steht eine Zusammenfassung („10 Projekte von 7 Einrichtungen veröffentlicht … Warnungen“), die auch in
 `.cache/build-report.json` landet. Bei einem Fehler (z. B. fehlende Pflichtspalte) bricht der Schritt mit einer
 deutschen Meldung ab, und es wird nichts veröffentlicht.
 
 | Was | Datei |
 |---|---|
 | Fragetitel → interne Felder, öffentlich/privat | `src/data/columns.ts` |
-| Regeln für Einträge (Freigabe, Beträge, Bilder) | `src/data/pipeline.ts` |
+| Regeln für Einträge (Freigabe, Beträge, Bilder, Projekte je Einrichtung) | `src/data/pipeline.ts` |
+| Fragenliste des Formulars (Umbau auf mehrere Projekte) | `docs/formular-fragen.md` |
+| Formel „Öffentlich“, Benachrichtigung, Einrichtungsliste | `docs/google-sheet/` |
 | Einstellungen und Standardwerte | `src/data/settings.ts` |
 | Bilder herunterladen und optimieren (mit Cache) | `src/lib/images.ts` |
 

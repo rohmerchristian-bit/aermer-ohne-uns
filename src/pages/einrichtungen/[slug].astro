@@ -5,176 +5,246 @@ import TileGrid from '../../components/TileGrid.astro';
 import ExternalLink from '../../components/ExternalLink.astro';
 import DonationBlock from '../../components/DonationBlock.astro';
 import IconArrow from '../../components/icons/IconArrow.astro';
-import { getArea } from '../../data/areas.ts';
-import { institutions, settings, sortedForGrid } from '../../data/index.ts';
-import type { Institution } from '../../data/types.ts';
-import { amountSourceLabel } from '../../lib/amount-label.ts';
+import { areas, getArea } from '../../data/areas.ts';
+import { count, organisations, projects, projectsOf, settings, sortedForGrid } from '../../data/index.ts';
+import type { InstitutionImage, Organisation } from '../../data/types.ts';
+import { amountSourceLabel, percentLabel } from '../../lib/amount-label.ts';
 import { formatCut, initials, truncate } from '../../lib/format.ts';
 
+// One page per organisation, with a section for each of its affected projects.
 export function getStaticPaths() {
-  return institutions.map((institution) => ({ params: { slug: institution.slug }, props: { institution } }));
+  return organisations.map((organisation) => ({ params: { slug: organisation.slug }, props: { organisation } }));
 }
 
 interface Props {
-  institution: Institution;
+  organisation: Organisation;
 }
 
-const { institution: inst } = Astro.props;
-const area = getArea(inst.area);
-const sourceLabel = amountSourceLabel(inst);
-const related = sortedForGrid(institutions.filter((i) => i.area === inst.area && i.slug !== inst.slug)).slice(0, 3);
+const { organisation: org } = Astro.props;
+const own = projectsOf(org.slug);
+const total = own.reduce((sum, p) => sum + (p.amount ?? 0), 0);
+const mainArea = getArea(own[0]!.area);
+const orgAreas = areas.filter((a) => own.some((p) => p.area === a.slug));
+const related = sortedForGrid(
+  projects.filter((p) => p.orgSlug !== org.slug && orgAreas.some((a) => a.slug === p.area)),
+).slice(0, 3);
+
 const paragraphs = (text: string | null) => (text ? text.split(/\n{2,}/).map((p) => p.split('\n')) : []);
-const socialLinks = inst.links.filter((l) => l !== inst.website);
-const linkLabel = (url: string) => new URL(url).hostname.replace(/^www\./, '');
-const pageUrl = new URL(url(`/einrichtungen/${inst.slug}/`), Astro.site).toString();
+const socialLinks = org.links.filter((l) => l !== org.website);
+const linkLabel = (link: string) => new URL(link).hostname.replace(/^www\./, '');
+const pageUrl = new URL(url(`/einrichtungen/${org.slug}/`), Astro.site).toString();
 
 const description = truncate(
-  [inst.amount !== null ? `${formatCut(inst.amount)} pro Jahr.` : null, inst.project, inst.consequences]
+  [
+    `${count(own.length, 'betroffenes Projekt', 'betroffene Projekte')}`,
+    total > 0 ? `${formatCut(total)} im Jahr 2027.` : null,
+    own.map((p) => p.name).join(', '),
+  ]
     .filter(Boolean)
-    .join(' '),
+    .join(' · '),
   160,
 );
 
-const sections = [
-  { id: 'folgen', title: 'Was die Kürzung bedeutet', text: inst.consequences },
-  { id: 'gekuerzt', title: 'Was gekürzt werden soll', text: inst.cutDescription },
-  { id: 'arbeit', title: 'Was wir tun', text: inst.description },
-  { id: 'reichweite', title: 'Wen wir erreichen', text: inst.reach },
-].filter((s) => s.text);
+const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' : 'Foto'}: ${img.credit}`;
 ---
 
-<Page title={inst.name} description={description}>
-  <article class="detail" data-area={area.slug} aria-labelledby="detail-titel">
-    <header class="detail__head">
+<Page title={org.name} description={description}>
+  <article class="detail" aria-labelledby="detail-titel">
+    <header class="detail__head" data-area={mainArea.slug}>
       <div class="container detail__head-inner">
         <p class="detail__back">
-          <a href={url('/einrichtungen/')}>Alle Einrichtungen</a>
+          <a href={url('/einrichtungen/')}>Alle Projekte</a>
         </p>
-        <p class="label">{area.label}</p>
-        <h1 id="detail-titel" class="detail__name">{inst.name}</h1>
-        {inst.project && <p class="detail__project">{inst.project}</p>}
-        <div class="detail__money">
-          {
-            inst.amount !== null ? (
-              <p class="detail__amount">
-                <span class="nobreak">{formatCut(inst.amount)}</span> <span class="detail__per">pro Jahr</span>
-              </p>
-            ) : (
-              <p class="detail__amount detail__amount--pending">Betrag folgt</p>
-            )
-          }
-          {sourceLabel && <p class="detail__source">{sourceLabel}</p>}
-        </div>
+        <p class="label">{orgAreas.map((a) => a.label).join(' · ')}</p>
+        <h1 id="detail-titel" class="detail__name">{org.name}</h1>
+        <p class="detail__summary">
+          {count(own.length, 'betroffenes Projekt', 'betroffene Projekte')}
+          {total > 0 && <>, zusammen <span class="nobreak">{formatCut(total)}</span> im Jahr 2027</>}
+        </p>
+        {
+          own.length > 1 && (
+            <nav aria-label="Projekte dieser Einrichtung">
+              <ul class="detail__toc" role="list">
+                {own.map((p) => (
+                  <li>
+                    <a href={`#${p.anchor}`}>{p.name}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )
+        }
       </div>
     </header>
 
-    <div class="container detail__body">
-      <figure class:list={['detail__media', inst.image && `detail__media--${inst.image.kind}`]}>
+    <div class="container detail__about">
+      <figure class:list={['detail__logo', org.logo && `detail__logo--${org.logo.kind}`]}>
         {
-          inst.image ? (
+          org.logo ? (
             <picture>
-              {inst.image.sources.map((source) => (
-                <source type={source.type} srcset={srcsetUrl(source.srcset)} sizes="(min-width: 64em) 40vw, 92vw" />
+              {org.logo.sources.map((source) => (
+                <source type={source.type} srcset={srcsetUrl(source.srcset)} sizes="(min-width: 64em) 24rem, 60vw" />
               ))}
               <img
-                src={url(inst.image.src)}
-                width={inst.image.width}
-                height={inst.image.height}
-                alt={inst.image.alt}
+                src={url(org.logo.src)}
+                width={org.logo.width}
+                height={org.logo.height}
+                alt={org.logo.alt}
                 decoding="async"
-                fetchpriority="high"
               />
             </picture>
           ) : (
-            <div class="detail__placeholder" aria-hidden="true">
-              {initials(inst.name)}
+            <div class="detail__placeholder" data-area={mainArea.slug} aria-hidden="true">
+              {initials(org.name)}
             </div>
           )
         }
-        {
-          inst.image?.credit && (
-            <figcaption class="detail__credit small">
-              {inst.image.kind === 'logo' ? 'Bild' : 'Foto'}: {inst.image.credit}
-            </figcaption>
-          )
-        }
+        {org.logo?.credit && <figcaption class="detail__credit small">{imageCaption(org.logo)}</figcaption>}
       </figure>
 
       <div class="detail__text">
         {
-          inst.quote && (
-            <blockquote class="detail__quote">
-              <p>„{inst.quote}“</p>
-              <footer class="label">{inst.name}</footer>
-            </blockquote>
-          )
-        }
-
-        {
-          sections.map((section) => (
-            <section class="detail__section" aria-labelledby={`abschnitt-${section.id}`}>
-              <h2 id={`abschnitt-${section.id}`} class="h3">
-                {section.title}
-              </h2>
-              {paragraphs(section.text).map((lines) => (
-                <p>
-                  {lines.map((line, i) => (
-                    <>
-                      {i > 0 && <br />}
-                      {line}
-                    </>
-                  ))}
-                </p>
+          org.description && (
+            <section class="detail__section" aria-labelledby="abschnitt-arbeit">
+              <h2 id="abschnitt-arbeit" class="h3">Was wir tun</h2>
+              {paragraphs(org.description).map((lines) => (
+                <p>{lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</p>
               ))}
             </section>
-          ))
+          )
         }
-
+        {
+          org.reach && (
+            <section class="detail__section" aria-labelledby="abschnitt-reichweite">
+              <h2 id="abschnitt-reichweite" class="h3">Wen wir erreichen</h2>
+              {paragraphs(org.reach).map((lines) => (
+                <p>{lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</p>
+              ))}
+            </section>
+          )
+        }
         <section class="detail__section" aria-labelledby="abschnitt-kontakt">
-          <h2 id="abschnitt-kontakt" class="h3">Mehr erfahren</h2>
-          {inst.address && <p>{inst.address}</p>}
+          <h2 id="abschnitt-kontakt" class="h3">Kontakt und Links</h2>
+          {org.address && <p>{org.address}</p>}
           <ul class="detail__links" role="list">
             {
-              inst.infoLink && (
+              org.website && (
                 <li>
-                  <ExternalLink href={inst.infoLink} context={`von ${inst.name}`}>
-                    Stellungnahme / weitere Informationen
+                  <ExternalLink href={org.website} context={`von ${org.name}`}>
+                    Website ({linkLabel(org.website)})
                   </ExternalLink>
                 </li>
               )
             }
             {
-              inst.website && (
+              socialLinks.map((link) => (
                 <li>
-                  <ExternalLink href={inst.website} context={`von ${inst.name}`}>
-                    Website ({linkLabel(inst.website)})
-                  </ExternalLink>
-                </li>
-              )
-            }
-            {
-              socialLinks.map((url) => (
-                <li>
-                  <ExternalLink href={url} context={`von ${inst.name}`}>
-                    {linkLabel(url)}
+                  <ExternalLink href={link} context={`von ${org.name}`}>
+                    {linkLabel(link)}
                   </ExternalLink>
                 </li>
               ))
             }
           </ul>
         </section>
-
-        <section class="detail__share" aria-labelledby="abschnitt-teilen">
-          <h2 id="abschnitt-teilen" class="label">Diese Seite teilen</h2>
-          <div class="detail__share-row">
-            <input class="input" id="share-url" type="text" readonly value={pageUrl} aria-label="Link zu dieser Seite" />
-            <button type="button" class="btn" data-copy-target="share-url" data-copied-label="Kopiert">
-              Link kopieren
-            </button>
-          </div>
-          <p class="small detail__hashtags">{settings.hashtags.join(' ')}</p>
-        </section>
       </div>
+    </div>
+
+    {
+      own.map((p) => {
+        const area = getArea(p.area);
+        const notes = [percentLabel(p.amountPercent), amountSourceLabel(p)].filter(Boolean).join(' · ');
+        return (
+          <section class="project" id={p.anchor} data-area={area.slug} aria-labelledby={`${p.anchor}-titel`}>
+            <div class="container project__inner">
+              <header class="project__head">
+                <p class="label project__area">
+                  <span class="project__swatch" aria-hidden="true" />
+                  {area.label}
+                </p>
+                <h2 id={`${p.anchor}-titel`} class="project__name">
+                  {p.name}
+                </h2>
+                {p.amount !== null ? (
+                  <p class="project__amount">
+                    <span class="nobreak">{formatCut(p.amount)}</span> <span class="project__per">im Jahr 2027</span>
+                  </p>
+                ) : p.nonMonetary ? (
+                  <p class="project__amount project__amount--text">{p.nonMonetary}</p>
+                ) : (
+                  <p class="project__amount project__amount--text">Betrag folgt</p>
+                )}
+                {p.amountLater && <p class="project__later">Danach: {p.amountLater}</p>}
+                {notes && <p class="project__source small">{notes}</p>}
+              </header>
+
+              <div class="project__body">
+                {p.ownImage && p.image && (
+                  <figure class={`project__media project__media--${p.image.kind}`}>
+                    <picture>
+                      {p.image.sources.map((source) => (
+                        <source type={source.type} srcset={srcsetUrl(source.srcset)} sizes="(min-width: 64em) 40vw, 92vw" />
+                      ))}
+                      <img
+                        src={url(p.image.src)}
+                        width={p.image.width}
+                        height={p.image.height}
+                        alt={p.image.alt}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </picture>
+                    {p.image.credit && <figcaption class="detail__credit small">{imageCaption(p.image)}</figcaption>}
+                  </figure>
+                )}
+
+                {p.quote && (
+                  <blockquote class="detail__quote">
+                    <p>„{p.quote}“</p>
+                  </blockquote>
+                )}
+
+                {p.consequences && (
+                  <div class="detail__section">
+                    <h3 class="h3">Was die Kürzung bedeutet</h3>
+                    {paragraphs(p.consequences).map((lines) => (
+                      <p>{lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</p>
+                    ))}
+                  </div>
+                )}
+                {p.cutDescription && (
+                  <div class="detail__section">
+                    <h3 class="h3">Was gekürzt werden soll</h3>
+                    {paragraphs(p.cutDescription).map((lines) => (
+                      <p>{lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</p>
+                    ))}
+                  </div>
+                )}
+                {p.infoLink && (
+                  <p class="detail__links">
+                    <ExternalLink href={p.infoLink} context={`zu ${p.name}`}>
+                      Stellungnahme / weitere Informationen
+                    </ExternalLink>
+                  </p>
+                )}
+              </div>
+            </div>
+          </section>
+        );
+      })
+    }
+
+    <div class="container">
+      <section class="detail__share" aria-labelledby="abschnitt-teilen">
+        <h2 id="abschnitt-teilen" class="label">Diese Seite teilen</h2>
+        <div class="detail__share-row">
+          <input class="input" id="share-url" type="text" readonly value={pageUrl} aria-label="Link zu dieser Seite" />
+          <button type="button" class="btn" data-copy-target="share-url" data-copied-label="Kopiert">
+            Link kopieren
+          </button>
+        </div>
+        <p class="small detail__hashtags">{settings.hashtags.join(' ')}</p>
+      </section>
     </div>
   </article>
 
@@ -184,12 +254,12 @@ const sections = [
         <div class="container">
           <div class="section__head">
             <p class="label">Ebenfalls betroffen</p>
-            <h2 id="weitere-titel">Mehr aus dem Bereich {area.label}</h2>
+            <h2 id="weitere-titel">Mehr aus {orgAreas.length === 1 ? `dem Bereich ${mainArea.label}` : 'diesen Bereichen'}</h2>
           </div>
-          <TileGrid institutions={related} />
+          <TileGrid projects={related} />
           <p class="detail__all">
-            <a href={url(`/einrichtungen/?bereich=${area.slug}`)}>
-              Alle aus dem Bereich {area.label} <IconArrow />
+            <a href={url(`/einrichtungen/?bereich=${orgAreas.map((a) => a.slug).join(',')}`)}>
+              Alle Projekte aus {orgAreas.length === 1 ? 'diesem Bereich' : 'diesen Bereichen'} <IconArrow />
             </a>
           </p>
         </div>
@@ -216,7 +286,7 @@ const sections = [
   .detail__head-inner {
     display: grid;
     gap: var(--space-4);
-    padding-block: var(--space-6) var(--space-8);
+    padding-block: var(--space-6) var(--space-7);
   }
 
   .detail__back {
@@ -235,64 +305,43 @@ const sections = [
     max-width: 18ch;
   }
 
-  .detail__project {
+  .detail__summary {
     font-size: var(--fs-lead);
+    font-weight: 800;
+    font-stretch: var(--stretch-semi);
+  }
+
+  .detail__toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin: var(--space-2) 0 0;
+    padding: 0;
+    list-style: none;
     font-weight: 700;
-    max-width: 40ch;
   }
 
-  .detail__money {
-    margin-top: var(--space-5);
-  }
-
-  .detail__amount {
-    font-size: clamp(3rem, 10vw, 8rem);
-    font-weight: 900;
-    font-stretch: var(--stretch-condensed);
-    line-height: var(--lh-tight);
-    letter-spacing: var(--tracking-tight);
-    font-variant-numeric: tabular-nums lining-nums;
-  }
-
-  .detail__per {
-    font-size: 0.3em;
-    letter-spacing: 0;
-  }
-
-  .detail__amount--pending {
-    font-size: clamp(2.5rem, 6vw, 5rem);
-  }
-
-  .detail__source {
-    margin-top: var(--space-3);
-    font-weight: 500;
-  }
-
-  .detail__body {
+  .detail__about {
     display: grid;
     gap: var(--space-7);
     padding-block: var(--space-8);
   }
 
   @media (min-width: 64em) {
-    .detail__body {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    .detail__about {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
       align-items: start;
-    }
-
-    .detail__media {
-      position: sticky;
-      top: var(--space-5);
     }
   }
 
-  .detail__media img {
+  .detail__logo img {
     width: 100%;
+    max-width: 24rem;
     height: auto;
     border: var(--line-strong) solid var(--color-ink);
   }
 
-  .detail__media--logo img {
+  .detail__logo--logo img {
     padding: var(--space-6);
     background: var(--color-white);
   }
@@ -300,11 +349,12 @@ const sections = [
   .detail__placeholder {
     display: grid;
     place-items: center;
-    aspect-ratio: 4 / 3;
+    max-width: 24rem;
+    aspect-ratio: 1;
     background: var(--area-bg);
     color: var(--area-fg);
     border: var(--line-strong) solid var(--color-ink);
-    font-size: clamp(5rem, 16vw, 12rem);
+    font-size: clamp(4rem, 12vw, 8rem);
     font-weight: 900;
     font-stretch: var(--stretch-condensed);
     line-height: 1;
@@ -317,24 +367,7 @@ const sections = [
 
   .detail__text {
     display: grid;
-    gap: var(--space-7);
-  }
-
-  .detail__quote {
-    padding-left: var(--space-5);
-    border-left: 0.5rem solid var(--area-bg);
-  }
-
-  .detail__quote p {
-    font-size: clamp(1.75rem, 3.2vw, 2.75rem);
-    font-weight: 800;
-    font-stretch: var(--stretch-semi);
-    line-height: 1.12;
-    max-width: 28ch;
-  }
-
-  .detail__quote footer {
-    margin-top: var(--space-4);
+    gap: var(--space-6);
   }
 
   .detail__section {
@@ -353,9 +386,114 @@ const sections = [
     font-weight: 700;
   }
 
+  /* One block per project */
+  .project {
+    border-top: var(--line-strong) solid var(--color-ink);
+    scroll-margin-top: var(--space-4);
+  }
+
+  .project__inner {
+    display: grid;
+    gap: var(--space-6);
+    padding-block: var(--space-7);
+  }
+
+  @media (min-width: 64em) {
+    .project__inner {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
+  }
+
+  .project__area {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .project__swatch {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: var(--line) solid var(--color-ink);
+    background: var(--area-bg);
+  }
+
+  .project__head {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+    padding-left: var(--space-5);
+    border-left: 0.75rem solid var(--area-bg);
+  }
+
+  .project__name {
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .project__amount {
+    margin-top: var(--space-3);
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    font-weight: 900;
+    font-stretch: var(--stretch-condensed);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-tight);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .project__amount--text {
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    line-height: 1.05;
+  }
+
+  .project__per {
+    font-size: 0.32em;
+    letter-spacing: 0;
+  }
+
+  .project__later {
+    font-weight: 800;
+  }
+
+  .project__source {
+    color: var(--color-muted);
+  }
+
+  .project__body {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .project__media img {
+    width: 100%;
+    height: auto;
+    border: var(--line-strong) solid var(--color-ink);
+  }
+
+  .project__media--logo img {
+    max-width: 20rem;
+    padding: var(--space-5);
+    background: var(--color-white);
+  }
+
+  .detail__quote {
+    padding-left: var(--space-5);
+    border-left: 0.5rem solid var(--color-ink);
+  }
+
+  .detail__quote p {
+    font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+    font-weight: 800;
+    font-stretch: var(--stretch-semi);
+    line-height: 1.12;
+    max-width: 28ch;
+  }
+
   .detail__share {
     display: grid;
     gap: var(--space-3);
+    margin-block: var(--space-7);
     padding: var(--space-5);
     border: var(--line-strong) solid var(--color-ink);
   }

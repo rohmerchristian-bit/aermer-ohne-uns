@@ -3,9 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": {
-    "node": "24.22.0"
-  },
   "scripts": {
     "data": "node scripts/prepare-data.ts",
     "dev": "npm run data && ASTRO_TELEMETRY_DISABLED=1 astro dev",

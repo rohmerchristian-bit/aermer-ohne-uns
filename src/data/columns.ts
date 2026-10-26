@@ -197,8 +197,7 @@ export const columns: readonly ColumnDef[] = [
       'Redebeitrag auf der Bühne',
     ],
   },
-  // Contact for an additional project. The form says „Erscheint auf Website“ – kept private
-  // until the initiative confirms that phone numbers and e-mail addresses may be published.
+  // Contact for an additional project: internal only (decision of the initiative, 26.10.2026).
   { key: 'projectPhone', header: 'Telefonnummer für Rückfragen', visibility: 'private' },
   { key: 'projectEmail', header: 'E-Mail-Adresse für Rückfragen', visibility: 'private' },
   {

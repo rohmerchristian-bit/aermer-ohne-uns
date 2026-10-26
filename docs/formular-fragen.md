@@ -160,6 +160,8 @@ um die automatische Einrichtungsliste in Abschnitt 7.
 3. Kachelfarbe nach Bereich des Projekts – **ja**
 4. „Wie könnte man Euch helfen …?“ – **vorerst nicht öffentlich**
 5. Bildrechte-Frage ohne Pflicht – **ja**
+6. „Telefonnummer für Rückfragen“ und „E-Mail-Adresse für Rückfragen“ – **intern, nicht auf der Website** (26.10.2026);
+   der Hinweis „Erscheint auf Website“ im Formular wird entsprechend geändert
 
 ## Ursprünglich offene Fragen
 

@@ -82,6 +82,18 @@ describe('column mapping', () => {
     expect(result.messages.some((m) => m.message.includes('doppelt'))).toBe(false);
   });
 
+  it('reads the organisation name from whichever duplicate name column is filled', () => {
+    const table = [
+      ['Name der Institution / Einrichtung', 'Zu welchem Bereich gehört eure Einrichtung?', 'Name der Institution / Einrichtung',
+        'Freigabe zur Veröffentlichung', 'Freigeben'],
+      ['Alt', 'Kultur & Kunst', '', 'ja', 'TRUE'],
+      ['', 'Kultur & Kunst', 'Neu', 'ja', 'TRUE'],
+    ];
+    const result = runPipeline(table, OPTIONS);
+    expect(result.organisations.map((o) => o.organisation.name)).toEqual(['Alt', 'Neu']);
+    expect(result.stats.invalid).toBe(0);
+  });
+
   it('warns about unknown columns and ignores them', () => {
     const table = sheet(BASE_KEYS, [{ name: 'A', area: 'Kultur', ...ok }]);
     table[0]!.push('Neue Frage');

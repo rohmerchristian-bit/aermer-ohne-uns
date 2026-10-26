@@ -54,8 +54,32 @@ function kopfzeile_(sheet) {
     .map((h) => String(h).trim());
 }
 
+/**
+ * Alle Spalten (1-basiert), deren Überschrift mit `anfang` beginnt. Wird eine Frage im Formular gelöscht und neu
+ * angelegt, behält Google die alte Spalte – dieselbe Überschrift kann dann mehrfach vorkommen.
+ */
+function spaltenBeginnenMit_(header, anfang) {
+  return header.map((h, i) => (h.startsWith(anfang) ? i + 1 : 0)).filter(Boolean);
+}
+
+/** Erster nicht leerer Wert einer Zeile aus mehreren Spalten (Werte als Array der ganzen Zeile, 0-basiert). */
+function ersterWert_(zeile, spalten) {
+  for (const c of spalten) {
+    const v = String(zeile[c - 1] ?? '').trim();
+    if (v) return v;
+  }
+  return '';
+}
+
 /** Einmal ausführen: prüft die benötigten Überschriften und ergänzt fehlende Hilfsspalten. */
-function einrichten() {
+function einrichten(e) {
+  // Ist der Trigger „Bei Formularübermittlung“ versehentlich auf diese Funktion gesetzt, wird die Antwort
+  // trotzdem richtig verarbeitet. Bitte den Trigger auf beiFormularAntwort umstellen.
+  if (e && e.range) {
+    console.warn('einrichten() wurde vom Formular-Trigger aufgerufen – bitte Trigger auf „beiFormularAntwort“ umstellen.');
+    beiFormularAntwort(e);
+    return;
+  }
   const sheet = SpreadsheetApp.getActive().getSheetByName(BLATT);
   if (!sheet) throw new Error(`Tab „${BLATT}“ nicht gefunden.`);
   let header = kopfzeile_(sheet);
@@ -72,8 +96,10 @@ function einrichten() {
   const probleme = [];
   if (!header.includes(SPALTE_FREIGABE)) probleme.push(`Spalte „${SPALTE_FREIGABE}“ fehlt.`);
   for (const anfang of [SPALTE_NAME_BEGINNT_MIT, SPALTE_BEREICH_BEGINNT_MIT]) {
-    const n = header.filter((h) => h.startsWith(anfang)).length;
-    if (n !== 1) probleme.push(`Überschrift „${anfang}…“ ${n === 0 ? 'fehlt' : `kommt ${n}-mal vor`}.`);
+    const n = spaltenBeginnenMit_(header, anfang).length;
+    if (n === 0) probleme.push(`Überschrift „${anfang}…“ fehlt.`);
+    // Mehrfach ist kein Fehler: das Skript nimmt pro Zeile die Spalte, in der etwas steht.
+    if (n > 1) console.log(`Hinweis: Überschrift „${anfang}…“ kommt ${n}-mal vor (alte und neue Frage) – wird zusammengeführt.`);
   }
   if (probleme.length) throw new Error(probleme.join(' '));
   console.log('Alles bereit. Jetzt den Trigger „Bei Formularübermittlung“ für beiFormularAntwort anlegen.');
@@ -94,7 +120,6 @@ function beiFormularAntwort(e, test = false) {
   const header = kopfzeile_(sheet);
 
   const spalte = (name) => header.indexOf(name) + 1;
-  const spalteBeginntMit = (anfang) => header.findIndex((h) => h.startsWith(anfang)) + 1;
 
   const statusCol = spalte(SPALTE_STATUS);
   const zeitCol = spalte(SPALTE_ZEIT);
@@ -119,12 +144,12 @@ function beiFormularAntwort(e, test = false) {
     }
   }
 
-  const wert = (col) => (col ? String(sheet.getRange(row, col).getValue()).trim() : '');
-  const einrichtung =
-    wert(spalteBeginntMit(SPALTE_NAME_BEGINNT_MIT)) || wert(spalteBeginntMit(SPALTE_AUSWAHL_BEGINNT_MIT)) || '(ohne Namen)';
-  const projekt = wert(spalteBeginntMit(SPALTE_PROJEKT_BEGINNT_MIT));
+  const zeile = sheet.getRange(row, 1, 1, header.length).getValues()[0];
+  const wert = (anfang) => ersterWert_(zeile, spaltenBeginnenMit_(header, anfang));
+  const einrichtung = wert(SPALTE_NAME_BEGINNT_MIT) || wert(SPALTE_AUSWAHL_BEGINNT_MIT) || '(ohne Namen)';
+  const projekt = wert(SPALTE_PROJEKT_BEGINNT_MIT);
   const name = projekt && projekt !== einrichtung ? `${einrichtung} – ${projekt}` : einrichtung;
-  const bereich = wert(spalteBeginntMit(SPALTE_BEREICH_BEGINNT_MIT));
+  const bereich = wert(SPALTE_BEREICH_BEGINNT_MIT);
   const link = `${SpreadsheetApp.getActive().getUrl()}#gid=${sheet.getSheetId()}&range=A${row}`;
 
   const zeilen = [
@@ -162,17 +187,17 @@ function aktualisiereEinrichtungsliste() {
   const sheet = ss.getSheetByName(BLATT);
   if (!sheet) throw new Error(`Tab „${BLATT}“ nicht gefunden.`);
   const header = kopfzeile_(sheet);
-  const nameCol = header.findIndex((h) => h.startsWith(SPALTE_NAME_BEGINNT_MIT));
+  const nameCols = spaltenBeginnenMit_(header, SPALTE_NAME_BEGINNT_MIT);
   const freiCol = header.indexOf(SPALTE_FREIGABE);
   const wegCol = header.findIndex((h) => h.startsWith(SPALTE_WEG_BEGINNT_MIT));
-  if (nameCol < 0 || freiCol < 0) throw new Error('Spalten „Name der Institution“ oder „Freigeben“ fehlen.');
+  if (!nameCols.length || freiCol < 0) throw new Error('Spalten „Name der Institution“ oder „Freigeben“ fehlen.');
 
   const zeilen = sheet.getLastRow() > 1 ? sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues() : [];
   const namen = [
     ...new Set(
       zeilen
         .filter((z) => z[freiCol] === true && (wegCol < 0 || !/weiteres/i.test(String(z[wegCol]))))
-        .map((z) => String(z[nameCol]).trim())
+        .map((z) => ersterWert_(z, nameCols))
         .filter(Boolean),
     ),
   ].sort((a, b) => a.localeCompare(b, 'de'));
@@ -193,7 +218,7 @@ function beiBearbeitung(e) {
   const sheet = e.range.getSheet();
   if (sheet.getName() !== BLATT) return;
   const header = kopfzeile_(sheet);
-  const betroffen = [header.indexOf(SPALTE_FREIGABE) + 1, header.findIndex((h) => h.startsWith(SPALTE_NAME_BEGINNT_MIT)) + 1];
+  const betroffen = [header.indexOf(SPALTE_FREIGABE) + 1, ...spaltenBeginnenMit_(header, SPALTE_NAME_BEGINNT_MIT)];
   if (betroffen.some((c) => c >= e.range.getColumn() && c <= e.range.getLastColumn())) aktualisiereEinrichtungslisteSicher_();
 }
 

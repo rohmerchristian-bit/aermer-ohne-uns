@@ -10,8 +10,9 @@ In das Blatt „Öffentlich“, Zelle **A1** (alles andere im Blatt leer lassen)
 =LET(
   kopf; ARRAYFORMULA(TRIM(Formularantworten!A1:BZ1));
   werte; Formularantworten!A2:BZ;
-  gesucht; ARRAYFORMULA(XMATCH({"Was möchtet ihr eintragen*"\"Für welche Einrichtung tragt ihr*"\"Name der Institution*"\"Standort*"\"Website*"\"Social Media*"\"Was tut eure Institution*"\"Wen erreicht eure Arbeit*"\"Logo der Einrichtung*"\"Logo-Upload für euer Profil*"\"Bildnachweis zum Logo*"\"Bildnachweis (Fotograf*"\"Betroffenes Projekt / Angebot*"\"Zu welchem Bereich*"\"Welche Zuschüsse*"\"Geplante Kürzung 2027*"\"Geplante Kürzung in Euro pro Jahr*"\"Geplante Kürzung 2028*"\"Geplante Kürzung 2029*"\"Kürzung in den Folgejahren*"\"Kürzung in Prozent*"\"Falls es nicht um einen Geldbetrag*"\"Quelle des Betrags*"\"Welche konkreten Folgen hat die Kürzung*"\"Absagen von Angeboten*"\"Prägnantes Zitat*"\"Link zu weiterführenden*"\"Bild oder Logo für dieses Projekt*"\"Bildnachweis zum Projektbild*"\"Freigabe zur Veröffentlichung*"\"Mit dem Hochladen bestätigen wir*"\"Freigeben"\"Betrag_geprüft"\"Hervorheben"}; kopf; 2));
-  spalten; FILTER(gesucht; NOT(ISNA(gesucht)));
+  begriffe; {"Was möchtet ihr eintragen*"\"Für welche Einrichtung tragt ihr*"\"Name der Institution*"\"Standort*"\"Website*"\"Social Media*"\"Was tut eure Institution*"\"Wen erreicht eure Arbeit*"\"Logo der Einrichtung*"\"Logo-Upload für euer Profil*"\"Bildnachweis zum Logo*"\"Bildnachweis (Fotograf*"\"Betroffenes Projekt / Angebot*"\"Zu welchem Bereich*"\"Welche Zuschüsse*"\"Geplante Kürzung 2027*"\"Geplante Kürzung in Euro pro Jahr*"\"Geplante Kürzung 2028*"\"Geplante Kürzung 2029*"\"Kürzung in den Folgejahren*"\"Kürzung in Prozent*"\"Falls es nicht um einen Geldbetrag*"\"Quelle des Betrags*"\"Welche konkreten Folgen hat die Kürzung*"\"Absagen von Angeboten*"\"Prägnantes Zitat*"\"Link zu weiterführenden*"\"Bild oder Logo für dieses Projekt*"\"Bildnachweis zum Projektbild*"\"Freigabe zur Veröffentlichung*"\"Mit dem Hochladen bestätigen wir*"\"Freigeben"\"Betrag_geprüft"\"Hervorheben"};
+  alle; HSTACK(ARRAYFORMULA(XMATCH(begriffe; kopf; 2)); ARRAYFORMULA(XMATCH(begriffe; kopf; 2; -1)));
+  spalten; UNIQUE(FILTER(alle; NOT(ISNA(alle))); TRUE);
   kopfzeile; CHOOSECOLS(kopf; spalten);
   treffer; FILTER(werte; CHOOSECOLS(werte; XMATCH("Freigeben"; kopf; 0)) = TRUE);
   IF(ISERROR(ROWS(treffer)); kopfzeile; VSTACK(kopfzeile; CHOOSECOLS(treffer; spalten)))
@@ -23,6 +24,9 @@ In das Blatt „Öffentlich“, Zelle **A1** (alles andere im Blatt leer lassen)
 - Sie sucht **34 Überschriften**, darunter auch die alten und neuen Titel beim Formular-Umbau
   (z. B. „Logo-Upload für euer Profil …“ *und* „Logo der Einrichtung“). Was es im Formular (noch) nicht
   gibt, lässt sie einfach weg – das Formular kann also Schritt für Schritt umgebaut werden.
+- Kommt eine Überschrift **mehrfach** vor (eine Frage wurde im Formular gelöscht und neu angelegt – Google behält die
+  alte Spalte), übernimmt die Formel die erste **und** die letzte passende Spalte. Die Website nimmt pro Zeile die
+  Spalte, in der etwas steht.
 - Private Fragen (Ansprechperson, E-Mail, Aktionen, Räume, Demo, Verteiler, „Wie könnte man Euch helfen“)
   stehen **nicht** in der Liste und kommen deshalb nie ins öffentliche Blatt.
 - Überschriften (Zeile 1) und Antworten (ab Zeile 2) werden getrennt gelesen; die Admin-Spalten

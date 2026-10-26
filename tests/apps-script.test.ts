@@ -177,3 +177,104 @@ describe('form rebuild script (docs/google-sheet/formular-umbau.gs)', () => {
     expect(s.logs.some((l) => l.includes('bereits ausgeführt'))).toBe(true);
   });
 });
+
+// ---- Notification script against a small spreadsheet mock --------------------------------------
+
+function sheetMock(rows: unknown[][]) {
+  const data = rows.map((r) => [...r]);
+  const cell = (r: number, c: number) => ({
+    getValue: () => data[r - 1]?.[c - 1] ?? '',
+    setValue: (v: unknown) => {
+      while (data[r - 1]!.length < c) data[r - 1]!.push('');
+      data[r - 1]![c - 1] = v;
+    },
+    isChecked: () => data[r - 1]?.[c - 1] === true,
+    uncheck: () => {
+      data[r - 1]![c - 1] = false;
+    },
+  });
+  const sheet = {
+    getName: () => 'Formularantworten',
+    getSheetId: () => 1,
+    getLastColumn: () => Math.max(...data.map((r) => r.length)),
+    getLastRow: () => data.length,
+    getRange: (r: number, c: number, nr = 1, nc = 1) => ({
+      ...cell(r, c),
+      getRow: () => r,
+      getColumn: () => c,
+      getLastColumn: () => c + nc - 1,
+      getSheet: () => sheet,
+      getValues: () =>
+        Array.from({ length: nr }, (_, i) => Array.from({ length: nc }, (_, j) => data[r - 1 + i]?.[c - 1 + j] ?? '')),
+    }),
+  };
+  return { sheet, data };
+}
+
+function runNotification(sheet: unknown, listItem: MockItem) {
+  const code = readFileSync('docs/google-sheet/benachrichtigung.gs', 'utf8');
+  const mails: Array<{ subject: string; body: string }> = [];
+  const logs: string[] = [];
+  const env = {
+    SpreadsheetApp: {
+      getActive: () => ({ getSheetByName: () => sheet, getUrl: () => 'https://sheet', getFormUrl: () => 'https://form' }),
+    },
+    FormApp: { ItemType: T, openByUrl: () => ({ getItems: () => [listItem] }) },
+    MailApp: { sendEmail: (m: { subject: string; body: string }) => mails.push(m) },
+    console: { log: (m: string) => logs.push(m), warn: (m: string) => logs.push(m) },
+  };
+  const fns = new Function(...Object.keys(env), `${code}\nreturn { einrichten, beiFormularAntwort, aktualisiereEinrichtungsliste };`)(
+    ...Object.values(env),
+  ) as { einrichten: (e?: unknown) => void; beiFormularAntwort: (e: unknown) => void; aktualisiereEinrichtungsliste: () => void };
+  return { ...fns, mails, logs };
+}
+
+describe('notification script (docs/google-sheet/benachrichtigung.gs)', () => {
+  // Old and re-created question: "Name der Institution" exists twice.
+  const header = [
+    'Was möchtet ihr eintragen?', 'Name der Institution / Einrichtung', 'Zu welchem Bereich gehört das Projekt / Angebot?',
+    'Name der Institution / Einrichtung ', 'Betroffenes Projekt / Angebot', 'Freigeben', 'Status', 'Zuletzt eingegangen',
+  ];
+  const NEW = 'Unsere Einrichtung ist neu hier – …';
+  const fresh = () =>
+    sheetMock([
+      header,
+      [NEW, 'Altes Kulturhaus', 'Kultur & Kunst', '', 'Saal', true, 'Geprüft', ''],
+      [NEW, '', 'Kinder & Jugend', 'Neues Jugendhaus', 'Treff', true, 'Geprüft', ''],
+      [NEW, '', 'Kultur & Kunst', 'Noch nicht freigegeben', 'X', false, '', ''],
+    ]);
+  const listItem = () => new MockItem(T.LIST, 'Für welche Einrichtung tragt ihr ein weiteres Projekt ein?', []);
+
+  it('einrichten() accepts duplicate name columns instead of failing', () => {
+    const { sheet } = fresh();
+    const s = runNotification(sheet, listItem());
+    expect(() => s.einrichten()).not.toThrow();
+    expect(s.logs.some((l) => l.includes('2-mal vor'))).toBe(true);
+  });
+
+  it('a form trigger wrongly set to einrichten() still processes the answer', () => {
+    const { sheet, data } = fresh();
+    const s = runNotification(sheet, listItem());
+    s.einrichten({ range: sheet.getRange(3, 1) });
+    expect(s.mails[0]!.subject).toContain('Neues Jugendhaus');
+    expect(data[2]![6]).toBe('Geändert – bitte prüfen');
+  });
+
+  it('takes the name from whichever duplicate column is filled', () => {
+    const { sheet } = fresh();
+    const s = runNotification(sheet, listItem());
+    s.beiFormularAntwort({ range: sheet.getRange(2, 1) });
+    s.beiFormularAntwort({ range: sheet.getRange(3, 1) });
+    expect(s.mails.map((m) => m.subject)).toEqual([
+      expect.stringContaining('Altes Kulturhaus – Saal'),
+      expect.stringContaining('Neues Jugendhaus – Treff'),
+    ]);
+  });
+
+  it('lists approved organisations from both name columns', () => {
+    const { sheet } = fresh();
+    const item = listItem();
+    runNotification(sheet, item).aktualisiereEinrichtungsliste();
+    expect(item.choices!.map((c) => c.v)).toEqual(['Altes Kulturhaus', 'Neues Jugendhaus']);
+  });
+});

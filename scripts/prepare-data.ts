@@ -53,13 +53,17 @@ async function loadTables(messages: BuildMessage[]): Promise<{ publicCsv: string
   const publicUrl = process.env.SHEET_PUBLIC_CSV_URL?.trim();
   if (!publicUrl) throw new DataError('SHEET_PUBLIC_CSV_URL ist nicht gesetzt (Link zum veröffentlichten Blatt „Öffentlich“).');
   const settingsUrl = process.env.SHEET_SETTINGS_CSV_URL?.trim();
-  if (!settingsUrl) {
+  let settingsCsv: string | null = null;
+  if (settingsUrl) {
+    settingsCsv = await fetchCsv(settingsUrl, 'Das Blatt „Einstellungen“');
+  } else if (existsSync(path.join(root, 'data/einstellungen.csv'))) {
+    // Until the "Einstellungen" sheet is published, the real settings live in the repository.
+    settingsCsv = await readFile(path.join(root, 'data/einstellungen.csv'), 'utf8');
+    messages.push({ severity: 'warning', message: 'Einstellungen kommen aus data/einstellungen.csv (Blatt „Einstellungen“ noch nicht verbunden).' });
+  } else {
     messages.push({ severity: 'warning', message: 'SHEET_SETTINGS_CSV_URL ist nicht gesetzt – es gelten die Standard-Einstellungen.' });
   }
-  return {
-    publicCsv: await fetchCsv(publicUrl, 'Das Blatt „Öffentlich“'),
-    settingsCsv: settingsUrl ? await fetchCsv(settingsUrl, 'Das Blatt „Einstellungen“') : null,
-  };
+  return { publicCsv: await fetchCsv(publicUrl, 'Das Blatt „Öffentlich“'), settingsCsv };
 }
 
 async function main(): Promise<void> {

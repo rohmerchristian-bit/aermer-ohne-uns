@@ -31,6 +31,8 @@ const robotsNoindex = noindex || isPreview;
     <meta name="description" content={description} />
     {robotsNoindex ? <meta name="robots" content="noindex, nofollow" /> : <link rel="canonical" href={canonical} />}
     <meta name="theme-color" content="#111111" />
+    <link rel="icon" type="image/png" sizes="32x32" href={url('/favicon-32.png')} />
+    <link rel="apple-touch-icon" href={url('/apple-touch-icon.png')} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="de_DE" />
     <meta property="og:site_name" content={SITE_NAME} />
@@ -47,8 +49,9 @@ const robotsNoindex = noindex || isPreview;
     {
       isPreview && (
         <p class="preview-banner">
-          Vorschau mit Beispieldaten – noch nicht veröffentlicht. Alle Einrichtungen und Zahlen auf den Kacheln sind
-          erfunden.
+          {process.env.DATA_SOURCE === 'remote'
+            ? 'Vorschau – noch nicht offiziell veröffentlicht. Es erscheinen nur vom Bündnis freigegebene Einträge.'
+            : 'Vorschau mit Beispieldaten – alle Einrichtungen und Zahlen auf den Kacheln sind erfunden.'}
         </p>
       )
     }

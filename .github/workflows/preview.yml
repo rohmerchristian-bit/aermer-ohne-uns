@@ -1,7 +1,9 @@
-# Public preview on GitHub Pages with SAMPLE data only.
+# Public preview on GitHub Pages with the REAL, approved entries from the sheet "Öffentlich".
 # https://rohmerchristian-bit.github.io/aermer-ohne-uns/
 #
-# Never uses the real Google Sheet – no secrets are needed or available here.
+# Rebuilt on every push, every hour and by hand ("Run workflow"). If the data step fails
+# (e.g. a broken sheet formula), nothing is deployed and the previous preview stays online.
+# Secret: SHEET_PUBLIC_CSV_URL (published CSV of the sheet "Öffentlich").
 # The production deployment to the E-Werk server is a separate workflow (Phase 6).
 
 name: Vorschau (GitHub Pages)
@@ -9,6 +11,8 @@ name: Vorschau (GitHub Pages)
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '17 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -24,7 +28,8 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     env:
-      DATA_SOURCE: sample
+      DATA_SOURCE: remote
+      SHEET_PUBLIC_CSV_URL: ${{ secrets.SHEET_PUBLIC_CSV_URL }}
       PREVIEW: '1'
       SITE_URL: https://${{ github.repository_owner }}.github.io
       BASE_PATH: /${{ github.event.repository.name }}
@@ -39,12 +44,21 @@ jobs:
 
       - run: npm ci
 
+      # Downloaded originals and optimised images, so Drive is not asked again every hour.
+      - uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: |
+            .cache/images
+            public/media
+          key: images-${{ github.run_id }}
+          restore-keys: images-
+
       - run: npm test
 
       - name: Typprüfung
         run: npm run check
 
-      - name: Website bauen (Beispieldaten)
+      - name: Website bauen (echte Daten)
         run: npm run build
 
       - name: Zusammenfassung

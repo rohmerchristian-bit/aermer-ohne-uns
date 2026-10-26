@@ -35,8 +35,9 @@ jobs:
     env:
       DATA_SOURCE: remote
       SHEET_PUBLIC_CSV_URL: ${{ secrets.SHEET_PUBLIC_CSV_URL }}
-      SITE_URL: ${{ secrets.SITE_URL }}
-      COMING_SOON: ${{ secrets.COMING_SOON }}
+      # Not secret: preferably set as repository *variables* (otherwise GitHub masks every "1" in the logs).
+      SITE_URL: ${{ vars.SITE_URL || secrets.SITE_URL }}
+      COMING_SOON: ${{ vars.COMING_SOON || secrets.COMING_SOON }}
       ASTRO_TELEMETRY_DISABLED: '1'
     steps:
       - name: Ist das Deployment eingerichtet?

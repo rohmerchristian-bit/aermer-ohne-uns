@@ -22,6 +22,10 @@ Die Zugangsdaten gehören nur in GitHub-Secrets – nie ins Repository. Lokal li
 `SITE_URL`, `COMING_SOON`, `FTP_HOST`, `FTP_USER`, `FTP_PASSWORD`, `FTP_DIR` (Werte aus `.env.deploy`).
 `SHEET_PUBLIC_CSV_URL` ist bereits angelegt.
 
+`SITE_URL` und `COMING_SOON` sind nicht geheim. Besser als **Variable** anlegen (gleiche Seite, Reiter
+*Variables*): Als Secret blendet GitHub sonst jede „1“ in den Protokollen als `***` aus. Eine Variable hat
+Vorrang vor einem gleichnamigen Secret.
+
 Danach läuft das Deployment beim nächsten Push oder spätestens zur nächsten vollen Stunde (Minute 47) –
 sofort geht es über *Actions → Deploy (aermerohneuns.de) → Run workflow*.
 
@@ -35,7 +39,7 @@ Solange `COMING_SOON` = `1` ist, steht online nur die Seite „Die Plattform sta
 aktuellem Hinweis aus den Einstellungen und – falls gesetzt – Links zu Formular, Instagram, Kontakt). Alle
 anderen Seiten werden nicht hochgeladen; jede andere Adresse zeigt dieselbe Seite. Die Seite ist `noindex`.
 
-**Zum Start der vollständigen Website:** Secret `COMING_SOON` auf `0` setzen (oder löschen) und den Workflow
+**Zum Start der vollständigen Website:** `COMING_SOON` auf `0` setzen (Variable bzw. Secret) und den Workflow
 starten. Vorher Impressum und Datenschutzerklärung einsetzen – die Platzhalter sind gelb markiert.
 
 ## Sicherheitsprüfung

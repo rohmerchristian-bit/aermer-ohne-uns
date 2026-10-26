@@ -1,0 +1,125 @@
+# Live website https://aermerohneuns.de on the E-Werk webspace (Hetzner), via encrypted FTP (FTPS).
+#
+# Runs every hour, on every push to main and by hand ("Run workflow").
+# Order: build completely → safety check → upload. If any step fails, nothing is uploaded and the
+# live site stays as it is.
+#
+# Repository secrets (Settings → Secrets and variables → Actions), e.g. from .env.deploy:
+#   SITE_URL, COMING_SOON, FTP_HOST, FTP_USER, FTP_PASSWORD, FTP_DIR, SHEET_PUBLIC_CSV_URL
+# Without FTP_HOST the workflow only reports that deployment is not set up yet.
+
+name: Deploy (aermerohneuns.de)
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '47 * * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Sicherheitsprüfung überspringen (nur wenn weniger Projekte wirklich gewollt sind)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-live
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    env:
+      DATA_SOURCE: remote
+      SHEET_PUBLIC_CSV_URL: ${{ secrets.SHEET_PUBLIC_CSV_URL }}
+      SITE_URL: ${{ secrets.SITE_URL }}
+      COMING_SOON: ${{ secrets.COMING_SOON }}
+      ASTRO_TELEMETRY_DISABLED: '1'
+    steps:
+      - name: Ist das Deployment eingerichtet?
+        id: setup
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_DIR: ${{ secrets.FTP_DIR }}
+        run: |
+          # The upload deletes files that are not part of the build – never allow it at the account root.
+          case "$FTP_DIR" in ""|"/"|"."|"./"|"~"|"~/") if [ -n "$FTP_HOST" ]; then echo "::error::FTP_DIR muss ein Unterordner sein (z. B. public_html)."; exit 1; fi;; esac
+          if [ -z "$FTP_HOST" ] || [ -z "$SITE_URL" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "### Deployment noch nicht eingerichtet" >> "$GITHUB_STEP_SUMMARY"
+            echo "Es fehlen die Secrets FTP_HOST/SITE_URL – siehe docs/deploy/README.md." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.setup.outputs.ready == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - if: steps.setup.outputs.ready == 'true'
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - if: steps.setup.outputs.ready == 'true'
+        run: npm ci
+
+      - if: steps.setup.outputs.ready == 'true'
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: |
+            .cache/images
+            public/media
+          key: live-images-${{ github.run_id }}
+          restore-keys: live-images-
+
+      - if: steps.setup.outputs.ready == 'true'
+        run: npm test
+
+      - if: steps.setup.outputs.ready == 'true'
+        name: Website bauen
+        run: npm run build
+
+      - if: steps.setup.outputs.ready == 'true'
+        name: Für den Server vorbereiten
+        run: node scripts/deploy-package.ts
+
+      - if: steps.setup.outputs.ready == 'true'
+        name: Sicherheitsprüfung
+        env:
+          DEPLOY_FORCE: ${{ inputs.force && '1' || '0' }}
+        run: node scripts/deploy-guard.ts
+
+      - if: steps.setup.outputs.ready == 'true'
+        name: Hochladen (FTPS)
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: ${{ secrets.FTP_DIR }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp > /dev/null
+          # mirror -R: lädt nur geänderte Dateien hoch und entfernt online, was es nicht mehr gibt.
+          # Nie gelöscht werden: Zertifikats-Prüfungen, Passwortdateien, cgi-bin.
+          lftp -c "
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ssl:verify-certificate true;
+            set net:max-retries 3;
+            open --user \"$FTP_USER\" --env-password ftp://$FTP_HOST;
+            mirror --reverse --delete --parallel=4 --verbose=1 \
+              --exclude-glob .well-known/ --exclude-glob .htpasswd* --exclude-glob cgi-bin/ \
+              dist/ \"$FTP_DIR/\"
+          "
+
+      - if: steps.setup.outputs.ready == 'true' && always()
+        name: Zusammenfassung
+        run: |
+          {
+            echo "### Deploy aermerohneuns.de"
+            if [ -f .cache/build-report.json ]; then node -e 'const r=require("./.cache/build-report.json"); console.log(r.summary); for (const m of (r.messages||[])) console.log("- " + m.message)'; fi
+            if [ -f dist/build-info.json ]; then node -e 'const i=require("./dist/build-info.json"); console.log(i.comingSoon ? "\nModus: Coming soon (nur Startseite „startet in Kürze“)" : "\nModus: vollständige Website")'; fi
+          } >> "$GITHUB_STEP_SUMMARY"

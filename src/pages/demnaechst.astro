@@ -1,0 +1,134 @@
+---
+import { url } from '../lib/paths.ts';
+import Base from '../layouts/Base.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import { settings } from '../data/index.ts';
+
+// "Coming soon" page. With COMING_SOON=1 the deploy workflow publishes only this page
+// (as / and as the 404 page). No navigation, so it never links to pages that are not online yet.
+---
+
+<Base
+  title="Ärmer ohne uns"
+  description="Die Plattform des Bündnisses #ÄrmerOhneUns startet in Kürze: welche Erlanger Einrichtungen von den Kürzungen im Haushalt 2027 betroffen sind."
+  noindex
+>
+  <section class="soon">
+    <div class="container soon__inner">
+      <h1 class="soon__logo">
+        <img src={url('/brand/logo.webp')} width="1200" height="1056" alt="Ärmer ohne uns" fetchpriority="high" />
+      </h1>
+
+      <div class="soon__text">
+        <p class="label">Erlangen · Haushalt 2027</p>
+        <p class="soon__title">Die Plattform startet in Kürze.</p>
+        <p class="lead">
+          Hier zeigen Kultur-, Bildungs- und Sozialeinrichtungen bald, was durch die Kürzungen im Haushalt 2027
+          verloren geht.
+        </p>
+
+        {settings.notice && <p class="soon__notice">{settings.notice}</p>}
+
+        <ul class="soon__links" role="list">
+          {
+            settings.formUrl && (
+              <li>
+                <ExternalLink href={settings.formUrl}>Eure Einrichtung ist betroffen? Jetzt eintragen</ExternalLink>
+              </li>
+            )
+          }
+          {
+            settings.instagramUrl && (
+              <li>
+                <ExternalLink href={settings.instagramUrl}>#ÄrmerOhneUns auf Instagram</ExternalLink>
+              </li>
+            )
+          }
+          {
+            settings.contactEmail && (
+              <li>
+                <a href={`mailto:${settings.contactEmail}`}>Kontakt: {settings.contactEmail}</a>
+              </li>
+            )
+          }
+        </ul>
+
+        <p class="small soon__note">
+          Eine Initiative des Bündnisses <span class="nobreak">#ÄrmerOhneUns</span>, verantwortlich: E-Werk
+          Kulturzentrum GmbH, Erlangen.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .soon {
+    min-height: 100vh;
+    display: grid;
+    align-items: center;
+    padding-block: var(--space-7);
+  }
+
+  .soon__inner {
+    display: grid;
+    gap: var(--space-7);
+    align-items: center;
+  }
+
+  @media (min-width: 64em) {
+    .soon__inner {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+  }
+
+  .soon__logo {
+    display: grid;
+    place-items: center;
+    max-width: 34rem;
+    aspect-ratio: 1;
+    padding: clamp(1.25rem, 5vw, 3rem);
+    background: var(--color-signal);
+    border: var(--line-strong) solid var(--color-ink);
+  }
+
+  .soon__logo img {
+    width: 100%;
+    height: auto;
+  }
+
+  .soon__text {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .soon__title {
+    font-size: var(--fs-h1);
+    font-weight: 900;
+    font-stretch: var(--stretch-condensed);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-tight);
+    max-width: 14ch;
+  }
+
+  .soon__notice {
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-ink);
+    color: var(--color-signal);
+    font-weight: 800;
+  }
+
+  .soon__links {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-weight: 800;
+  }
+
+  .soon__note {
+    color: var(--color-muted);
+  }
+</style>

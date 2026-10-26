@@ -73,3 +73,8 @@ Build mit Satori in `src/lib/og.ts`:
 
 Für die Bilder liegen statische Archivo-Schnitte in `src/assets/og-fonts/` (aus der variablen Schrift erzeugt,
 SIL Open Font License, siehe `OFL.txt` dort).
+
+## Live-Website und Deployment
+
+Siehe [docs/deploy/README.md](docs/deploy/README.md): stündlicher Upload per FTPS auf aermerohneuns.de,
+Coming-soon-Modus, Sicherheitsprüfung, `.htaccess` und nginx-Beispiel.

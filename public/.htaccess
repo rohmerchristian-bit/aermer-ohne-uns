@@ -1,0 +1,58 @@
+# #ÄrmerOhneUns – Apache (Hetzner Webhosting). Wird bei jedem Build nach dist/ kopiert.
+# Eine gleichwertige nginx-Konfiguration liegt in docs/deploy/nginx.conf.
+
+Options -Indexes
+DirectorySlash On
+AddDefaultCharset utf-8
+ErrorDocument 404 /404.html
+
+# ---- HTTPS und ohne „www.“ -----------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Let's-Encrypt-Prüfungen nicht umleiten
+  RewriteCond %{REQUEST_URI} !^/\.well-known/
+  RewriteCond %{HTTPS} off [OR]
+  RewriteCond %{HTTP_HOST} ^www\. [NC]
+  RewriteCond %{HTTP_HOST} ^(?:www\.)?(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L,NE]
+</IfModule>
+
+# ---- Sicherheits-Header ----------------------------------------------------------
+<IfModule mod_headers.c>
+  # Alles kommt vom eigenen Server. Einzige Ausnahme: das Newsletter-Formular sendet an CleverReach.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self' https://*.cleverreach.com; upgrade-insecure-requests"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+  Header always set X-Frame-Options "DENY"
+  # Erst aktivieren, wenn HTTPS dauerhaft läuft (dann bleibt der Browser ein Jahr lang bei HTTPS):
+  # Header always set Strict-Transport-Security "max-age=31536000"
+</IfModule>
+
+# ---- Caching -----------------------------------------------------------------------
+<IfModule mod_headers.c>
+  # Dateien mit Hash im Namen ändern sich nie: ein Jahr lang behalten.
+  <FilesMatch "\.(js|css|woff2|avif|webp)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  # Bilder ohne Hash (Logo, Favicons, Vorschaubilder) und tokens.css: eine Stunde.
+  <FilesMatch "\.(png|jpg|svg|ico)$">
+    Header set Cache-Control "public, max-age=3600"
+  </FilesMatch>
+  <FilesMatch "^tokens\.css$">
+    Header set Cache-Control "public, max-age=3600"
+  </FilesMatch>
+  # Seiten immer neu prüfen – sie ändern sich mit jedem stündlichen Build.
+  <FilesMatch "\.(html|json|txt|xml)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain application/javascript application/json image/svg+xml
+</IfModule>
+
+# Fonts mit richtigem Typ ausliefern
+AddType font/woff2 .woff2
+AddType image/avif .avif
+AddType image/webp .webp

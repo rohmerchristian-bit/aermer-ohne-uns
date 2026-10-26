@@ -1,10 +1,13 @@
 ---
 import Page from '../layouts/Page.astro';
-import P from '../components/Placeholder.astro';
-import TechNote from '../components/TechNote.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+
+// Verantwortliche Stelle, Datenschutzbeauftragter und Hosting übernommen von https://www.e-werk.de/datenschutz/
+// (Stand 26.10.2026). Der übrige Text beschreibt, was diese Website tatsächlich tut – sie nutzt im Gegensatz
+// zu e-werk.de keine Cookies, keine Analyse- oder Werbedienste und keine eingebetteten Inhalte.
 ---
 
-<Page title="Datenschutz" description="Datenschutzerklärung der Kampagnen-Website #ÄrmerOhneUns.">
+<Page title="Datenschutz" description="Datenschutzerklärung der Kampagnen-Website #ÄrmerOhneUns: keine Cookies, kein Tracking.">
   <header class="page-head">
     <div class="container">
       <p class="label">Rechtliches</p>
@@ -14,72 +17,158 @@ import TechNote from '../components/TechNote.astro';
 
   <section class="section">
     <div class="container prose">
+      <h2 id="kurz">Das Wichtigste in Kürze</h2>
+      <ul>
+        <li>Diese Website setzt <strong>keine Cookies</strong> und nutzt <strong>keine Analyse-, Tracking- oder Werbedienste</strong>.</li>
+        <li>
+          Schriften, Bilder und alle anderen Inhalte kommen vom eigenen Server. Beim Besuch entstehen keine Verbindungen
+          zu Google, Meta oder anderen Dritten.
+        </li>
+        <li>Beim Aufruf speichert der Server technisch notwendige Zugriffsdaten (Server-Logfiles), siehe unten.</li>
+        <li>
+          Externe Angebote – das Eintragungsformular bei Google, die Spendenaktion, Instagram – sind nur verlinkt. Eine
+          Verbindung dorthin entsteht erst, wenn Sie einen solchen Link anklicken.
+        </li>
+      </ul>
+
       <h2 id="verantwortlich">Verantwortliche Stelle</h2>
       <p>
         E-Werk Kulturzentrum GmbH<br />
-        <P text="ADRESSE" /><br />
-        <P text="KONTAKT FÜR DATENSCHUTZANFRAGEN" />
+        Fuchsenwiese 1<br />
+        91054 Erlangen<br />
+        Deutschland
+      </p>
+      <p>
+        Vertreten durch den Geschäftsführer: Jan-Peter Dinger<br />
+        Telefon: +49 (0)9131 800 50<br />
+        E-Mail: <a href="mailto:info@e-werk.de">info@e-werk.de</a>
+      </p>
+      <p>
+        Die E-Werk Kulturzentrum GmbH betreibt diese Website für das Bündnis
+        <span class="nobreak">#ÄrmerOhneUns</span>.
       </p>
 
-      <h2 id="dsb">Datenschutzbeauftragte*r</h2>
-      <p><P text="NAME UND KONTAKT, FALLS BENANNT – SONST ABSCHNITT ENTFERNEN" /></p>
+      <h2 id="dsb">Datenschutzbeauftragter</h2>
+      <p>
+        Kevin Liebe<br />
+        E-Werk Kulturzentrum GmbH<br />
+        Fuchsenwiese 1<br />
+        91054 Erlangen<br />
+        Telefon: +49 (0)9131 800 50<br />
+        E-Mail: <a href="mailto:datenschutz@e-werk.de">datenschutz@e-werk.de</a>
+      </p>
 
       <h2 id="hosting">Hosting</h2>
-      <p><P text="TEXT FOLGT: HOSTING AUF DER INFRASTRUKTUR DES E-WERKS" /></p>
-      <TechNote>
-        <p>Die Website besteht nur aus statischen Dateien und wird auf einem Server des E-Werks ausgeliefert.</p>
-      </TechNote>
+      <p>
+        Die Website wird bei der Hetzner Online GmbH, Industriestr. 25, 91710 Gunzenhausen, gehostet. Rechtsgrundlage
+        ist unser berechtigtes Interesse an einer zuverlässigen Bereitstellung der Website (Art. 6 Abs. 1 lit. f DSGVO).
+        Mit Hetzner besteht ein Vertrag über Auftragsverarbeitung; Hetzner verarbeitet die Daten nur nach unseren
+        Weisungen. Einzelheiten:
+        <ExternalLink href="https://www.hetzner.com/de/legal/privacy-policy/">Datenschutzerklärung von Hetzner</ExternalLink>.
+      </p>
 
       <h2 id="logfiles">Server-Logfiles</h2>
-      <p><P text="TEXT FOLGT: WELCHE DATEN DER SERVER PROTOKOLLIERT, ZWECK, RECHTSGRUNDLAGE, SPEICHERDAUER" /></p>
-      <TechNote>
-        <p>Was der Webserver protokolliert (z. B. IP-Adresse, Zeitpunkt, aufgerufene Datei), hängt von dessen
-          Konfiguration beim E-Werk ab und ist dort zu erfragen. Die Website selbst erhebt keine Daten.</p>
-      </TechNote>
+      <p>Bei jedem Aufruf einer Seite speichert der Server automatisch Informationen, die Ihr Browser übermittelt:</p>
+      <ul>
+        <li>IP-Adresse des anfragenden Geräts</li>
+        <li>Datum und Uhrzeit des Zugriffs</li>
+        <li>aufgerufene Seite bzw. Datei, übertragene Datenmenge und Statuscode</li>
+        <li>die zuvor besuchte Seite (Referrer), sofern übermittelt</li>
+        <li>Browsertyp und -version sowie Betriebssystem</li>
+      </ul>
+      <p>
+        Diese Daten werden nicht mit anderen Daten zusammengeführt und nicht ausgewertet, um Besucherinnen und Besucher
+        zu identifizieren. Sie dienen dazu, die Website technisch bereitzustellen und ihre Sicherheit zu gewährleisten
+        (z. B. zur Abwehr von Angriffen). Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Die Logfiles werden nach
+        Ablauf der vom Hoster vorgesehenen Frist automatisch gelöscht.
+      </p>
 
       <h2 id="cookies">Keine Cookies, kein Tracking</h2>
-      <p><P text="TEXT FOLGT" /></p>
-      <TechNote>
-        <p>
-          Die Website setzt keine Cookies und nutzt keinen Local Storage für Besucherdaten. Es gibt keine Analyse- oder
-          Tracking-Werkzeuge. Schriften und Bilder werden vom eigenen Server geladen; beim Seitenaufruf entstehen keine
-          Verbindungen zu Google oder anderen Dritten. Bilder der Einrichtungen werden beim Erstellen der Website
-          einmalig aus Google Drive kopiert, nicht beim Besuch.
-        </p>
-      </TechNote>
+      <p>
+        Diese Website speichert keine Cookies und keine sonstigen Informationen auf Ihrem Gerät. Es werden keine
+        Analyse-, Tracking- oder Werbedienste eingesetzt und keine Inhalte von Drittanbietern eingebettet (keine Karten,
+        Videos, Schriftarten- oder Social-Media-Plugins). Deshalb gibt es auch keinen Cookie-Hinweis.
+      </p>
 
-      <h2 id="newsletter">Newsletter (CleverReach)</h2>
-      <p><P text="TEXT FOLGT: ANBIETER CLEVERREACH, DOUBLE-OPT-IN, ERHOBENE DATEN, RECHTSGRUNDLAGE, WIDERRUF, AUFTRAGSVERARBEITUNG" /></p>
-      <TechNote>
-        <p>
-          Das Anmeldeformular sendet E-Mail-Adresse und optional den Vornamen direkt an CleverReach. Erst beim Absenden
-          entsteht eine Verbindung zu CleverReach. Die Anmeldung wird per E-Mail bestätigt (Double-Opt-in); jede
-          Newsletter-Mail enthält einen Abmeldelink.
-        </p>
-      </TechNote>
+      <h2 id="tls">Verschlüsselung</h2>
+      <p>
+        Die Website wird ausschließlich über eine verschlüsselte Verbindung (TLS) ausgeliefert. Sie erkennen das an
+        „https://“ und dem Schloss-Symbol in der Adresszeile.
+      </p>
+
+      <h2 id="inhalte">Inhalte der Einrichtungen</h2>
+      <p>
+        Die Angaben zu Einrichtungen und Projekten haben die Einrichtungen selbst über das Eintragungsformular gemacht
+        und der Veröffentlichung zugestimmt. Veröffentlicht werden nur Einträge, die das Bündnis geprüft und
+        freigegeben hat, und nur die dafür vorgesehenen Angaben. Kontaktdaten wie Ansprechpersonen, E-Mail-Adressen
+        und Telefonnummern werden nie auf der Website veröffentlicht. Bilder und Logos werden nur mit bestätigten
+        Nutzungsrechten gezeigt; sie werden beim Erstellen der Website einmalig auf unseren Server kopiert und von dort
+        ausgeliefert.
+      </p>
+      <p>
+        Einrichtungen, die ihre Angaben ändern oder entfernen lassen möchten, wenden sich an
+        <a href="mailto:info@e-werk.de">info@e-werk.de</a>.
+      </p>
+
+      <h2 id="google-formular">Eintragung über Google Formulare</h2>
+      <p>
+        Für die Eintragung von Einrichtungen nutzen wir ein Formular von Google Formulare (Anbieter: Google Ireland
+        Limited, Gordon House, Barrow Street, Dublin 4, Irland). Das Formular ist auf dieser Website nur verlinkt. Wenn
+        Sie es öffnen, verarbeitet Google Daten nach seinen eigenen Bestimmungen; dabei kann es zu einer Übermittlung
+        in die USA kommen.
+        <ExternalLink href="https://policies.google.com/privacy?hl=de">Datenschutzerklärung von Google</ExternalLink>.
+      </p>
+      <p>
+        Im Formular werden Angaben zur Einrichtung und zu betroffenen Projekten, Kontaktdaten für Rückfragen sowie
+        optional Bilder und Logos erfasst. Das Bündnis nutzt sie, um Einträge zu prüfen, freigegebene Angaben auf
+        dieser Website zu veröffentlichen und – soweit gewünscht – für die Bündnisarbeit (z. B. Verteiler, Kundgebung).
+        Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit per E-Mail an
+        <a href="mailto:info@e-werk.de">info@e-werk.de</a> widerrufen können. Die Angaben werden gelöscht, sobald sie für
+        die Kampagne nicht mehr benötigt werden oder Sie die Löschung verlangen.
+      </p>
 
       <h2 id="externe-links">Externe Links</h2>
-      <p><P text="TEXT FOLGT: HINWEIS, DASS BEIM KLICK AUF EXTERNE LINKS DIE DATENSCHUTZBESTIMMUNGEN DER JEWEILIGEN ANBIETER GELTEN" /></p>
-      <h3 id="wirwunder">Spenden über WirWunder</h3>
-      <p><P text="TEXT FOLGT" /></p>
-      <h3 id="instagram">Instagram</h3>
-      <p><P text="TEXT FOLGT" /></p>
-      <h3 id="google-formular">Eintragung über Google Formulare</h3>
-      <p><P text="TEXT FOLGT: GOOGLE ALS ANBIETER, WELCHE DATEN IM FORMULAR ERHOBEN WERDEN, WOFÜR, WER ZUGRIFF HAT, LÖSCHUNG" /></p>
-      <TechNote>
-        <p>
-          WirWunder, Instagram und das Google Formular sind nur verlinkt, nicht eingebettet. Eine Verbindung zu diesen
-          Diensten entsteht erst, wenn jemand auf den Link klickt. Externe Links öffnen in einem neuen Tab. Im Google
-          Formular werden auch Ansprechperson und E-Mail-Adresse erfasst; diese Angaben werden nie auf der Website
-          veröffentlicht.
-        </p>
-      </TechNote>
+      <p>
+        Diese Website verlinkt auf Angebote anderer Anbieter, etwa die Spendenaktion auf WirWunder, Instagram (Meta
+        Platforms Ireland Limited) und die Websites der beteiligten Einrichtungen. Erst wenn Sie einen solchen Link
+        anklicken, verlassen Sie diese Website; dann gelten die Datenschutzbestimmungen des jeweiligen Anbieters.
+        Externe Links öffnen sich in einem neuen Tab.
+      </p>
 
-      <h2 id="rechte">Eure Rechte</h2>
-      <p><P text="TEXT FOLGT: AUSKUNFT, BERICHTIGUNG, LÖSCHUNG, EINSCHRÄNKUNG, WIDERSPRUCH, DATENÜBERTRAGBARKEIT, BESCHWERDE BEI DER AUFSICHTSBEHÖRDE" /></p>
+      <h2 id="newsletter">Newsletter</h2>
+      <p>
+        Derzeit wird über diese Website kein Newsletter angeboten. Bevor sich das ändert, wird diese
+        Datenschutzerklärung entsprechend ergänzt.
+      </p>
+
+      <h2 id="kontakt">Kontakt per E-Mail</h2>
+      <p>
+        Wenn Sie uns per E-Mail schreiben, verarbeiten wir Ihre Angaben, um Ihr Anliegen zu bearbeiten (Art. 6 Abs. 1
+        lit. b bzw. lit. f DSGVO). Die Daten werden gelöscht, sobald sie dafür nicht mehr erforderlich sind und keine
+        gesetzlichen Aufbewahrungspflichten entgegenstehen.
+      </p>
+
+      <h2 id="rechte">Ihre Rechte</h2>
+      <p>Sie haben jederzeit das Recht auf</p>
+      <ul>
+        <li>Auskunft über die zu Ihrer Person gespeicherten Daten (Art. 15 DSGVO),</li>
+        <li>Berichtigung unrichtiger Daten (Art. 16 DSGVO),</li>
+        <li>Löschung (Art. 17 DSGVO) und Einschränkung der Verarbeitung (Art. 18 DSGVO),</li>
+        <li>Datenübertragbarkeit (Art. 20 DSGVO),</li>
+        <li>Widerspruch gegen Verarbeitungen auf Grundlage berechtigter Interessen (Art. 21 DSGVO),</li>
+        <li>Widerruf einer erteilten Einwilligung mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO).</li>
+      </ul>
+      <p>
+        Wenden Sie sich dafür an die verantwortliche Stelle oder den Datenschutzbeauftragten (Kontakt oben).
+      </p>
+      <p>
+        Außerdem haben Sie das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren (Art. 77 DSGVO). Für uns
+        zuständig ist das Bayerische Landesamt für Datenschutzaufsicht, Promenade 18, 91522 Ansbach,
+        <ExternalLink href="https://www.lda.bayern.de">www.lda.bayern.de</ExternalLink>.
+      </p>
 
       <h2 id="stand">Stand</h2>
-      <p><P text="DATUM" /></p>
+      <p>Oktober 2026</p>
     </div>
   </section>
 </Page>

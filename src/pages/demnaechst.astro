@@ -53,6 +53,10 @@ import { settings } from '../data/index.ts';
           }
         </ul>
 
+        <p class="small soon__legal">
+          <a href={url('/impressum/')}>Impressum</a> · <a href={url('/datenschutz/')}>Datenschutz</a>
+        </p>
+
         <p class="small soon__note">
           Eine Initiative des Bündnisses <span class="nobreak">#ÄrmerOhneUns</span>, verantwortlich: E-Werk
           Kulturzentrum GmbH, Erlangen.
@@ -126,6 +130,10 @@ import { settings } from '../data/index.ts';
     padding: 0;
     list-style: none;
     font-weight: 800;
+  }
+
+  .soon__legal {
+    font-weight: 700;
   }
 
   .soon__note {

@@ -1,9 +1,10 @@
 ---
 import Page from '../layouts/Page.astro';
-import P from '../components/Placeholder.astro';
+
+// Angaben übernommen von https://www.e-werk.de/impressum/ (Stand 26.10.2026).
 ---
 
-<Page title="Impressum" description="Impressum der Kampagnen-Website #ÄrmerOhneUns.">
+<Page title="Impressum" description="Impressum der Kampagnen-Website #ÄrmerOhneUns – E-Werk Kulturzentrum GmbH, Erlangen.">
   <header class="page-head">
     <div class="container">
       <p class="label">Rechtliches</p>
@@ -16,38 +17,51 @@ import P from '../components/Placeholder.astro';
       <h2>Angaben gemäß § 5 DDG</h2>
       <p>
         E-Werk Kulturzentrum GmbH<br />
-        <P text="STRASSE UND HAUSNUMMER" /><br />
-        <P text="PLZ" /> Erlangen
+        Fuchsenwiese 1<br />
+        91054 Erlangen
       </p>
 
       <h2>Vertreten durch</h2>
-      <p><P text="GESCHÄFTSFÜHRUNG" /></p>
+      <p>Jan-Peter Dinger (Geschäftsführer)</p>
 
       <h2>Kontakt</h2>
       <p>
-        Telefon: <P text="TELEFON" /><br />
-        E-Mail: <P text="E-MAIL" />
+        Telefon: <a href="tel:+499131800500">+49 (0)9131 800 50</a><br />
+        Telefax: +49 (0)9131 8005 10<br />
+        E-Mail: <a href="mailto:info@e-werk.de">info@e-werk.de</a>
       </p>
 
       <h2>Registereintrag</h2>
       <p>
-        Registergericht: <P text="REGISTERGERICHT" /><br />
-        Registernummer: <P text="HRB-NUMMER" />
+        Registergericht: Amtsgericht Fürth<br />
+        Registernummer: HRB 2416
       </p>
 
       <h2>Umsatzsteuer-ID</h2>
-      <p><P text="UMSATZSTEUER-IDENTIFIKATIONSNUMMER, FALLS VORHANDEN – SONST ABSCHNITT ENTFERNEN" /></p>
+      <p>Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz: DE 132498873</p>
 
-      <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
-      <p><P text="NAME UND ANSCHRIFT" /></p>
+      <h2>Redaktionell verantwortlich</h2>
+      <p>
+        Tina Langheinrich<br />
+        Leitung Kommunikation & Marketing<br />
+        E-Werk Kulturzentrum GmbH<br />
+        Fuchsenwiese 1<br />
+        91054 Erlangen
+      </p>
+
+      <h2>Verbraucherstreitbeilegung / Universalschlichtungsstelle</h2>
+      <p>
+        Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle
+        teilzunehmen.
+      </p>
 
       <h2>Über diese Website</h2>
       <p>
         Eine Initiative des Bündnisses <span class="nobreak">#ÄrmerOhneUns</span>, verantwortlich: E-Werk
-        Kulturzentrum GmbH, Erlangen. Für die Einträge der Einrichtungen sind die jeweiligen Einrichtungen
-        verantwortlich; das Bündnis prüft jeden Eintrag vor der Veröffentlichung.
+        Kulturzentrum GmbH, Erlangen. Die Angaben zu den einzelnen Einrichtungen und Projekten stammen von den
+        Einrichtungen selbst; das Bündnis prüft jeden Eintrag vor der Veröffentlichung. Für die Inhalte verlinkter
+        externer Seiten sind deren Betreiber verantwortlich.
       </p>
-      <p><P text="WEITERE ANGABEN DES TEAMS, Z. B. HAFTUNG FÜR LINKS, BILDNACHWEISE ALLGEMEIN" /></p>
     </div>
   </section>
 </Page>

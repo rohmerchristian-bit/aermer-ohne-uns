@@ -1,8 +1,8 @@
 // Prepares dist/ for upload to the web server. Run after `npm run build`.
 //
 // - writes dist/build-info.json (counts for the safety check of the next deploy)
-// - COMING_SOON=1: keeps only the "coming soon" page (as / and as the 404 page) plus the
-//   files it needs; all other pages are removed, so nothing unfinished is online.
+// - COMING_SOON=1: keeps only the "coming soon" page (as / and as the 404 page), Impressum and
+//   Datenschutz (legally required) plus the files they need; all other pages are removed.
 
 import { existsSync } from 'node:fs';
 import { readdir, readFile, rm, writeFile, copyFile } from 'node:fs/promises';
@@ -12,6 +12,8 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
 const comingSoon = process.env.COMING_SOON === '1';
+// Legal pages stay online in coming-soon mode (the imprint requirement applies to it, too).
+const KEEP = new Set([path.join('impressum', 'index.html'), path.join('datenschutz', 'index.html')]);
 
 async function main(): Promise<void> {
   if (!existsSync(path.join(dist, 'index.html'))) throw new Error('dist/ fehlt – erst „npm run build“ ausführen.');
@@ -41,7 +43,7 @@ async function main(): Promise<void> {
       for (const entry of await readdir(dir, { withFileTypes: true })) {
         const full = path.join(dir, entry.name);
         if (entry.isDirectory()) await walk(full);
-        else if (entry.name.endsWith('.html')) {
+        else if (entry.name.endsWith('.html') && !KEEP.has(path.relative(dist, full))) {
           await rm(full);
           removed.push(path.relative(dist, full));
         }
@@ -49,12 +51,12 @@ async function main(): Promise<void> {
     }
     await walk(dist);
     // Empty page folders are left out of the upload by removing them, too.
-    for (const dir of ['einrichtungen', 'hintergrund', 'mitmachen', 'impressum', 'datenschutz', 'styleguide', 'demnaechst', 'og/einrichtungen']) {
+    for (const dir of ['einrichtungen', 'hintergrund', 'mitmachen', 'styleguide', 'demnaechst', 'og/einrichtungen']) {
       await rm(path.join(dist, dir), { recursive: true, force: true });
     }
     await writeFile(path.join(dist, 'index.html'), html);
     await copyFile(path.join(dist, 'index.html'), path.join(dist, '404.html'));
-    console.log(`Coming-soon-Modus: ${removed.length} Seiten entfernt, nur die Startseite „Die Plattform startet in Kürze“ bleibt.`);
+    console.log(`Coming-soon-Modus: ${removed.length} Seiten entfernt, online bleiben „startet in Kürze“, Impressum und Datenschutz.`);
   }
 
   await writeFile(path.join(dist, 'build-info.json'), JSON.stringify(info, null, 2));

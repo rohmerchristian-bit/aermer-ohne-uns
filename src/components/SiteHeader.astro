@@ -10,6 +10,8 @@ const items = [
   { href: '/mitmachen/', label: 'Mitmachen' },
 ];
 const isCurrent = (href: string) => path === href || path.startsWith(href);
+// COMING_SOON=1: only the coming-soon page and the legal pages are online – no links to other pages.
+const comingSoon = process.env.COMING_SOON === '1';
 ---
 
 {
@@ -24,20 +26,22 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
     <a class="site-header__logo" href={url('/')} aria-current={path === '/' ? 'page' : undefined}>
       <img src={url('/brand/logo-400.webp')} width="400" height="352" alt="Ärmer ohne uns – zur Startseite" />
     </a>
-    <nav aria-label="Hauptnavigation">
-      <ul class="site-nav" role="list">
-        {
-          items.map((item) => (
-            <li>
-              <a href={url(item.href)} aria-current={isCurrent(item.href) ? 'page' : undefined}>
-                {item.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-    <a class="btn btn--signal site-header__donate" href={url('/#spenden')}>Spenden</a>
+    {
+      !comingSoon && (
+        <nav aria-label="Hauptnavigation">
+          <ul class="site-nav" role="list">
+            {items.map((item) => (
+              <li>
+                <a href={url(item.href)} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
+    {!comingSoon && <a class="btn btn--signal site-header__donate" href={url('/#spenden')}>Spenden</a>}
   </div>
 </header>
 

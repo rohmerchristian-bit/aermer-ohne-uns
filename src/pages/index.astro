@@ -21,7 +21,11 @@ const tiles = sortedForGrid().slice(0, HOME_TILES);
 >
   <section class="hero" aria-labelledby="hero-titel">
     <div class="container hero__inner">
-      <h1 id="hero-titel" class="display hero__claim">Ärmer<br />ohne uns</h1>
+      <h1 id="hero-titel" class="hero__logo">
+        <img src={url('/brand/logo.webp')} width="1200" height="1056" alt="Ärmer ohne uns" fetchpriority="high" />
+      </h1>
+
+      <div class="hero__content">
 
       {
         totalAmount > 0 ? (
@@ -58,6 +62,7 @@ const tiles = sortedForGrid().slice(0, HOME_TILES);
           )
         }
         <a class="btn btn--signal" href="#spenden">Jetzt spenden <IconArrow /></a>
+      </div>
       </div>
     </div>
   </section>
@@ -122,9 +127,33 @@ const tiles = sortedForGrid().slice(0, HOME_TILES);
     gap: var(--space-6);
   }
 
-  .hero__claim {
-    font-size: clamp(3.5rem, 15vw, 13rem);
-    line-height: 0.82;
+  @media (min-width: 64em) {
+    .hero__inner {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: end;
+      gap: var(--space-7);
+    }
+  }
+
+  /* The campaign logo on a neon block (logo itself stays black). */
+  .hero__logo {
+    display: grid;
+    place-items: center;
+    max-width: 34rem;
+    aspect-ratio: 1;
+    padding: clamp(1.25rem, 5vw, 3rem);
+    background: var(--color-signal);
+    border: var(--line-strong) solid var(--color-ink);
+  }
+
+  .hero__logo img {
+    width: 100%;
+    height: auto;
+  }
+
+  .hero__content {
+    display: grid;
+    gap: var(--space-6);
   }
 
   .hero__total {

@@ -6,7 +6,9 @@ import { settings } from '../data/index.ts';
 
 <footer class="site-footer on-dark">
   <div class="container site-footer__inner">
-    <p class="site-footer__claim">Ärmer ohne uns</p>
+    <p class="site-footer__logo">
+      <img src={url('/brand/logo-neon-512.png')} width="512" height="512" alt="Ärmer ohne uns" loading="lazy" />
+    </p>
     <nav aria-label="Rechtliches und Kontakt">
       <ul class="site-footer__links" role="list">
         <li><a href={url('/impressum/')}>Impressum</a></li>
@@ -33,13 +35,9 @@ import { settings } from '../data/index.ts';
     gap: var(--space-6);
   }
 
-  .site-footer__claim {
-    font-size: var(--fs-h1);
-    font-weight: 900;
-    font-stretch: var(--stretch-condensed);
-    line-height: var(--lh-tight);
-    letter-spacing: var(--tracking-tight);
-    text-transform: uppercase;
+  .site-footer__logo img {
+    width: clamp(7rem, 14vw, 10rem);
+    height: auto;
   }
 
   .site-footer__links {

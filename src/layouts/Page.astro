@@ -8,6 +8,9 @@ interface Props {
   title: string;
   description?: string;
   noindex?: boolean;
+  ogImage?: string;
+  ogImageAlt?: string;
+  ogType?: 'website' | 'article';
 }
 const props = Astro.props;
 ---

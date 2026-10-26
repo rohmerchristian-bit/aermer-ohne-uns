@@ -5,6 +5,7 @@ import JoinCta from '../../components/JoinCta.astro';
 import { areas } from '../../data/areas.ts';
 import { organisationCount, projectCount, projects, sortedForGrid, totalAmount } from '../../data/index.ts';
 import { statusText } from '../../scripts/filter.ts';
+import { pageCardAlt, shareImagePath } from '../../data/share.ts';
 
 const usedAreas = areas.filter((a) => projects.some((p) => p.area === a.slug));
 const initialStatus = statusText(projectCount, organisationCount, totalAmount);
@@ -12,6 +13,8 @@ const initialStatus = statusText(projectCount, organisationCount, totalAmount);
 
 <Page
   title="Betroffene Einrichtungen"
+  ogImage={shareImagePath('einrichtungen')}
+  ogImageAlt={pageCardAlt('einrichtungen')}
   description="Alle Erlanger Einrichtungen, denen im Haushalt 2027 Mittel gekürzt werden sollen – mit Betrag, Folgen und Stellungnahmen."
 >
   <section class="section list-head" aria-labelledby="liste-titel">

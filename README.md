@@ -61,3 +61,15 @@ ausdrücklich. Ein Test (`tests/pipeline.test.ts`) prüft das.
 ## Schrift
 
 Archivo (variabel, Breiten- und Gewichtsachse), selbst gehostet unter `public/fonts/archivo/`. Lizenz: SIL Open Font License 1.1 (`public/fonts/archivo/OFL.txt`).
+
+## Vorschaubilder beim Teilen (Open Graph)
+
+Jede Seite hat Teilen-Angaben (`og:*`, `twitter:*`) mit einem eigenen Bild (1200 × 630). Die Bilder entstehen beim
+Build mit Satori in `src/lib/og.ts`:
+
+- `/og/seiten/<seite>.png` – Startseite (Gesamtsumme), Betroffene, Hintergrund, Mitmachen und ein Standardbild
+  für alle übrigen Seiten. Texte: `src/data/share.ts`.
+- `/og/einrichtungen/<slug>.png` – pro Einrichtung in der Farbe ihres Bereichs, mit Name und Kürzung 2027.
+
+Für die Bilder liegen statische Archivo-Schnitte in `src/assets/og-fonts/` (aus der variablen Schrift erzeugt,
+SIL Open Font License, siehe `OFL.txt` dort).

@@ -10,6 +10,8 @@ import { count, organisations, projects, projectsOf, settings, sortedForGrid } f
 import type { InstitutionImage, Organisation } from '../../data/types.ts';
 import { amountSourceLabel, percentLabel } from '../../lib/amount-label.ts';
 import { formatCut, initials, truncate } from '../../lib/format.ts';
+import { organisationShareImagePath } from '../../data/share.ts';
+import { organisationCardAlt } from '../../data/organisation-card.ts';
 
 // One page per organisation, with a section for each of its affected projects.
 export function getStaticPaths() {
@@ -48,7 +50,13 @@ const description = truncate(
 const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' : 'Foto'}: ${img.credit}`;
 ---
 
-<Page title={org.name} description={description}>
+<Page
+  title={org.name}
+  description={description}
+  ogType="article"
+  ogImage={organisationShareImagePath(org.slug)}
+  ogImageAlt={organisationCardAlt(org.slug)}
+>
   <article class="detail" aria-labelledby="detail-titel">
     <header class="detail__head" data-area={mainArea.slug}>
       <div class="container detail__head-inner">

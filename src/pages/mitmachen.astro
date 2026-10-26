@@ -4,10 +4,13 @@ import JoinCta from '../components/JoinCta.astro';
 import DonationBlock from '../components/DonationBlock.astro';
 import ExternalLink from '../components/ExternalLink.astro';
 import { settings } from '../data/index.ts';
+import { pageCardAlt, shareImagePath } from '../data/share.ts';
 ---
 
 <Page
   title="Mitmachen"
+  ogImage={shareImagePath('mitmachen')}
+  ogImageAlt={pageCardAlt('mitmachen')}
   description="Einrichtung eintragen, Newsletter abonnieren, spenden: So unterstützt ihr das Bündnis #ÄrmerOhneUns in Erlangen."
 >
   <header class="page-head">

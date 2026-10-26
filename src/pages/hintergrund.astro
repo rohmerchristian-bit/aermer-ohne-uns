@@ -6,6 +6,7 @@ import ExternalLink from '../components/ExternalLink.astro';
 import { budgetDetails } from '../data/budget.ts';
 import { count, organisationCount, projectCount, projects, settings, totalAmount } from '../data/index.ts';
 import { formatEuro } from '../lib/format.ts';
+import { pageCardAlt, shareImagePath } from '../data/share.ts';
 
 const withAmount = projects.filter((p) => p.amount !== null);
 const verified = withAmount.filter((p) => p.amountKind === 'verified').length;
@@ -13,6 +14,8 @@ const verified = withAmount.filter((p) => p.amountKind === 'verified').length;
 
 <Page
   title="Worum es geht"
+  ogImage={shareImagePath('hintergrund')}
+  ogImageAlt={pageCardAlt('hintergrund')}
   description="Die offiziellen Zahlen zur Haushaltskonsolidierung der Stadt Erlangen 2027, der Zeitplan bis zum Beschluss und die Quellen."
 >
   <header class="page-head">

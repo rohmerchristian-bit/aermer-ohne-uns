@@ -1,5 +1,7 @@
 ---
 import { url } from '../lib/paths.ts';
+import { OG_HEIGHT, OG_WIDTH } from '../lib/og-size.ts';
+import { pageCardAlt, shareImagePath } from '../data/share.ts';
 import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/base.css';
@@ -11,11 +13,25 @@ interface Props {
   description?: string;
   /** Hide from search engines (admin, styleguide). */
   noindex?: boolean;
+  /** Share image path (root-relative, without base), defaults to the general image. */
+  ogImage?: string;
+  ogImageAlt?: string;
+  /** 'article' for organisation pages, 'website' otherwise. */
+  ogType?: 'website' | 'article';
 }
 
 const SITE_NAME = 'Ärmer ohne uns';
-const { title, description = 'Welche Einrichtungen in Erlangen von den Kürzungen im Haushalt 2027 betroffen sind – und was verloren geht.', noindex = false } = Astro.props;
+const {
+  title,
+  description = 'Welche Einrichtungen in Erlangen von den Kürzungen im Haushalt 2027 betroffen sind – und was verloren geht.',
+  noindex = false,
+  ogImage = shareImagePath('standard'),
+  ogImageAlt = pageCardAlt('standard'),
+  ogType = 'website',
+} = Astro.props;
+const ogImageUrl = new URL(url(ogImage), Astro.site).toString();
 const fullTitle = title === SITE_NAME ? `${SITE_NAME} – #ÄrmerOhneUns` : `${title} – ${SITE_NAME}`;
+const shareTitle = title === SITE_NAME ? fullTitle : `${title} – #ÄrmerOhneUns`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 // PREVIEW=1: public preview build (GitHub Pages) – never indexed, clearly labelled.
 const isPreview = process.env.PREVIEW === '1';
@@ -33,12 +49,22 @@ const robotsNoindex = noindex || isPreview;
     <meta name="theme-color" content="#111111" />
     <link rel="icon" type="image/png" sizes="32x32" href={url('/favicon-32.png')} />
     <link rel="apple-touch-icon" href={url('/apple-touch-icon.png')} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:locale" content="de_DE" />
     <meta property="og:site_name" content={SITE_NAME} />
-    <meta property="og:title" content={title === SITE_NAME ? fullTitle : title} />
+    <meta property="og:title" content={shareTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content={String(OG_WIDTH)} />
+    <meta property="og:image:height" content={String(OG_HEIGHT)} />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={shareTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
     <slot name="head" />
     <link rel="preload" href={url('/fonts/archivo/archivo-latin-wdth-normal.woff2')} as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href={url('/tokens.css')} />

@@ -10,6 +10,7 @@ import JoinCta from '../components/JoinCta.astro';
 import IconArrow from '../components/icons/IconArrow.astro';
 import { count, organisationCount, projectCount, projects, projectsWithAmount, settings, sortedForGrid, totalAmount } from '../data/index.ts';
 import { formatEuro } from '../lib/format.ts';
+import { pageCardAlt, shareImagePath } from '../data/share.ts';
 
 const HOME_TILES = 8;
 const tiles = sortedForGrid().slice(0, HOME_TILES);
@@ -17,6 +18,8 @@ const tiles = sortedForGrid().slice(0, HOME_TILES);
 
 <Page
   title="Ärmer ohne uns"
+  ogImage={shareImagePath('start')}
+  ogImageAlt={pageCardAlt('start')}
   description="Erlangen muss im Haushalt 2027 sparen. Hier zeigen Kultur-, Bildungs- und Sozialeinrichtungen, was durch die Kürzungen verloren geht."
 >
   <section class="hero" aria-labelledby="hero-titel">

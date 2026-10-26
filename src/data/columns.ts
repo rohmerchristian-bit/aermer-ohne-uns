@@ -15,6 +15,11 @@ export type ColumnKey =
   | 'projectImageUrls'
   | 'projectImageCredit'
   | 'imageCreditLegacy'
+  | 'social'
+  | 'amount2028'
+  | 'amount2029'
+  | 'projectPhone'
+  | 'projectEmail'
   | 'name'
   | 'area'
   | 'address'
@@ -87,7 +92,7 @@ export const columns: readonly ColumnDef[] = [
     required: true,
     aliases: ['Zu welchem Bereich gehört das Projekt / Angebot?'],
   },
-  { key: 'address', header: 'Standort / Adresse', visibility: 'public' },
+  { key: 'address', header: 'Standort / Adresse', visibility: 'public', headerStartsWith: ['Standort'] },
   {
     key: 'contact',
     header: 'Ansprechperson für das Bündnis (Format: Vorname, Nachname, Funktion)',
@@ -99,7 +104,8 @@ export const columns: readonly ColumnDef[] = [
     visibility: 'private',
     aliases: ['E-Mail-Adresse'],
   },
-  { key: 'links', header: 'Website / Social-Media-Kanäle', visibility: 'public' },
+  { key: 'links', header: 'Website / Social-Media-Kanäle', visibility: 'public', aliases: ['Website'] },
+  { key: 'social', header: 'Social Media Kanal', visibility: 'public' },
   {
     key: 'description',
     header: 'Was tut eure Institution in Kürze? (Kurzbeschreibung der Arbeit)',
@@ -120,8 +126,11 @@ export const columns: readonly ColumnDef[] = [
     visibility: 'public',
     aliases: ['Geplante Kürzung 2027 in Euro'],
   },
-  { key: 'amountLater', header: 'Kürzung in den Folgejahren', visibility: 'public' },
-  { key: 'amountPercent', header: 'Kürzung in Prozent', visibility: 'public' },
+  { key: 'amount2028', header: 'Geplante Kürzung 2028 in Euro', visibility: 'public' },
+  { key: 'amount2029', header: 'Geplante Kürzung 2029 in Euro', visibility: 'public' },
+  // Earlier free-text question, replaced by the 2028/2029 amounts.
+  { key: 'amountLater', header: 'Kürzung in den Folgejahren', visibility: 'public', legacy: true },
+  { key: 'amountPercent', header: 'Kürzung in Prozent', visibility: 'public', headerStartsWith: ['Kürzung in Prozent'] },
   {
     key: 'nonMonetary',
     header: 'Falls es nicht um einen Geldbetrag geht: Was fällt weg?',
@@ -150,7 +159,7 @@ export const columns: readonly ColumnDef[] = [
     aliases: ['Logo-Upload für euer Profil auf der Plattform', 'Logo der Einrichtung'],
     // NOTE: this is the organisation's logo (section 4); project images are projectImageUrls.
   },
-  { key: 'imageCredit', header: 'Bildnachweis zum Logo', visibility: 'public' },
+  { key: 'imageCredit', header: 'Bildnachweis zum Logo', visibility: 'public', headerStartsWith: ['Bildnachweis zum Logo'] },
   // The original credit question was removed from the form; its column still holds older answers.
   { key: 'imageCreditLegacy', header: 'Bildnachweis (Fotograf*in / Rechteinhaber)', visibility: 'public', legacy: true },
   { key: 'projectImageUrls', header: 'Bild oder Logo für dieses Projekt', visibility: 'public' },
@@ -164,6 +173,7 @@ export const columns: readonly ColumnDef[] = [
     key: 'rooms',
     header: 'Wärt ihr bereit, Räume oder Infrastruktur für Treffen des Bündnisses bereitzustellen?',
     visibility: 'private',
+    headerStartsWith: ['Wärt ihr'],
   },
   { key: 'consentPublish', header: 'Freigabe zur Veröffentlichung', visibility: 'filter', required: true },
   {
@@ -178,8 +188,19 @@ export const columns: readonly ColumnDef[] = [
     key: 'demo',
     header: 'Ich möchte dabei sein und als Teil des Bündnis "ÄrmerOhneUns" an dem Demo mit meiner Organisation teilnehmen (kostenlos).',
     visibility: 'private',
-    headerStartsWith: ['Ich möchte dabei sein und als Teil des Bündnis'],
+    headerStartsWith: [
+      'Ich möchte dabei sein und als Teil des Bündnis',
+      'Teilnahme an der Kundgebung',
+      'Dürfen wir das Logo deiner Organisation',
+      'Könnt ihr Werbung für die Kundgebung',
+      'Infostand auf der Kundgebung',
+      'Redebeitrag auf der Bühne',
+    ],
   },
+  // Contact for an additional project. The form says „Erscheint auf Website“ – kept private
+  // until the initiative confirms that phone numbers and e-mail addresses may be published.
+  { key: 'projectPhone', header: 'Telefonnummer für Rückfragen', visibility: 'private' },
+  { key: 'projectEmail', header: 'E-Mail-Adresse für Rückfragen', visibility: 'private' },
   {
     // Private until the initiative decides whether help offers are shown on the website.
     key: 'help',

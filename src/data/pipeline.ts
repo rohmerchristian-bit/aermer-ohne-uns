@@ -11,6 +11,7 @@ import { columns, findColumn, isChecked, isConsent, READABLE_KEYS, type ColumnKe
 import type { BuildMessage, ImageRef, OrganisationEntry, Project, ProjectEntry } from './types.ts';
 import { parseAmount } from '../lib/amount.ts';
 import { uniqueSlug } from '../lib/slug.ts';
+import { formatEuro } from '../lib/format.ts';
 
 export class DataError extends Error {
   /** Warnings collected before the error, so they can still be shown. */
@@ -165,7 +166,7 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
       if (orgByKey.has(key)) {
         warn(`${label}: Die Einrichtung ist mehrfach als neu eingetragen. Das Projekt wird ihr zugeordnet, die Basisdaten kommen aus dem ersten Eintrag.`);
       } else {
-        const links = extractUrls(read('links'));
+        const links = extractUrls(`${read('links')} ${read('social')}`);
         orgByKey.set(key, {
           organisation: {
             slug: uniqueSlug(orgName, orgSlugs),
@@ -200,7 +201,7 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
       amount: amount?.value ?? null,
       amountKind: amount?.kind ?? null,
       amountSource: amount ? text('amountSource') : null,
-      amountLater: text('amountLater'),
+      amountLater: laterYears(read('amount2028'), read('amount2029')) ?? text('amountLater'),
       amountPercent: text('amountPercent'),
       nonMonetary: text('nonMonetary'),
       consequences: text('consequences'),
@@ -247,6 +248,19 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
   const organisations = [...orgByKey.values()].filter((o) => projects.some((p) => p.project.orgSlug === o.organisation.slug));
   stats.organisations = organisations.length;
   return { organisations, projects, messages, stats };
+}
+
+/** "2028: 25.000 €, 2029: 45.000 €" from the separate amount questions; null if both are empty. */
+export function laterYears(raw2028: string, raw2029: string): string | null {
+  const parts = [
+    ['2028', raw2028],
+    ['2029', raw2029],
+  ].flatMap(([year, raw]) => {
+    if (!raw!.trim()) return [];
+    const amount = parseAmount(raw);
+    return [`${year}: ${amount.ok ? formatEuro(amount.value) : raw!.trim()}`];
+  });
+  return parts.length ? parts.join(', ') : null;
 }
 
 /** "Ein weiteres betroffenes Projekt für eine bereits eingetragene Einrichtung" → true. Empty (old answers) → false. */

@@ -2,7 +2,7 @@
 // Visitors only ever load these local files – never Google Drive.
 //
 // Cache layout:
-//   .cache/images/originals/<drive-id>   downloaded originals (Drive uploads never change)
+//   .cache/images/originals/<drive-id>   downloaded originals (re-fetched only if not a readable image)
 //   public/media/<hash>-<width>.<format> optimised output, reused while the original is unchanged
 
 import { createHash } from 'node:crypto';
@@ -37,8 +37,22 @@ export function imagePaths(root: string): ImagePaths {
 
 export class ImageError extends Error {}
 
+async function isReadableImage(buffer: Buffer): Promise<boolean> {
+  try {
+    const meta = await sharp(buffer).metadata();
+    return Boolean(meta.width && meta.height);
+  } catch {
+    return false;
+  }
+}
+
 async function downloadDrive(id: string, cacheFile: string): Promise<Buffer> {
-  if (existsSync(cacheFile)) return readFile(cacheFile);
+  // A cached file that is no image (e.g. a PDF later replaced by a new version in Drive) is fetched again.
+  if (existsSync(cacheFile)) {
+    const cached = await readFile(cacheFile);
+    if (await isReadableImage(cached)) return cached;
+    await rm(cacheFile, { force: true });
+  }
 
   const urls = [
     `https://drive.usercontent.google.com/download?id=${encodeURIComponent(id)}&export=download`,

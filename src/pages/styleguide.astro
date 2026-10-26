@@ -25,7 +25,8 @@ const swatches = [
 });
 
 const mutedOnPaper = contrastRatio(base.muted, base.paper);
-const demo = projects.find((p) => p.ownImage) ?? projects[0]!;
+// With real data there may be no approved project yet – then the tile examples are skipped.
+const demo = projects.find((p) => p.ownImage) ?? projects[0];
 ---
 
 <Base title="Styleguide" noindex>
@@ -172,11 +173,19 @@ const demo = projects.find((p) => p.ownImage) ?? projects[0]!;
         }
       </ul>
 
-      <h3 class="sg-subhead">Vorder- und Rückseite nebeneinander</h3>
-      <ul class="tile-grid" role="list">
-        <li><Tile project={demo} headingLevel={4} idSuffix="-vorn" /></li>
-        <li><Tile project={demo} headingLevel={4} idSuffix="-hinten" flipped /></li>
-      </ul>
+      {
+        demo ? (
+          <>
+            <h3 class="sg-subhead">Vorder- und Rückseite nebeneinander</h3>
+            <ul class="tile-grid" role="list">
+              <li><Tile project={demo} headingLevel={4} idSuffix="-vorn" /></li>
+              <li><Tile project={demo} headingLevel={4} idSuffix="-hinten" flipped /></li>
+            </ul>
+          </>
+        ) : (
+          <p>Noch keine freigegebenen Projekte – Beispielkacheln erscheinen mit DATA_SOURCE=sample.</p>
+        )
+      }
     </div>
   </section>
 </Base>

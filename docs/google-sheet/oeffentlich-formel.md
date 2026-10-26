@@ -1,10 +1,10 @@
-# Formel für das Blatt „Öffentlich“
+# Formel für das Blatt „SHEET_PUBLIC_CSV“
 
 Diese Formel wählt die Spalten **nach ihren Überschriften** aus, nicht nach Buchstaben. Kommen im Formular
 neue Fragen hinzu, verschiebt sich dadurch nichts – und neue Fragen (z. B. eine weitere E-Mail-Frage)
 erscheinen **nicht** automatisch im öffentlichen Blatt.
 
-In das Blatt „Öffentlich“, Zelle **A1** (alles andere im Blatt leer lassen):
+In das Blatt „SHEET_PUBLIC_CSV“, Zelle **A1** (alles andere im Blatt leer lassen):
 
 ```
 =LET(
@@ -17,6 +17,15 @@ In das Blatt „Öffentlich“, Zelle **A1** (alles andere im Blatt leer lassen)
   treffer; FILTER(werte; CHOOSECOLS(werte; XMATCH("Freigeben"; kopf; 0)) = TRUE);
   IF(ISERROR(ROWS(treffer)); kopfzeile; VSTACK(kopfzeile; CHOOSECOLS(treffer; spalten)))
 )
+```
+
+**Zum Einfügen:** A1 einmal anklicken, die Formel in die **Formelleiste** (neben „fx“) einfügen, Enter.
+Nicht direkt in die Zelle einfügen – dann verteilt Google Sheets die Zeilen auf A1, A2, A3 … und es kommt
+`#ERROR!`. Vorher muss das ganze Blatt außer A1 leer sein, sonst meldet A1 „Array-Ergebnis wurde nicht
+erweitert“. Dieselbe Formel in einer Zeile, sicher zum Einfügen:
+
+```
+=LET(kopf; ARRAYFORMULA(TRIM(Formularantworten!A1:BZ1)); werte; Formularantworten!A2:BZ; begriffe; {"Was möchtet ihr eintragen*"\"Für welche Einrichtung tragt ihr*"\"Name der Institution*"\"Standort*"\"Website*"\"Social Media*"\"Was tut eure Institution*"\"Wen erreicht eure Arbeit*"\"Logo der Einrichtung*"\"Logo-Upload für euer Profil*"\"Bildnachweis zum Logo*"\"Bildnachweis (Fotograf*"\"Betroffenes Projekt / Angebot*"\"Zu welchem Bereich*"\"Welche Zuschüsse*"\"Geplante Kürzung 2027*"\"Geplante Kürzung in Euro pro Jahr*"\"Geplante Kürzung 2028*"\"Geplante Kürzung 2029*"\"Kürzung in den Folgejahren*"\"Kürzung in Prozent*"\"Falls es nicht um einen Geldbetrag*"\"Quelle des Betrags*"\"Welche konkreten Folgen hat die Kürzung*"\"Absagen von Angeboten*"\"Prägnantes Zitat*"\"Link zu weiterführenden*"\"Bild oder Logo für dieses Projekt*"\"Bildnachweis zum Projektbild*"\"Freigabe zur Veröffentlichung*"\"Mit dem Hochladen bestätigen wir*"\"Freigeben"\"Betrag_geprüft"\"Hervorheben"}; alle; HSTACK(ARRAYFORMULA(XMATCH(begriffe; kopf; 2)); ARRAYFORMULA(XMATCH(begriffe; kopf; 2; -1))); spalten; UNIQUE(FILTER(alle; NOT(ISNA(alle))); TRUE); kopfzeile; CHOOSECOLS(kopf; spalten); treffer; FILTER(werte; CHOOSECOLS(werte; XMATCH("Freigeben"; kopf; 0)) = TRUE); IF(ISERROR(ROWS(treffer)); kopfzeile; VSTACK(kopfzeile; CHOOSECOLS(treffer; spalten))))
 ```
 
 ## Was die Formel tut

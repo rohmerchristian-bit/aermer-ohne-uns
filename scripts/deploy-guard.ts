@@ -33,7 +33,7 @@ async function main(): Promise<void> {
   if (dropped && process.env.DEPLOY_FORCE !== '1') {
     console.error(
       `✖ Die Zahl der Projekte fällt von ${previous.projects} auf ${next.projects}. Das sieht nach einem Fehler im Sheet aus ` +
-        '(Formel im Blatt „Öffentlich“, Spalte „Freigeben“). Die Website bleibt unverändert. ' +
+        '(Formel im Blatt „SHEET_PUBLIC_CSV“, Spalte „Freigeben“). Die Website bleibt unverändert. ' +
         'Wenn das so gewollt ist: Workflow „Deploy“ von Hand mit „force“ starten.',
     );
     process.exit(1);

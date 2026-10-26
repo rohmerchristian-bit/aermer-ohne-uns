@@ -150,7 +150,7 @@ Unverändert: „Freigabe zur Veröffentlichung“ (Pflicht) · „Aufnahme in d
 
 `Freigeben` · `Betrag_geprüft` (Betrag 2027) · `Hervorheben` · `Status` · `Zuletzt eingegangen`
 
-Nach dem Umbau passe ich die Formel für das Blatt „Öffentlich“ an (neue Spalten) und ergänze das Skript
+Nach dem Umbau passe ich die Formel für das Blatt „SHEET_PUBLIC_CSV“ an (neue Spalten) und ergänze das Skript
 um die automatische Einrichtungsliste in Abschnitt 7.
 
 ## Entscheidungen der Initiative (19.10.2026)

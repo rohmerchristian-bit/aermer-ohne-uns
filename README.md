@@ -35,12 +35,12 @@ deutschen Meldung ab, und es wird nichts veröffentlicht.
 | Fragetitel → interne Felder, öffentlich/privat | `src/data/columns.ts` |
 | Regeln für Einträge (Freigabe, Beträge, Bilder, Projekte je Einrichtung) | `src/data/pipeline.ts` |
 | Fragenliste des Formulars (Umbau auf mehrere Projekte) | `docs/formular-fragen.md` |
-| Formel „Öffentlich“, Benachrichtigung, Einrichtungsliste | `docs/google-sheet/` |
+| Formel „SHEET_PUBLIC_CSV“, Benachrichtigung, Einrichtungsliste | `docs/google-sheet/` |
 | Einstellungen und Standardwerte | `src/data/settings.ts` |
 | Bilder herunterladen und optimieren (mit Cache) | `src/lib/images.ts` |
 
 **Datenschutz-Sicherheitsnetz:** Private Formularfelder (E-Mail, Ansprechperson, Zeitstempel, Aktionen, Räume,
-Verteiler) werden nie gelesen, auch wenn das Blatt „Öffentlich“ sie versehentlich enthält. Der Build warnt dann
+Verteiler) werden nie gelesen, auch wenn das Blatt „SHEET_PUBLIC_CSV“ sie versehentlich enthält. Der Build warnt dann
 ausdrücklich. Ein Test (`tests/pipeline.test.ts`) prüft das.
 
 ## Styleguide

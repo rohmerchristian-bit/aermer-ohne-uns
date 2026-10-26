@@ -59,7 +59,7 @@ describe('column mapping', () => {
   });
 
   it('explains formula errors in the published sheet', () => {
-    expect(() => runPipeline([['#REF!']], OPTIONS)).toThrow(/Formel im Blatt „Öffentlich“ liefert den Fehler „#REF!“/);
+    expect(() => runPipeline([['#REF!']], OPTIONS)).toThrow(/Formel im Blatt „SHEET_PUBLIC_CSV“ liefert den Fehler „#REF!“/);
   });
 
   it('ignores a repeated header row', () => {
@@ -104,7 +104,7 @@ describe('column mapping', () => {
 });
 
 describe('privacy allowlist', () => {
-  // A deliberately misconfigured "Öffentlich" sheet that publishes EVERY column.
+  // A deliberately misconfigured "SHEET_PUBLIC_CSV" sheet that publishes EVERY column.
   const ALL_KEYS = columns.map((c) => c.key);
   const SECRET: Partial<Record<ColumnKey, string>> = {
     submittedAt: '01.10.2026 10:00:00 GEHEIM-ZEIT',

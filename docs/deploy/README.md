@@ -47,7 +47,7 @@ starten. Vorher Impressum und Datenschutzerklärung einsetzen – die Platzhalte
 Vor jedem Upload vergleicht [`scripts/deploy-guard.ts`](../../scripts/deploy-guard.ts) die neue Zahl der
 Projekte mit der Online-Version (`/build-info.json`). Fällt sie um mehr als die Hälfte (bei mindestens 4
 Projekten online), wird **nicht** hochgeladen – das passiert typischerweise, wenn die Formel im Blatt
-„Öffentlich“ kaputt ist oder „Freigeben“ versehentlich geleert wurde.
+„SHEET_PUBLIC_CSV“ kaputt ist oder „Freigeben“ versehentlich geleert wurde.
 
 Ist der Rückgang gewollt: *Actions → Deploy → Run workflow* mit Haken bei **„Sicherheitsprüfung überspringen“**.
 
@@ -79,7 +79,7 @@ Unter *Actions* den roten Lauf öffnen – die Zusammenfassung oben nennt die Ur
 
 | Meldung | Ursache / Lösung |
 |---|---|
-| „Formel im Blatt „Öffentlich“ liefert den Fehler …“ | Formel im Sheet prüfen ([oeffentlich-formel.md](../google-sheet/oeffentlich-formel.md)) |
+| „Formel im Blatt „SHEET_PUBLIC_CSV“ liefert den Fehler …“ | Formel im Sheet prüfen ([oeffentlich-formel.md](../google-sheet/oeffentlich-formel.md)) |
 | „Die Zahl der Projekte fällt von … auf …“ | Sicherheitsprüfung, siehe oben |
 | `Login failed` / `530` | FTP-Benutzer oder Passwort im Secret falsch |
 | `Fatal error: Certificate verification` | FTP_HOST muss der Servername sein (`wwwNNN.your-server.de`), nicht die Domain |

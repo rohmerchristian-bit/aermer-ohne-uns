@@ -51,7 +51,7 @@ async function loadTables(messages: BuildMessage[]): Promise<{ publicCsv: string
   if (source !== 'remote') throw new DataError(`DATA_SOURCE muss „sample“ oder „remote“ sein, nicht „${source}“.`);
 
   const publicUrl = process.env.SHEET_PUBLIC_CSV_URL?.trim();
-  if (!publicUrl) throw new DataError('SHEET_PUBLIC_CSV_URL ist nicht gesetzt (Link zum veröffentlichten Blatt „Öffentlich“).');
+  if (!publicUrl) throw new DataError('SHEET_PUBLIC_CSV_URL ist nicht gesetzt (Link zum veröffentlichten Blatt „SHEET_PUBLIC_CSV“).');
   const settingsUrl = process.env.SHEET_SETTINGS_CSV_URL?.trim();
   let settingsCsv: string | null = null;
   if (settingsUrl) {
@@ -63,7 +63,7 @@ async function loadTables(messages: BuildMessage[]): Promise<{ publicCsv: string
   } else {
     messages.push({ severity: 'warning', message: 'SHEET_SETTINGS_CSV_URL ist nicht gesetzt – es gelten die Standard-Einstellungen.' });
   }
-  return { publicCsv: await fetchCsv(publicUrl, 'Das Blatt „Öffentlich“'), settingsCsv };
+  return { publicCsv: await fetchCsv(publicUrl, 'Das Blatt „SHEET_PUBLIC_CSV“'), settingsCsv };
 }
 
 async function main(): Promise<void> {

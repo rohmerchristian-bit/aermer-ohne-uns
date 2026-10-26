@@ -11,7 +11,7 @@ Sheet und schickt dem Prüf-Team eine E-Mail. Es läuft in Google, nicht auf der
    Mal fragt Google nach Berechtigungen (Tabelle bearbeiten, E-Mails senden) – mit dem Konto bestätigen,
    dem das Sheet gehört. Das legt die Spalten `Status` und `Zuletzt eingegangen` ganz rechts an und prüft
    die übrigen Überschriften. Im *Ausführungsprotokoll* steht „Alles bereit“ oder, was fehlt.
-   Die beiden Spalten übernimmt das Blatt „Öffentlich“ nicht ([oeffentlich-formel.md](oeffentlich-formel.md)).
+   Die beiden Spalten übernimmt das Blatt „SHEET_PUBLIC_CSV“ nicht ([oeffentlich-formel.md](oeffentlich-formel.md)).
 3. **Trigger anlegen.** Links auf das Uhr-Symbol (*Trigger*) → *Trigger hinzufügen*:
    - Funktion: `beiFormularAntwort`
    - Ereignisquelle: *Aus Tabelle*

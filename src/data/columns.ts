@@ -51,7 +51,7 @@ export type ColumnKey =
 /**
  * public:   may appear on the website.
  * filter:   read only to decide whether an entry (or its image) is shown; never output.
- * private:  must never be read into the website. Expected to be missing from the "Öffentlich" sheet.
+ * private:  must never be read into the website. Expected to be missing from the "SHEET_PUBLIC_CSV" sheet.
  */
 export type Visibility = 'public' | 'filter' | 'private';
 

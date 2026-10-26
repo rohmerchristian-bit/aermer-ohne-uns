@@ -1,4 +1,4 @@
-// Turns the rows of the published "Öffentlich" sheet into organisations and their projects.
+// Turns the rows of the published "SHEET_PUBLIC_CSV" sheet into organisations and their projects.
 // One row = one project = one tile. Rows of the path "weiteres Projekt" attach to an organisation
 // that was entered (and approved) through the path "neue Einrichtung".
 //
@@ -51,7 +51,7 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
   const [header, ...rows] = table;
   if (!header || header.every((h) => h.trim() === '')) {
     throw new DataError(
-      'Das Blatt „Öffentlich“ ist leer – es wurde keine Kopfzeile gefunden. Meist liefert die Formel in A1 einen Fehler ' +
+      'Das Blatt „SHEET_PUBLIC_CSV“ ist leer – es wurde keine Kopfzeile gefunden. Meist liefert die Formel in A1 einen Fehler ' +
         '(z. B. eine umbenannte Überschrift). Siehe docs/google-sheet/oeffentlich-formel.md.',
     );
   }
@@ -60,7 +60,7 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
   const formulaError = header.find((h) => /^#(REF!|NAME\?|N\/A|VALUE!|ERROR!|DIV\/0!)/i.test(h.trim()));
   if (formulaError) {
     throw new DataError(
-      `Die Formel im Blatt „Öffentlich“ liefert den Fehler „${formulaError.trim()}“. ` +
+      `Die Formel im Blatt „SHEET_PUBLIC_CSV“ liefert den Fehler „${formulaError.trim()}“. ` +
         'Meist stimmt der Name des Quellblatts in der Formel nicht (aktuell: „Formularantworten“) oder eine Überschrift ' +
         'wurde im Formular umbenannt. Siehe docs/google-sheet/oeffentlich-formel.md.',
     );
@@ -78,7 +78,7 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
     }
     if (!READABLE_KEYS.has(column.key)) {
       warn(
-        `Das Blatt „Öffentlich“ enthält die private Spalte „${column.header}“. Sie wird NICHT veröffentlicht – bitte die Formel im Sheet korrigieren.`,
+        `Das Blatt „SHEET_PUBLIC_CSV“ enthält die private Spalte „${column.header}“. Sie wird NICHT veröffentlicht – bitte die Formel im Sheet korrigieren.`,
       );
       return;
     }
@@ -88,14 +88,14 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
   const missingRequired = columns.filter((c) => c.required && !indexOf.has(c.key));
   if (missingRequired.length > 0) {
     throw new DataError(
-      `Im Blatt „Öffentlich“ fehlen Pflichtspalten: ${missingRequired.map((c) => `„${c.header}“`).join(', ')}. ` +
+      `Im Blatt „SHEET_PUBLIC_CSV“ fehlen Pflichtspalten: ${missingRequired.map((c) => `„${c.header}“`).join(', ')}. ` +
         'Bitte die Kopfzeile im Google Sheet prüfen (Schreibweise wie im Formular).',
       messages,
     );
   }
   const missingOptional = columns.filter((c) => c.visibility !== 'private' && !c.required && !c.legacy && !indexOf.has(c.key));
   if (missingOptional.length > 0) {
-    warn(`Diese Spalten fehlen im Blatt „Öffentlich“ und bleiben leer: ${missingOptional.map((c) => `„${c.header}“`).join(', ')}.`);
+    warn(`Diese Spalten fehlen im Blatt „SHEET_PUBLIC_CSV“ und bleiben leer: ${missingOptional.map((c) => `„${c.header}“`).join(', ')}.`);
   }
 
   const stats = { rows: rows.length, projects: 0, organisations: 0, notApproved: 0, noConsent: 0, invalid: 0 };
@@ -120,7 +120,7 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
     // A copy of the header row (e.g. from a faulty sheet formula) is never an entry.
     const nameIndex = indexOf.get('name')![0]!;
     if ((row[nameIndex] ?? '').trim() === (header[nameIndex] ?? '').trim()) {
-      warn(`Zeile ${line} wiederholt die Kopfzeile und wird ignoriert – bitte die Formel im Blatt „Öffentlich“ prüfen.`);
+      warn(`Zeile ${line} wiederholt die Kopfzeile und wird ignoriert – bitte die Formel im Blatt „SHEET_PUBLIC_CSV“ prüfen.`);
       return;
     }
 

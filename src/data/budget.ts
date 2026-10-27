@@ -2,6 +2,9 @@
 // do not round or recalculate. The source title and URL are maintained in the
 // "Einstellungen" sheet (quelle_vorlage_titel, quelle_vorlage_url).
 
+/** The year whose cut is shown on the tiles and added up (the "2027" amount in the form). */
+export const AMOUNT_YEAR = 2027;
+
 export interface BudgetFact {
   value: string;
   label: string;

@@ -3,6 +3,7 @@ import { srcsetUrl, url } from '../lib/paths.ts';
 import type { Project } from '../data/types.ts';
 import { getArea } from '../data/areas.ts';
 import { getOrganisation } from '../data/index.ts';
+import { AMOUNT_YEAR } from '../data/budget.ts';
 import { formatCut, initials, truncate } from '../lib/format.ts';
 import { amountSourceLabel, percentLabel } from '../lib/amount-label.ts';
 import IconFlip from './icons/IconFlip.astro';
@@ -53,12 +54,17 @@ const fullName = showOrg ? `${p.name} (${p.orgName})` : p.name;
       <div class="tile__money">
         {
           p.amount !== null ? (
-            <p class="tile__amount">
-              <span class:list={['tile__amount-value', { 'tile__amount-value--long': p.amount >= 1_000_000 }]}>
-                {formatCut(p.amount)}
-              </span>
-              <span class="tile__amount-unit">/&nbsp;Jahr</span>
-            </p>
+            <div class="tile__dated">
+              <p class="tile__year">
+                <span class="tile__year-label">Kürzung</span>
+                <span class="tile__year-value">{AMOUNT_YEAR}</span>
+              </p>
+              <p class="tile__amount">
+                <span class:list={['tile__amount-value', { 'tile__amount-value--long': p.amount >= 1_000_000 }]}>
+                  {formatCut(p.amount)}
+                </span>
+              </p>
+            </div>
           ) : p.nonMonetary ? (
             <p class="tile__amount tile__amount--text">{p.nonMonetary}</p>
           ) : (
@@ -265,9 +271,38 @@ const fullName = showOrg ? `${p.name} (${p.orgName})` : p.name;
     font-size: clamp(2.25rem, 13cqi, 3.75rem);
   }
 
-  .tile__amount-unit {
-    font-size: 1.375rem;
-    font-weight: 800;
+  /* Year tab: sits on the rule above the amount like the tab of a filing card, in inverted tile colours. */
+  .tile__year {
+    display: inline-flex;
+    align-items: stretch;
+    background: currentColor;
+    line-height: 1;
+  }
+
+  .tile__year > span {
+    color: var(--area-bg);
+    padding: 0.3rem 0.5rem 0.25rem;
+  }
+
+  .tile__year-label {
+    align-self: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .tile__year-value {
+    border-left: var(--line) solid var(--area-bg);
+    font-size: 1.125rem;
+    font-weight: 900;
+    font-stretch: var(--stretch-condensed);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .tile__dated .tile__amount {
+    padding-top: var(--space-2);
+    border-top: var(--line-strong) solid currentColor;
   }
 
   .tile__amount--text {

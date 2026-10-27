@@ -3,12 +3,8 @@ import Page from '../layouts/Page.astro';
 import BudgetFacts from '../components/BudgetFacts.astro';
 import Timeline from '../components/Timeline.astro';
 import ExternalLink from '../components/ExternalLink.astro';
-import { count, organisationCount, projectCount, projects, settings, totalAmount } from '../data/index.ts';
-import { formatEuro } from '../lib/format.ts';
+import { settings } from '../data/index.ts';
 import { pageCardAlt, shareImagePath } from '../data/share.ts';
-
-const withAmount = projects.filter((p) => p.amount !== null);
-const verified = withAmount.filter((p) => p.amountKind === 'verified').length;
 ---
 
 <Page
@@ -22,8 +18,8 @@ const verified = withAmount.filter((p) => p.amountKind === 'verified').length;
       <p class="label">Hintergrund</p>
       <h1>Worum es geht</h1>
       <p class="lead">
-        Die Stadt Erlangen muss bis 2029 weitere 29 Millionen Euro einsparen. Hier stehen die offiziellen Zahlen, der
-        Zeitplan – und wie die Summe der Projekte auf dieser Plattform zustande kommt.
+        Die Stadt Erlangen muss bis 2029 weitere 29 Millionen Euro einsparen. Hier stehen die offiziellen Zahlen und der
+        Zeitplan.
       </p>
     </div>
   </header>
@@ -47,31 +43,6 @@ const verified = withAmount.filter((p) => p.amountKind === 'verified').length;
         </p>
       </div>
       <Timeline />
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="summe-titel">
-    <div class="container prose">
-      <h2 id="summe-titel">So entsteht die Summe der Projekte</h2>
-      <p>
-        Die Summe der Projekte auf dieser Plattform ist keine Hochrechnung und keine Schätzung. Sie addiert die Kürzungen, die für das
-        Jahr 2027 geplant sind, bei allen Projekten auf dieser Plattform. Eine Einrichtung kann mehrere betroffene
-        Projekte eintragen; jedes zählt einzeln. Kürzungen in späteren Jahren stehen bei den Projekten, fließen aber
-        nicht in die Summe ein – ebenso wenig Kürzungen ohne Geldbetrag (z. B. wegfallende Mietzuschüsse).
-      </p>
-      {
-        projectCount > 0 && (
-          <p>
-            Aktuell: <strong class="nobreak">{formatEuro(totalAmount)}</strong> bei {withAmount.length} von{' '}
-            {count(projectCount, 'Projekt', 'Projekten')} aus {count(organisationCount, 'Einrichtung', 'Einrichtungen')}.
-            Davon {verified} vom Bündnis geprüft (mit Quelle), die übrigen als „Angabe der Einrichtung“ gekennzeichnet.
-          </p>
-        )
-      }
-      <p>
-        Jeder Eintrag wird vom Bündnis geprüft, bevor er erscheint. Wo ein Betrag in den Unterlagen der Stadt belegt
-        ist, nennen wir die Quelle direkt am Betrag.
-      </p>
     </div>
   </section>
 

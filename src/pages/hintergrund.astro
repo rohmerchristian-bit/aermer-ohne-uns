@@ -2,6 +2,7 @@
 import Page from '../layouts/Page.astro';
 import BudgetFacts from '../components/BudgetFacts.astro';
 import Timeline from '../components/Timeline.astro';
+import SavingsList from '../components/SavingsList.astro';
 import ExternalLink from '../components/ExternalLink.astro';
 import { settings } from '../data/index.ts';
 import { pageCardAlt, shareImagePath } from '../data/share.ts';
@@ -30,6 +31,19 @@ import { pageCardAlt, shareImagePath } from '../data/share.ts';
         <h2 id="zahlen-titel">Die offiziellen Zahlen</h2>
       </div>
       <BudgetFacts />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="liste-titel">
+    <div class="container">
+      <div class="section__head">
+        <h2 id="liste-titel">Die komplette Sparliste</h2>
+        <p>
+          Alle Einsparmöglichkeiten, die die Stadtverwaltung vorgeschlagen hat – nach Referaten geordnet. Ein Referat
+          antippen, um seine Maßnahmen zu sehen.
+        </p>
+      </div>
+      <SavingsList />
     </div>
   </section>
 

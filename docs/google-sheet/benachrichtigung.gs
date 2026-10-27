@@ -115,6 +115,11 @@ function probelauf() {
 
 /** Wird vom Trigger „Bei Formularübermittlung“ aufgerufen. `test` nur für probelauf(). */
 function beiFormularAntwort(e, test = false) {
+  // Ohne e.range kommt der Aufruf nicht vom Formular (z. B. Trigger „Beim Öffnen“ oder „Ausführen“ im Editor).
+  if (!e || !e.range) {
+    console.warn('beiFormularAntwort() ohne Formularantwort aufgerufen – Trigger muss „Bei Formularübermittlung“ sein. Zum Testen probelauf() nutzen.');
+    return;
+  }
   const sheet = e.range.getSheet();
   const row = e.range.getRow();
   const header = kopfzeile_(sheet);

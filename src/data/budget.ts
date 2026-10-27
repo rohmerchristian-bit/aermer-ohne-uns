@@ -32,7 +32,7 @@ export const affectedDepartments: BudgetFact[] = [
   { value: '1,1 Mio. €', label: 'Referat 1 · u. a. Sport' },
   { value: '3,7 Mio. €', label: 'Referat 4 · Kultur, Bildung und Freizeit' },
   { value: '11,5 Mio. €', label: 'Referat 5 · Jugend, Familie und Soziales' },
-  { value: '0,4 Mio. €', label: 'Referat 7 · Jugend, Familie und Soziales' },
+  { value: '0,4 Mio. €', label: 'Referat 7 · Umwelt und Klimaschutz' },
 ];
 
 /** Additional detail for the background page. */

@@ -27,7 +27,8 @@ const id = `tile-${p.id}${idSuffix}`;
 const Heading = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
 
 const CONSEQUENCES_MAX = 280;
-const QUOTE_MAX = 110;
+// The quote is never cut; longer quotes get a smaller type size instead.
+const quoteSize = !p.quote ? null : p.quote.length > 220 ? 'small' : p.quote.length > 130 ? 'medium' : null;
 // Tile width per breakpoint (see .tile-grid in src/styles/layout.css).
 const IMAGE_SIZES = '(min-width: 96em) 22rem, (min-width: 64em) 30vw, (min-width: 40em) 46vw, 92vw';
 
@@ -121,8 +122,8 @@ const fullName = showOrg ? `${p.name} (${p.orgName})` : p.name;
       <div class="tile__back-body">
         {
           p.quote && (
-            <blockquote class="tile__quote">
-              <p>„{truncate(p.quote, QUOTE_MAX)}“</p>
+            <blockquote class:list={['tile__quote', quoteSize && `tile__quote--${quoteSize}`]}>
+              <p>„{p.quote}“</p>
             </blockquote>
           )
         }
@@ -434,8 +435,11 @@ const fullName = showOrg ? `${p.name} (${p.orgName})` : p.name;
     flex-direction: column;
     gap: var(--space-3);
     min-height: 0;
-    padding: var(--space-4) var(--tile-pad) 0;
-    overflow: hidden;
+    padding: var(--space-4) var(--tile-pad) var(--space-2);
+    /* If a long quote and the consequences do not fit, the text scrolls instead of being cut. */
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
   }
 
   .tile__quote {
@@ -445,12 +449,13 @@ const fullName = showOrg ? `${p.name} (${p.orgName})` : p.name;
     line-height: 1.15;
   }
 
-  .tile__quote p {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    overflow: hidden;
+  .tile__quote--medium {
+    font-size: 1.0625rem;
+  }
+
+  .tile__quote--small {
+    font-size: 0.9375rem;
+    line-height: 1.2;
   }
 
   .tile__quote,
@@ -461,11 +466,6 @@ const fullName = showOrg ? `${p.name} (${p.orgName})` : p.name;
   .tile__consequences {
     font-size: var(--fs-small);
     line-height: 1.4;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4;
-    line-clamp: 4;
-    overflow: hidden;
   }
 
   .tile__links {

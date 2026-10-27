@@ -1,9 +1,11 @@
 ---
 import { timeline } from '../data/budget.ts';
 
-// Steps of the budget process. Steps whose date has passed at build time are marked done.
+// Steps of the budget process. Steps whose date has passed at build time are marked done;
+// a step without exact date ("Herbst 2026") counts as done once a later step is done.
 const today = new Date().toISOString().slice(0, 10);
-const steps = timeline.map((step) => ({ ...step, done: step.isoDate ? step.isoDate <= today : false }));
+const passed = timeline.map((step) => Boolean(step.isoDate && step.isoDate <= today));
+const steps = timeline.map((step, i) => ({ ...step, done: step.isoDate ? passed[i]! : passed.slice(i + 1).some(Boolean) }));
 const currentIndex = steps.findIndex((s) => !s.done);
 ---
 
@@ -35,7 +37,13 @@ const currentIndex = steps.findIndex((s) => !s.done);
 
   @media (min-width: 48em) {
     .timeline {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64em) {
+    .timeline {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 

@@ -8,6 +8,7 @@ const DURATION = 1400;
 
 function animate(el: HTMLElement): void {
   const target = Number(el.dataset.countTo);
+  const unit = el.dataset.countUnit;
   if (!Number.isFinite(target) || target <= 0) return;
 
   // Reserve the final width so the layout does not move while counting.
@@ -16,7 +17,9 @@ function animate(el: HTMLElement): void {
   const step = (now: number) => {
     const t = Math.min(1, (now - start) / DURATION);
     const eased = 1 - (1 - t) ** 4;
-    el.textContent = formatEuro(Math.round(target * eased));
+    const value = Math.round(target * eased);
+    // data-count-unit="Mio. €" shows whole numbers with that unit instead of a full euro amount.
+    el.textContent = unit ? `${value} ${unit}` : formatEuro(value);
     if (t < 1) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);

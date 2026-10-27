@@ -32,7 +32,7 @@ export const DEFAULT_SETTINGS: Settings = {
     'Mitteilung der Verwaltung an den Stadtrat vom 24.09.2026, Vorlage II/056/2026 „Haushaltskonsolidierung: Einbringung von Einsparmöglichkeiten zum Haushaltsentwurf 2027“',
   contactEmail: null,
   instagramUrl: null,
-  heroSubtitle: 'weniger im Jahr 2027 für Kultur, Bildung und Soziales in Erlangen',
+  heroSubtitle: 'weniger für Bildung, Familien, Kinder & Jugend, Kultur und Sport.',
   notice: null,
   hashtags: ['#ÄrmerOhneUns', '#Erlangen', '#Kulturerhalten'],
 };

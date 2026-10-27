@@ -7,11 +7,27 @@ export interface BudgetFact {
   label: string;
 }
 
+/** Headline figure on the home page (texts from the E-Werk team, 27.10.2026). */
+export const headline = {
+  /** Shown as "29 Mio. €"; counted up from 0 on the home page. */
+  millions: 29,
+  subtitle: 'weniger für Bildung, Familien, Kinder & Jugend, Kultur und Sport.',
+  basis: 'Summe der bis 2029 geplanten Kürzungen im Zuge der Haushaltskonsolidierungen der Stadt Erlangen.',
+};
+
 export const budgetFacts: BudgetFact[] = [
-  { value: '10,8 Mio. €', label: 'zu erzielendes Einsparvolumen für den Haushalt 2027' },
-  { value: '5,4 Mio. €', label: 'Einsparvolumen für 2026, das noch „in anderer Form“ zu erbringen ist' },
-  { value: '8,483 Mio. €', label: 'Einsparvorschläge aus den Referatsklausuren – vorgegeben waren dort 8,648 Mio. €' },
-  { value: 'Januar 2027', label: 'Beschluss im Haushalts-Stadtrat' },
+  { value: '8.483.000 €', label: 'geplante Einsparungen 2027' },
+  { value: '11.813.900 €', label: 'geplante Einsparungen 2028' },
+  { value: '15.043.200 €', label: 'geplante Einsparungen 2029' },
+  { value: 'Januar 2027', label: 'Der Stadtrat stimmt über die Sparliste ab.' },
+];
+
+/** Savings 2026–2029 by department ("Referat") with the largest cuts. */
+export const affectedDepartments: BudgetFact[] = [
+  { value: '1,1 Mio. €', label: 'Referat 1 · u. a. Sport' },
+  { value: '3,7 Mio. €', label: 'Referat 4 · Kultur, Bildung und Freizeit' },
+  { value: '11,5 Mio. €', label: 'Referat 5 · Jugend, Familie und Soziales' },
+  { value: '0,4 Mio. €', label: 'Referat 7 · Jugend, Familie und Soziales' },
 ];
 
 /** Additional detail for the background page. */
@@ -42,6 +58,12 @@ export const timeline: TimelineStep[] = [
     date: 'Herbst 2026',
     title: 'Fachausschüsse und Haushalts-HFPA',
     text: 'Die Einsparvorschläge werden einzeln abgestimmt. Hier entscheidet sich, was gestrichen wird.',
+  },
+  {
+    date: '18.11.2026',
+    isoDate: '2026-11-18',
+    title: 'Kundgebung am Rathausplatz',
+    text: 'Mittwoch, 15:00 Uhr, Rathausplatz Erlangen.',
   },
   {
     date: 'Januar 2027',

@@ -10,6 +10,7 @@ import JoinCta from '../components/JoinCta.astro';
 import IconArrow from '../components/icons/IconArrow.astro';
 import { count, organisationCount, projectCount, projects, projectsWithAmount, settings, sortedForGrid, totalAmount } from '../data/index.ts';
 import { formatEuro } from '../lib/format.ts';
+import { headline } from '../data/budget.ts';
 import { pageCardAlt, shareImagePath } from '../data/share.ts';
 
 const HOME_TILES = 8;
@@ -20,7 +21,7 @@ const tiles = sortedForGrid().slice(0, HOME_TILES);
   title="Ärmer ohne uns"
   ogImage={shareImagePath('start')}
   ogImageAlt={pageCardAlt('start')}
-  description="Erlangen muss im Haushalt 2027 sparen. Hier zeigen Kultur-, Bildungs- und Sozialeinrichtungen, was durch die Kürzungen verloren geht."
+  description="Erlangen muss bis 2029 weitere 29 Millionen Euro einsparen. Hier zeigen Kultur-, Bildungs- und Sozialeinrichtungen, was durch die Kürzungen verloren geht."
 >
   <section class="hero" aria-labelledby="hero-titel">
     <div class="container hero__inner">
@@ -30,31 +31,16 @@ const tiles = sortedForGrid().slice(0, HOME_TILES);
 
       <div class="hero__content">
 
-      {
-        totalAmount > 0 ? (
-          <div class="hero__total">
-            <p class="hero__number" aria-hidden="true">
-              <span data-count-to={totalAmount}>{formatEuro(totalAmount)}</span>
-            </p>
-            <p class="hero__subtitle">
-              <span class="visually-hidden">{formatEuro(totalAmount)} </span>
-              {settings.heroSubtitle}
-            </p>
-            <p class="hero__basis small">
-              Summe der für 2027 geplanten Kürzungen bei {count(projectsWithAmount, 'Projekt', 'Projekten')}
-              {projectsWithAmount < projectCount && ` mit Betragsangabe (von ${projectCount})`} aus{' '}
-              {count(organisationCount, 'Einrichtung', 'Einrichtungen')} auf dieser Plattform.
-            </p>
-          </div>
-        ) : (
-          <div class="hero__total">
-            <p class="hero__subtitle">
-              Welche Angebote in Erlangen durch die Kürzungen im Haushalt 2027 verloren gehen – die ersten Einrichtungen
-              tragen sich gerade ein.
-            </p>
-          </div>
-        )
-      }
+      <div class="hero__total">
+        <p class="hero__number" aria-hidden="true">
+          <span data-count-to={headline.millions} data-count-unit="Mio. €">{headline.millions} Mio. €</span>
+        </p>
+        <p class="hero__subtitle">
+          <span class="visually-hidden">{headline.millions} Millionen Euro </span>
+          {settings.heroSubtitle}
+        </p>
+        <p class="hero__basis small">{headline.basis}</p>
+      </div>
 
       <div class="hero__actions">
         {
@@ -76,8 +62,8 @@ const tiles = sortedForGrid().slice(0, HOME_TILES);
         <p class="label">Worum es geht</p>
         <h2 id="worum-titel">Erlangen muss sparen. Die Frage ist, wo.</h2>
         <p class="lead">
-          Die Stadt muss im Haushalt 2027 Millionen einsparen. Die Vorschläge der Verwaltung treffen viele Angebote, die
-          die Stadt lebenswert machen.
+          Die Stadt muss bis 2029 weitere 29 Millionen Euro einsparen. Die Liste der Stadtspitze enthält
+          „Einsparmöglichkeiten“. Darunter viele Angebote, die unsere Stadt lebenswert machen.
         </p>
       </div>
       <BudgetFacts />
@@ -96,6 +82,16 @@ const tiles = sortedForGrid().slice(0, HOME_TILES);
           <div class="section__head home__grid-head">
             <p class="label">Betroffene</p>
             <h2 id="betroffene-titel">Was verloren geht</h2>
+            {
+              totalAmount > 0 && (
+                <p class="home__platform-sum">
+                  Auf dieser Plattform: <strong class="nobreak">{formatEuro(totalAmount)}</strong> weniger im Jahr 2027
+                  bei {count(projectsWithAmount, 'Projekt', 'Projekten')}
+                  {projectsWithAmount < projectCount && ` mit Betragsangabe (von ${projectCount})`} aus{' '}
+                  {count(organisationCount, 'Einrichtung', 'Einrichtungen')}.
+                </p>
+              )
+            }
             <AreaLinks projects={projects} />
           </div>
           <TileGrid projects={tiles} />
@@ -206,6 +202,10 @@ const tiles = sortedForGrid().slice(0, HOME_TILES);
   .home__more {
     margin-top: var(--space-6);
     font-weight: 800;
+  }
+
+  .home__platform-sum {
+    max-width: 60ch;
   }
 
   .home__grid-head {

@@ -1,5 +1,5 @@
 ---
-import { budgetFacts } from '../data/budget.ts';
+import { affectedDepartments, budgetFacts } from '../data/budget.ts';
 import { settings } from '../data/index.ts';
 import ExternalLink from './ExternalLink.astro';
 
@@ -20,8 +20,21 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
     ))
   }
 </ul>
+<div class="facts__departments">
+  <p class="facts__departments-title">Besonders betroffen (2026–2029):</p>
+  <ul class="departments" role="list">
+    {
+      affectedDepartments.map((d) => (
+        <li class="departments__item">
+          <span class="departments__value nobreak">{d.value}</span>
+          <span class="departments__label">{d.label}</span>
+        </li>
+      ))
+    }
+  </ul>
+</div>
 <p class="facts__source small">
-  Quelle:
+  Quelle:{' '}
   {settings.sourceUrl ? <ExternalLink href={settings.sourceUrl}>{settings.sourceTitle}</ExternalLink> : settings.sourceTitle}
 </p>
 
@@ -64,6 +77,44 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
 
   .facts__label {
     max-width: 30ch;
+  }
+
+  .facts__departments {
+    margin-top: var(--space-6);
+  }
+
+  .facts__departments-title {
+    font-weight: 800;
+  }
+
+  .departments {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48em) {
+    .departments {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--space-5);
+    }
+  }
+
+  .departments__item {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: baseline;
+    padding-block: var(--space-3);
+    border-bottom: var(--line) solid currentColor;
+  }
+
+  .departments__value {
+    font-size: var(--fs-h3);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums lining-nums;
   }
 
   .facts__source {

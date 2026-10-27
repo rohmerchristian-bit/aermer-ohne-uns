@@ -3,7 +3,6 @@ import Page from '../layouts/Page.astro';
 import BudgetFacts from '../components/BudgetFacts.astro';
 import Timeline from '../components/Timeline.astro';
 import ExternalLink from '../components/ExternalLink.astro';
-import { budgetDetails } from '../data/budget.ts';
 import { count, organisationCount, projectCount, projects, settings, totalAmount } from '../data/index.ts';
 import { formatEuro } from '../lib/format.ts';
 import { pageCardAlt, shareImagePath } from '../data/share.ts';
@@ -35,9 +34,6 @@ const verified = withAmount.filter((p) => p.amountKind === 'verified').length;
         <h2 id="zahlen-titel">Die offiziellen Zahlen</h2>
       </div>
       <BudgetFacts />
-      <div class="prose bg__details">
-        <ul>{budgetDetails.map((line) => <li>{line}</li>)}</ul>
-      </div>
     </div>
   </section>
 
@@ -91,8 +87,3 @@ const verified = withAmount.filter((p) => p.amountKind === 'verified').length;
   </section>
 </Page>
 
-<style>
-  .bg__details {
-    margin-top: var(--space-6);
-  }
-</style>

@@ -35,15 +35,6 @@ export const affectedDepartments: BudgetFact[] = [
   { value: '0,4 Mio. €', label: 'Referat 7 · Umwelt und Klimaschutz' },
 ];
 
-/** Additional detail for the background page. */
-export const budgetDetails: string[] = [
-  'Von den 10,8 Mio. € für 2027 sind 2,2 Mio. € bereits in den Budgets des Haushaltsentwurfs berücksichtigt.',
-  'Für die Referatsklausuren verblieben 8,648 Mio. €; identifiziert wurden 8,483 Mio. €, rechnerisch fehlen noch 0,165 Mio. €.',
-  'Die Einsparvorschläge gehen zur Einzelabstimmung in die Fachausschüsse und den Haushalts-HFPA.',
-  'Beschlossen wird der Haushalt im Haushalts-Stadtrat im Januar 2027.',
-  'Für 2026 bleiben 5,4 Mio. € „in anderer Form“ noch zu erbringen.',
-];
-
 export interface TimelineStep {
   date: string;
   title: string;

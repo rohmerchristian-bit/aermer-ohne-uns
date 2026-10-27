@@ -1,5 +1,5 @@
 ---
-import { affectedDepartments, budgetFacts } from '../data/budget.ts';
+import { affectedDepartments, budgetFacts, listNote } from '../data/budget.ts';
 import { settings } from '../data/index.ts';
 import ExternalLink from './ExternalLink.astro';
 
@@ -20,6 +20,7 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
     ))
   }
 </ul>
+<p class="facts__note">{listNote}</p>
 <div class="facts__departments">
   <p class="facts__departments-title">Besonders betroffen (2026–2029):</p>
   <ul class="departments" role="list">
@@ -77,6 +78,12 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
 
   .facts__label {
     max-width: 30ch;
+  }
+
+  .facts__note {
+    margin-top: var(--space-5);
+    max-width: 60ch;
+    font-weight: 700;
   }
 
   .facts__departments {

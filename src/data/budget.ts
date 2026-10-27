@@ -7,20 +7,25 @@ export interface BudgetFact {
   label: string;
 }
 
-/** Headline figure on the home page (texts from the E-Werk team, 27.10.2026). */
+/** Headline figure on the home page: savings target set by the Regierung von Mittelfranken (E-Werk team, 27.10.2026). */
 export const headline = {
   /** Shown as "29 Mio. €"; counted up from 0 on the home page. */
   millions: 29,
   subtitle: 'weniger für Bildung, Familien, Kinder & Jugend, Kultur und Sport.',
-  basis: 'Summe der bis 2029 geplanten Kürzungen im Zuge der Haushaltskonsolidierungen der Stadt Erlangen.',
+  basis:
+    'Derzeit geplante Einsparungen bis 2029 – diese Summe fordert die Regierung von Mittelfranken im Zuge der Haushaltskonsolidierung der Stadt Erlangen.',
 };
 
 export const budgetFacts: BudgetFact[] = [
-  { value: '8.483.000 €', label: 'geplante Einsparungen 2027' },
-  { value: '11.813.900 €', label: 'geplante Einsparungen 2028' },
-  { value: '15.043.200 €', label: 'geplante Einsparungen 2029' },
+  { value: '8.483.000 €', label: 'Einsparmöglichkeiten auf der Liste für 2027' },
+  { value: '11.813.900 €', label: 'Einsparmöglichkeiten auf der Liste für 2028' },
+  { value: '15.043.200 €', label: 'Einsparmöglichkeiten auf der Liste für 2029' },
   { value: 'Januar 2027', label: 'Der Stadtrat stimmt über die Sparliste ab.' },
 ];
+
+/** Shown below the facts: the list holds more measures than the target requires. */
+export const listNote =
+  'Zusammen enthält die Liste Maßnahmen über rund 35,3 Mio. € – mehr als die geforderten 29 Mio. €. Welche davon umgesetzt werden, entscheidet der Stadtrat.';
 
 /** Savings 2026–2029 by department ("Referat") with the largest cuts. */
 export const affectedDepartments: BudgetFact[] = [

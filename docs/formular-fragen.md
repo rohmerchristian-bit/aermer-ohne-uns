@@ -161,7 +161,7 @@ um die automatische Einrichtungsliste in Abschnitt 7.
 4. „Wie könnte man Euch helfen …?“ – **vorerst nicht öffentlich**
 5. Bildrechte-Frage ohne Pflicht – **ja**
 6. „Telefonnummer für Rückfragen“ und „E-Mail-Adresse für Rückfragen“ – **öffentlich** auf der Einrichtungsseite unter „Kontakt und Links“ (Entscheidung 28.10.2026, vorher intern);
-   im Formular muss bei beiden Fragen stehen, dass sie auf der Website erscheinen
+   im Formular steht bei beiden Fragen „Erscheint auf Website“
 
 ## Ursprünglich offene Fragen
 

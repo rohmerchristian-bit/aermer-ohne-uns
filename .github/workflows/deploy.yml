@@ -6,6 +6,8 @@
 #
 # Repository secrets (Settings → Secrets and variables → Actions), e.g. from .env.deploy:
 #   SITE_URL, COMING_SOON, FTP_HOST, FTP_USER, FTP_PASSWORD, FTP_DIR, SHEET_PUBLIC_CSV_URL
+# For the password-protected /intern/ tools (optional – without them /intern/ is not uploaded):
+#   INTERN_HTPASSWD (secret, htpasswd lines), INTERN_AUTH_DIR (variable, absolute server path of FTP_DIR)
 # Without FTP_HOST the workflow only reports that deployment is not set up yet.
 
 name: Deploy (aermerohneuns.de)
@@ -86,6 +88,9 @@ jobs:
 
       - if: steps.setup.outputs.ready == 'true'
         name: Für den Server vorbereiten
+        env:
+          INTERN_HTPASSWD: ${{ secrets.INTERN_HTPASSWD }}
+          INTERN_AUTH_DIR: ${{ vars.INTERN_AUTH_DIR }}
         run: node scripts/deploy-package.ts
 
       - if: steps.setup.outputs.ready == 'true'
@@ -115,6 +120,27 @@ jobs:
               --exclude-glob .well-known/ --exclude-glob .htpasswd* --exclude-glob cgi-bin/ \
               dist/ \"$FTP_DIR/\"
           "
+
+      # Safety net: /intern/ must ask for a password. If it is reachable without one, it is
+      # removed from the server at once and the run fails.
+      - if: steps.setup.outputs.ready == 'true'
+        name: Prüfen, ob /intern/ geschützt ist
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: ${{ secrets.FTP_DIR }}
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "${SITE_URL%/}/intern/")
+          echo "/intern/ antwortet mit HTTP $code"
+          if [ "$code" = "200" ]; then
+            lftp -c "set ftp:ssl-force true; set ftp:ssl-protect-data true; open --user \"$FTP_USER\" --env-password ftp://$FTP_HOST; rm -r \"$FTP_DIR/intern\""
+            echo "::error::/intern/ war ohne Passwort erreichbar und wurde vom Server entfernt. INTERN_AUTH_DIR prüfen."
+            exit 1
+          fi
+          if [ -d dist/intern ] && [ "$code" != "401" ]; then
+            echo "::warning::/intern/ antwortet mit HTTP $code statt 401 – vermutlich stimmt INTERN_AUTH_DIR nicht (docs/deploy/README.md)."
+          fi
 
       - if: steps.setup.outputs.ready == 'true' && always()
         name: Zusammenfassung

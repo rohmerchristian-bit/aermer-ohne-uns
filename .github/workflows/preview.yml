@@ -61,6 +61,10 @@ jobs:
       - name: Website bauen (echte Daten)
         run: npm run build
 
+      # GitHub Pages cannot protect folders with a password: the internal tools stay off the preview.
+      - name: Interne Werkzeuge entfernen
+        run: rm -rf dist/intern
+
       - name: Zusammenfassung
         run: |
           echo "### Vorschau gebaut" >> "$GITHUB_STEP_SUMMARY"

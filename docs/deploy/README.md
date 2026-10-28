@@ -37,7 +37,7 @@ sofort geht es über *Actions → Deploy (aermerohneuns.de) → Run workflow*.
 
 Solange `COMING_SOON` = `1` ist, steht online nur die Seite „Die Plattform startet in Kürze“ (mit Logo,
 aktuellem Hinweis aus den Einstellungen und – falls gesetzt – Links zu Formular, Instagram, Kontakt). Alle
-anderen Seiten werden nicht hochgeladen; jede andere Adresse zeigt dieselbe Seite. Die Seite ist `noindex`.
+anderen Seiten werden nicht hochgeladen (außer dem passwortgeschützten `/intern/`); jede andere Adresse zeigt dieselbe Seite. Die Seite ist `noindex`.
 
 **Zum Start der vollständigen Website:** `COMING_SOON` auf `0` setzen (Variable bzw. Secret) und den Workflow
 starten. Vorher Impressum und Datenschutzerklärung einsetzen – die Platzhalter sind gelb markiert.
@@ -60,18 +60,40 @@ Sicherheits-Header (Content-Security-Policy nur eigene Domain, Formular-Ziel Cle
 - **HSTS** ist vorbereitet, aber auskommentiert: erst einschalten, wenn HTTPS für die Domain zuverlässig läuft.
 - **SSL-Zertifikat:** im Hetzner-konsoleH für die Domain Let's Encrypt aktivieren (falls noch nicht geschehen).
 
-## Passwortschutz für /admin/ (ab Phase 5)
+## Interner Bereich /intern/ (Social-Media-Vorlagen)
 
-Der Social-Media-Generator unter `/admin/` wird per HTTP-Basic-Auth geschützt. Dafür im konsoleH unter
-*Einstellungen → Verzeichnisschutz* den Ordner `public_html/admin` schützen und Benutzer anlegen – Hetzner
-erzeugt `.htaccess`/`.htpasswd` dann selbst. Alternativ auf einem Rechner mit Apache-Tools:
+Unter `https://aermerohneuns.de/intern/` liegt das Werkzeug für Social-Media-Posts und -Stories
+(Anleitung: [`docs/social-vorlagen.md`](../social-vorlagen.md)). Es ist per **Passwort** (HTTP Basic Auth)
+geschützt und läuft auch im Coming-soon-Modus. Auf der GitHub-Vorschau gibt es den Bereich nicht – GitHub
+Pages kann keine Ordner schützen.
 
-```bash
-htpasswd -c .htpasswd-aermerohneuns team
-```
+**Einrichtung (einmalig), zwei Werte in GitHub** (*Settings → Secrets and variables → Actions*):
 
-Die erzeugte Datei per FTP **außerhalb** von `public_html` ablegen und den Pfad in `public/admin/.htaccess`
-eintragen (folgt mit Phase 5). Der Upload löscht `.htpasswd*`-Dateien nie.
+1. **Secret `INTERN_HTPASSWD`** – Benutzername und verschlüsseltes Passwort. Auf dem Mac im Terminal
+   (fragt das Passwort zweimal ab, zeigt es nicht an; `team` ist der Benutzername):
+
+   ```bash
+   htpasswd -nB team
+   ```
+
+   Die ausgegebene Zeile (`team:$2y$…`) komplett als Secret einfügen. Mehrere Zugänge: mehrere Zeilen.
+   Das Passwort selbst steht nirgends – nur dieser verschlüsselte Wert.
+2. **Variable `INTERN_AUTH_DIR`** – der absolute Pfad des Website-Ordners (`FTP_DIR`) auf dem Server,
+   z. B. `/usr/www/users/BENUTZER/public_html`. Steht im konsoleH unter *Einstellungen* bzw. in den
+   Server-Infos („Pfad zum Webverzeichnis“).
+
+Der Deploy schreibt daraus `intern/.htaccess` und die Benutzerdatei `intern/.htusers` (Apache liefert
+`.ht*`-Dateien nie aus).
+
+**Sicherungen:**
+
+- Fehlt einer der beiden Werte oder ist er ungültig, wird `/intern/` **gar nicht** hochgeladen.
+- Nach jedem Upload ruft der Deploy `/intern/` ohne Passwort auf. Kommt die Seite trotzdem (HTTP 200),
+  wird der Ordner sofort vom Server gelöscht und der Lauf schlägt fehl. Antwortet der Server mit einem
+  Fehler statt mit der Passwortabfrage (z. B. 500), stimmt meist `INTERN_AUTH_DIR` nicht – der Lauf zeigt
+  dann eine Warnung.
+
+**Passwort ändern:** neue Zeile mit `htpasswd -nB team` erzeugen, Secret ersetzen, Workflow starten.
 
 ## Wenn ein Lauf fehlschlägt
 

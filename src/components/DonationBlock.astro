@@ -7,7 +7,7 @@ import IconExternal from './icons/IconExternal.astro';
 import IconArrow from './icons/IconArrow.astro';
 
 // Big signal-coloured block: donations go to the central account of the Erlanger Bürgerstiftung,
-// online via WirWunder or BetterPlace. Details and bank transfer on /spenden/. No embedded widget.
+// online via WirWunder (betterplace). Details and bank transfer on /spenden/. No embedded widget.
 interface Props {
   headingLevel?: 2 | 3;
   /** On an organisation page: how to direct a donation to this organisation. */
@@ -67,21 +67,11 @@ const status = getDonationStatus(settings);
         )
       }
       {
-        status.url || status.betterplaceUrl ? (
-          <div class="donate__actions">
-            {status.url && (
-              <a class="btn donate__btn" href={status.url} target="_blank" rel="noopener">
-                Bei WirWunder spenden <IconExternal />
-                <span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
-              </a>
-            )}
-            {status.betterplaceUrl && (
-              <a class="btn btn--outline donate__btn" href={status.betterplaceUrl} target="_blank" rel="noopener">
-                Bei BetterPlace spenden <IconExternal />
-                <span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
-              </a>
-            )}
-          </div>
+        status.url ? (
+          <a class="btn donate__btn" href={status.url} target="_blank" rel="noopener">
+            Bei WirWunder spenden <IconExternal />
+            <span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
+          </a>
         ) : (
           <p class="donate__soon">Spendenaktion startet in Kürze.</p>
         )
@@ -170,12 +160,6 @@ const status = getDonationStatus(settings);
 
   .donate__btn {
     --btn-block: var(--color-paper);
-  }
-
-  .donate__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
   }
 
   .donate__hint {

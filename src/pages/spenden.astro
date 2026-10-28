@@ -9,7 +9,7 @@ import { pageCardAlt, shareImagePath } from '../data/share.ts';
 import { url } from '../lib/paths.ts';
 
 // Wording from the alliance team (28.10.2026). Donations go to the central account of the
-// Erlanger Bürgerstiftung; online via WirWunder or BetterPlace.
+// Erlanger Bürgerstiftung; online via WirWunder, the regional donation platform of betterplace.
 const status = getDonationStatus(settings);
 ---
 
@@ -17,7 +17,7 @@ const status = getDonationStatus(settings);
   title="Spenden"
   ogImage={shareImagePath('spenden')}
   ogImageAlt={pageCardAlt('spenden')}
-  description="So spenden Sie für #ÄrmerOhneUns: zentrales Spendenkonto bei der Erlanger Bürgerstiftung, online über WirWunder oder BetterPlace oder per Überweisung."
+  description="So spenden Sie für #ÄrmerOhneUns: zentrales Spendenkonto bei der Erlanger Bürgerstiftung, online über WirWunder (betterplace) oder per Überweisung."
 >
   <header class="page-head">
     <div class="container">
@@ -62,23 +62,15 @@ const status = getDonationStatus(settings);
     <div class="container donate-online__inner">
       <div>
         <h2 id="online-titel">Online spenden</h2>
-        <p>Online spenden Sie über die Plattform WirWunder oder BetterPlace.</p>
+        <p>Online spenden Sie über WirWunder, die regionale Spendenplattform von betterplace.</p>
       </div>
       {
-        status.url || status.betterplaceUrl ? (
+        status.url ? (
           <div class="donate-online__actions">
-            {status.url && (
-              <a class="btn" href={status.url} target="_blank" rel="noopener">
-                Bei WirWunder spenden <IconExternal />
-                <span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
-              </a>
-            )}
-            {status.betterplaceUrl && (
-              <a class="btn btn--outline" href={status.betterplaceUrl} target="_blank" rel="noopener">
-                Bei BetterPlace spenden <IconExternal />
-                <span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
-              </a>
-            )}
+            <a class="btn" href={status.url} target="_blank" rel="noopener">
+              Bei WirWunder spenden <IconExternal />
+              <span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
+            </a>
           </div>
         ) : (
           <p class="donate-online__soon">Die Online-Spende startet in Kürze.</p>

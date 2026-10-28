@@ -95,12 +95,6 @@ const donation = getDonationStatus(settings);
                 Bei WirWunder spenden <IconExternal />
                 <span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
               </a>
-              {donation.betterplaceUrl && (
-                <a class="btn btn--outline" href={donation.betterplaceUrl} target="_blank" rel="noopener">
-                  Bei BetterPlace spenden <IconExternal />
-                  <span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
-                </a>
-              )}
             </div>
           )
         }

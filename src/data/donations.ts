@@ -8,8 +8,6 @@ import type { Settings } from './settings.ts';
 export interface DonationStatus {
   /** null → campaign not live yet: show "Spendenaktion startet in Kürze". */
   url: string | null;
-  /** Second online option (BetterPlace); null hides the button. */
-  betterplaceUrl: string | null;
   current: number | null;
   goal: number | null;
   /** Date of the last update, as entered in the sheet. */
@@ -22,7 +20,7 @@ export function getDonationStatus(settings: Settings): DonationStatus {
   const current = settings.donationCurrent;
   const goal = settings.donationGoal;
   const percent = current !== null && goal ? Math.min(100, Math.round((current / goal) * 100)) : null;
-  return { url: settings.wirwunderUrl, betterplaceUrl: settings.betterplaceUrl, current, goal, asOf: settings.donationDate, percent };
+  return { url: settings.wirwunderUrl, current, goal, asOf: settings.donationDate, percent };
 }
 
 /**

@@ -8,7 +8,6 @@ import { extractUrls } from './pipeline.ts';
 
 export interface Settings {
   wirwunderUrl: string | null;
-  betterplaceUrl: string | null;
   donationCurrent: number | null;
   donationGoal: number | null;
   donationDate: string | null;
@@ -24,7 +23,6 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = {
   wirwunderUrl: null,
-  betterplaceUrl: null,
   donationCurrent: null,
   donationGoal: 500_000,
   donationDate: null,
@@ -43,7 +41,6 @@ type Kind = 'url' | 'amount' | 'text' | 'email' | 'hashtags';
 
 const KEYS: Record<string, { field: keyof Settings; kind: Kind }> = {
   wirwunder_url: { field: 'wirwunderUrl', kind: 'url' },
-  betterplace_url: { field: 'betterplaceUrl', kind: 'url' },
   spenden_stand_euro: { field: 'donationCurrent', kind: 'amount' },
   spenden_ziel_euro: { field: 'donationGoal', kind: 'amount' },
   spenden_stand_datum: { field: 'donationDate', kind: 'text' },

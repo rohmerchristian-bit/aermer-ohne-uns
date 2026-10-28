@@ -1,0 +1,167 @@
+---
+import Page from '../layouts/Page.astro';
+import BankTransfer from '../components/BankTransfer.astro';
+import IconExternal from '../components/icons/IconExternal.astro';
+import IconArrow from '../components/icons/IconArrow.astro';
+import { settings } from '../data/index.ts';
+import { getDonationStatus } from '../data/donations.ts';
+import { pageCardAlt, shareImagePath } from '../data/share.ts';
+import { url } from '../lib/paths.ts';
+
+// Wording from the alliance team (28.10.2026). Donations go to the central account of the
+// Erlanger Bürgerstiftung; online via WirWunder or BetterPlace.
+const status = getDonationStatus(settings);
+---
+
+<Page
+  title="Spenden"
+  ogImage={shareImagePath('spenden')}
+  ogImageAlt={pageCardAlt('spenden')}
+  description="So spenden Sie für #ÄrmerOhneUns: zentrales Spendenkonto bei der Erlanger Bürgerstiftung, online über WirWunder oder BetterPlace oder per Überweisung."
+>
+  <header class="page-head">
+    <div class="container">
+      <p class="label">Spenden</p>
+      <h1>Wie Sie für ÄrmerOhneUns spenden können</h1>
+      <p class="lead intro">
+        Die Sparmaßnahmen treffen viele Projekte in Erlangen, die Menschen im Alltag unterstützen: in der Sozialarbeit, bei
+        Kindern und Familien, in Kultur und Sport. Damit diese Angebote erhalten bleiben, haben wir als Bündnis
+        ÄrmerOhneUns eine zentrale Spendenkooperation mit der gemeinnützigen Erlanger Bürgerstiftung geschlossen.
+      </p>
+    </div>
+  </header>
+
+  <section class="section" aria-labelledby="bedeutung-titel">
+    <div class="container">
+      <div class="section__head">
+        <h2 id="bedeutung-titel">Was bedeutet das für Sie?</h2>
+      </div>
+      <ul class="points" role="list">
+        <li class="points__item">
+          <h3 class="points__title">Zentrales Spendenkonto</h3>
+          <p>
+            Die Bürgerstiftung hat dafür eigens ein Konto eingerichtet. Sie verwaltet die Mittel und kuratiert die
+            Verteilung. Ein Kuratorium entscheidet, welche Vereine und Projekte die Spenden erhalten.
+          </p>
+        </li>
+        <li class="points__item">
+          <h3 class="points__title">Gezielt helfen</h3>
+          <p>
+            Sie müssen nicht einzeln bei jeder Initiative spenden. Sie können aber im Zuge Ihrer Spende über die Funktion
+            „Kommentar“ hinterlassen, für welche Organisation Ihre Spende bestimmt ist.
+          </p>
+          <p class="small">
+            <a href={url('/einrichtungen/')}>Alle betroffenen Einrichtungen ansehen <IconArrow /></a>
+          </p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section donate-online" id="online" aria-labelledby="online-titel">
+    <div class="container donate-online__inner">
+      <div>
+        <h2 id="online-titel">Online spenden</h2>
+        <p>Online spenden Sie über die Plattform WirWunder oder BetterPlace.</p>
+      </div>
+      {
+        status.url || status.betterplaceUrl ? (
+          <div class="donate-online__actions">
+            {status.url && (
+              <a class="btn" href={status.url} target="_blank" rel="noopener">
+                Bei WirWunder spenden <IconExternal />
+                <span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
+              </a>
+            )}
+            {status.betterplaceUrl && (
+              <a class="btn btn--outline" href={status.betterplaceUrl} target="_blank" rel="noopener">
+                Bei BetterPlace spenden <IconExternal />
+                <span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
+              </a>
+            )}
+          </div>
+        ) : (
+          <p class="donate-online__soon">Die Online-Spende startet in Kürze.</p>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section" id="ueberweisung" aria-labelledby="ueberweisung-titel">
+    <div class="container">
+      <div class="section__head">
+        <h2 id="ueberweisung-titel">Spenden per Überweisung</h2>
+      </div>
+      <div class="transfer">
+        <BankTransfer />
+      </div>
+    </div>
+  </section>
+</Page>
+
+<style>
+  .points {
+    display: grid;
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: var(--line-strong) solid currentColor;
+  }
+
+  @media (min-width: 48em) {
+    .points {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--space-7);
+    }
+  }
+
+  .points__item {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    padding-top: var(--space-5);
+  }
+
+  .points__title {
+    font-size: var(--fs-h3);
+    font-weight: 900;
+  }
+
+  .donate-online {
+    background: var(--color-signal);
+    color: var(--color-signal-text);
+    border-block: var(--line-strong) solid var(--color-ink);
+  }
+
+  .donate-online__inner {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 64em) {
+    .donate-online__inner {
+      grid-template-columns: 3fr 2fr;
+      align-items: end;
+    }
+  }
+
+  .donate-online__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .donate-online__soon {
+    font-weight: 800;
+  }
+
+  .transfer {
+    max-width: 52rem;
+  }
+
+  /* The intro is longer than the usual lead sentence. */
+  .page-head .intro {
+    max-width: 60ch;
+  }
+</style>

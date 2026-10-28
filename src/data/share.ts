@@ -5,9 +5,9 @@ import { count, organisationCount, projectCount, settings, totalAmount } from '.
 import { formatEuro } from '../lib/format.ts';
 import type { PageCard } from '../lib/og.ts';
 
-export type SharePage = 'standard' | 'start' | 'einrichtungen' | 'hintergrund' | 'mitmachen';
+export type SharePage = 'standard' | 'start' | 'einrichtungen' | 'hintergrund' | 'mitmachen' | 'spenden';
 
-export const SHARE_PAGES: SharePage[] = ['standard', 'start', 'einrichtungen', 'hintergrund', 'mitmachen'];
+export const SHARE_PAGES: SharePage[] = ['standard', 'start', 'einrichtungen', 'hintergrund', 'mitmachen', 'spenden'];
 
 export function shareImagePath(page: SharePage): string {
   return `/og/seiten/${page}.png`;
@@ -41,6 +41,12 @@ export function pageCard(page: SharePage): PageCard {
         kicker: 'Mitmachen',
         title: 'Gemeinsam sind wir schwer zu übersehen.',
         text: 'Eintragen, informiert bleiben, spenden, weitersagen.',
+      };
+    case 'spenden':
+      return {
+        kicker: 'Spenden',
+        title: 'Was wegfällt, fangen wir gemeinsam auf.',
+        text: 'Zentrales Spendenkonto bei der Erlanger Bürgerstiftung.',
       };
     default:
       return {

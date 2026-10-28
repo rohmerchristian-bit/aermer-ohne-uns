@@ -1,0 +1,164 @@
+---
+import QRCode from 'qrcode';
+import { DONATION_ACCOUNT, formatIban, giroCodePayload } from '../data/donations.ts';
+
+// Bank details of the central donation account: every value can be copied with one click,
+// and the GiroCode fills recipient, IBAN and reference into banking apps.
+const account = DONATION_ACCOUNT;
+const rows = [
+  { label: 'Empfänger', value: account.recipient, copy: account.recipient },
+  { label: 'IBAN', value: formatIban(account.iban), copy: account.iban },
+  { label: 'BIC', value: account.bic, copy: account.bic },
+  { label: 'Verwendungszweck', value: account.reference, copy: account.reference },
+];
+// Rendered at build time: plain SVG paths, no script and no inline styles (CSP).
+const qr = await QRCode.toString(giroCodePayload(account), { type: 'svg', errorCorrectionLevel: 'M', margin: 0, color: { dark: '#111111', light: '#ffffff' } });
+---
+
+<div class="bank">
+  <dl class="bank__list">
+    {
+      rows.map((row) => (
+        <div class="bank__row">
+          <dt>{row.label}</dt>
+          <dd>
+            <span class="bank__value">{row.value}</span>
+            <button type="button" class="bank__copy" data-copy={row.copy} hidden>
+              Kopieren<span class="visually-hidden">: {row.label}</span>
+            </button>
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+  <figure class="bank__qr">
+    <div class="bank__qr-code" set:html={qr} role="img" aria-label="GiroCode mit den Überweisungsdaten" />
+    <figcaption class="small">
+      <strong>GiroCode:</strong> mit der Banking-App scannen – Empfänger, IBAN und Verwendungszweck sind dann ausgefüllt.
+    </figcaption>
+  </figure>
+</div>
+
+<script>
+  // Copy buttons appear only where the browser can copy (and JavaScript runs).
+  document.querySelectorAll<HTMLButtonElement>('.bank__copy[data-copy]').forEach((button) => {
+    if (!navigator.clipboard) return;
+    button.hidden = false;
+    const label = button.innerHTML;
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy!);
+        button.textContent = 'Kopiert ✓';
+      } catch {
+        button.textContent = 'Bitte markieren';
+      }
+      setTimeout(() => (button.innerHTML = label), 2000);
+    });
+  });
+</script>
+
+<style>
+  .bank {
+    display: grid;
+    gap: var(--space-5);
+    padding: var(--space-5);
+    border: var(--line-strong) solid var(--color-ink);
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  @media (min-width: 48em) {
+    .bank {
+      grid-template-columns: minmax(0, 1fr) 11rem;
+      align-items: start;
+    }
+  }
+
+  .bank__list {
+    display: grid;
+    margin: 0;
+  }
+
+  .bank__row {
+    display: grid;
+    gap: var(--space-1);
+    padding-block: var(--space-3);
+    border-bottom: var(--line) solid var(--color-ink);
+  }
+
+  .bank__row:first-child {
+    padding-top: 0;
+  }
+
+  .bank__row:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .bank__row dt {
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  /* Phones: value on its own line, button below; from 30em side by side. */
+  .bank__row dd {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  @media (min-width: 30em) {
+    .bank__row dd {
+      flex-direction: row;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+  }
+
+  /* The IBAN stays on one line, so it can be read and compared in groups of four. */
+  .bank__value {
+    font-size: clamp(1rem, 4.4vw, 1.25rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums lining-nums;
+    white-space: nowrap;
+  }
+
+  .bank__copy {
+    padding: var(--space-1) var(--space-3);
+    border: var(--line) solid var(--color-ink);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--fs-small);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .bank__copy:hover {
+    background: var(--color-signal);
+  }
+
+  .bank__qr {
+    display: grid;
+    gap: var(--space-2);
+    max-width: 11rem;
+    margin: 0;
+  }
+
+  .bank__qr-code {
+    padding: var(--space-3);
+    background: #fff;
+    border: var(--line) solid var(--color-ink);
+  }
+
+  .bank__qr-code :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+</style>

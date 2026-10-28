@@ -95,6 +95,10 @@ const donation = getDonationStatus(settings);
                 Bei WirWunder spenden <IconExternal />
                 <span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
               </a>
+              <p class="small">
+                WirWunder ist die Spendenplattform der Sparkassen-Finanzgruppe in Kooperation mit betterplace.org; die
+                Spendenbescheinigung erhalten Sie von betterplace.org.
+              </p>
             </div>
           )
         }
@@ -213,8 +217,8 @@ const donation = getDonationStatus(settings);
   }
 
   .soon-donate__actions {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    justify-items: start;
     gap: var(--space-3);
     margin-top: var(--space-2);
   }

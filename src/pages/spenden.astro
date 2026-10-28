@@ -9,7 +9,8 @@ import { pageCardAlt, shareImagePath } from '../data/share.ts';
 import { url } from '../lib/paths.ts';
 
 // Wording from the alliance team (28.10.2026). Donations go to the central account of the
-// Erlanger Bürgerstiftung; online via WirWunder, the regional donation platform of betterplace.
+// Erlanger Bürgerstiftung; online via WirWunder (Sparkassen-Finanzgruppe in cooperation with betterplace.org).
+// Wording as on wirwunder.de/hoechstadt and the betterplace project page (checked 28.10.2026).
 const status = getDonationStatus(settings);
 ---
 
@@ -17,7 +18,7 @@ const status = getDonationStatus(settings);
   title="Spenden"
   ogImage={shareImagePath('spenden')}
   ogImageAlt={pageCardAlt('spenden')}
-  description="So spenden Sie für #ÄrmerOhneUns: zentrales Spendenkonto bei der Erlanger Bürgerstiftung, online über WirWunder (betterplace) oder per Überweisung."
+  description="So spenden Sie für #ÄrmerOhneUns: zentrales Spendenkonto bei der Erlanger Bürgerstiftung, online über WirWunder oder per Überweisung."
 >
   <header class="page-head">
     <div class="container">
@@ -62,7 +63,11 @@ const status = getDonationStatus(settings);
     <div class="container donate-online__inner">
       <div>
         <h2 id="online-titel">Online spenden</h2>
-        <p>Online spenden Sie über WirWunder, die regionale Spendenplattform von betterplace.</p>
+        <p>
+          Online spenden Sie über WirWunder Erlangen Höchstadt Herzogenaurach – die Spendenplattform der
+          Sparkassen-Finanzgruppe in Kooperation mit betterplace.org.
+        </p>
+        <p class="small">Die Spendenbescheinigung für Online-Spenden erhalten Sie von betterplace.org.</p>
       </div>
       {
         status.url ? (

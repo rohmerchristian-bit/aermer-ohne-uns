@@ -2,10 +2,15 @@
 import { url } from '../lib/paths.ts';
 import Base from '../layouts/Base.astro';
 import ExternalLink from '../components/ExternalLink.astro';
+import BankTransfer from '../components/BankTransfer.astro';
+import IconExternal from '../components/icons/IconExternal.astro';
 import { settings } from '../data/index.ts';
+import { getDonationStatus } from '../data/donations.ts';
 
 // "Coming soon" page. With COMING_SOON=1 the deploy workflow publishes only this page
-// (as / and as the 404 page). No navigation, so it never links to pages that are not online yet.
+// (as / and as the 404 page). No navigation, so it never links to pages that are not online yet –
+// that is why the donation details are shown here in full instead of linking to /spenden/.
+const donation = getDonationStatus(settings);
 ---
 
 <Base
@@ -30,6 +35,9 @@ import { settings } from '../data/index.ts';
         {settings.notice && <p class="soon__notice">{settings.notice}</p>}
 
         <ul class="soon__links" role="list">
+          <li>
+            <a href="#spenden">Jetzt spenden: WirWunder oder Überweisung</a>
+          </li>
           {
             settings.formUrl && (
               <li>
@@ -61,6 +69,45 @@ import { settings } from '../data/index.ts';
           Eine Initiative des Bündnisses <span class="nobreak">#ÄrmerOhneUns</span>, verantwortlich: E-Werk
           Kulturzentrum GmbH, Erlangen.
         </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="soon-donate" id="spenden" aria-labelledby="spenden-titel">
+    <div class="container soon-donate__inner">
+      <div class="soon-donate__text">
+        <p class="label">Jetzt schon spenden</p>
+        <h2 id="spenden-titel" class="soon-donate__title">Was wegfällt, fangen wir gemeinsam auf.</h2>
+        <p>
+          Damit Angebote in Sozialarbeit, für Kinder und Familien, in Kultur und Sport erhalten bleiben, hat das Bündnis
+          ÄrmerOhneUns eine zentrale Spendenkooperation mit der gemeinnützigen Erlanger Bürgerstiftung geschlossen. Sie
+          verwaltet die Spenden auf einem eigenen Konto; ein Kuratorium entscheidet, welche Vereine und Projekte sie
+          erhalten.
+        </p>
+        <p>
+          Sie können im Zuge Ihrer Spende über die Funktion „Kommentar“ angeben, für welche Organisation Ihre Spende
+          bestimmt ist.
+        </p>
+        {
+          donation.url && (
+            <div class="soon-donate__actions">
+              <a class="btn" href={donation.url} target="_blank" rel="noopener">
+                Bei WirWunder spenden <IconExternal />
+                <span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
+              </a>
+              {donation.betterplaceUrl && (
+                <a class="btn btn--outline" href={donation.betterplaceUrl} target="_blank" rel="noopener">
+                  Bei BetterPlace spenden <IconExternal />
+                  <span class="visually-hidden"> (externer Link, öffnet in neuem Tab)</span>
+                </a>
+              )}
+            </div>
+          )
+        }
+      </div>
+      <div class="soon-donate__transfer">
+        <h3 class="soon-donate__subtitle">Per Überweisung</h3>
+        <BankTransfer />
       </div>
     </div>
   </section>
@@ -138,5 +185,53 @@ import { settings } from '../data/index.ts';
 
   .soon__note {
     color: var(--color-muted);
+  }
+
+  .soon-donate {
+    background: var(--color-signal);
+    color: var(--color-signal-text);
+    border-top: var(--line-strong) solid var(--color-ink);
+  }
+
+  .soon-donate__inner {
+    display: grid;
+    gap: var(--space-7);
+    padding-block: var(--space-8);
+  }
+
+  @media (min-width: 64em) {
+    .soon-donate__inner {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: start;
+    }
+  }
+
+  .soon-donate__text {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+
+  .soon-donate__title {
+    font-size: var(--fs-h2);
+    font-weight: 900;
+    line-height: var(--lh-tight);
+  }
+
+  .soon-donate__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+
+  .soon-donate__transfer {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .soon-donate__subtitle {
+    font-size: var(--fs-h3);
+    font-weight: 900;
   }
 </style>

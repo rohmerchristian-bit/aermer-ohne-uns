@@ -15,6 +15,7 @@ const rows = [
 const qr = await QRCode.toString(giroCodePayload(account), { type: 'svg', errorCorrectionLevel: 'M', margin: 0, color: { dark: '#111111', light: '#ffffff' } });
 ---
 
+<div class="bank-wrap">
 <div class="bank">
   <dl class="bank__list">
     {
@@ -38,6 +39,7 @@ const qr = await QRCode.toString(giroCodePayload(account), { type: 'svg', errorC
     </figcaption>
   </figure>
 </div>
+</div>
 
 <script>
   // Copy buttons appear only where the browser can copy (and JavaScript runs).
@@ -58,6 +60,11 @@ const qr = await QRCode.toString(giroCodePayload(account), { type: 'svg', errorC
 </script>
 
 <style>
+  /* The box adapts to its own width (it sits in narrow and wide columns), not to the screen. */
+  .bank-wrap {
+    container-type: inline-size;
+  }
+
   .bank {
     display: grid;
     gap: var(--space-5);
@@ -67,7 +74,7 @@ const qr = await QRCode.toString(giroCodePayload(account), { type: 'svg', errorC
     color: var(--color-ink);
   }
 
-  @media (min-width: 48em) {
+  @container (min-width: 44rem) {
     .bank {
       grid-template-columns: minmax(0, 1fr) 11rem;
       align-items: start;
@@ -111,7 +118,7 @@ const qr = await QRCode.toString(giroCodePayload(account), { type: 'svg', errorC
     margin: 0;
   }
 
-  @media (min-width: 30em) {
+  @container (min-width: 26rem) {
     .bank__row dd {
       flex-direction: row;
       align-items: baseline;

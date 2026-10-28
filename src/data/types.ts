@@ -59,6 +59,9 @@ export interface Project {
   consequences: string | null;
   quote: string | null;
   infoLink: string | null;
+  /** Public contact for questions and offers of help (form section 8). */
+  contactEmail: string | null;
+  contactPhone: string | null;
   /** Project image, or the organisation's logo if the project has none. */
   image: InstitutionImage | null;
   /** True if `image` is the project's own image (not the organisation logo). */

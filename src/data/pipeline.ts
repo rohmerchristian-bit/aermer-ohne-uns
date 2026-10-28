@@ -207,6 +207,8 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
       consequences: text('consequences'),
       quote: stripQuotes(text('quote')),
       infoLink: infoLinks[0] ?? null,
+      contactEmail: contactEmail(read('projectEmail'), (msg) => warn(`${label}: ${msg}`)),
+      contactPhone: contactPhone(read('projectPhone'), (msg) => warn(`${label}: ${msg}`)),
     };
 
     // Additional projects are attached after all organisations are known (row order does not matter).
@@ -296,6 +298,24 @@ function resolveAmount(
 }
 
 /** Trims every line, collapses runs of spaces, keeps paragraph breaks. Empty → null. */
+/** A single e-mail address, or null with a warning if the answer is not one. */
+export function contactEmail(raw: string, warn: (message: string) => void): string | null {
+  const value = raw.trim();
+  if (!value) return null;
+  if (/^[^\s@<>]+@[^\s@<>]+\.[a-z]{2,}$/i.test(value)) return value;
+  warn(`E-Mail-Adresse für Rückfragen nicht erkannt („${value.slice(0, 60)}“) – sie wird nicht angezeigt.`);
+  return null;
+}
+
+/** A phone number as written (digits, spaces, +, /, -, brackets), or null with a warning. */
+export function contactPhone(raw: string, warn: (message: string) => void): string | null {
+  const value = raw.trim().replace(/\s+/g, ' ');
+  if (!value) return null;
+  if (/^\+?[\d\s/()-]+$/.test(value) && value.replace(/\D/g, '').length >= 5) return value;
+  warn(`Telefonnummer für Rückfragen nicht erkannt („${value.slice(0, 40)}“) – sie wird nicht angezeigt.`);
+  return null;
+}
+
 export function cleanText(raw: string): string | null {
   const text = raw
     .replace(/\r\n?/g, '\n')

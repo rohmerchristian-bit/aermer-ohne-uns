@@ -197,9 +197,11 @@ export const columns: readonly ColumnDef[] = [
       'Redebeitrag auf der Bühne',
     ],
   },
-  // Contact for an additional project: internal only (decision of the initiative, 26.10.2026).
-  { key: 'projectPhone', header: 'Telefonnummer für Rückfragen', visibility: 'private' },
-  { key: 'projectEmail', header: 'E-Mail-Adresse für Rückfragen', visibility: 'private' },
+  // Contact for questions (form section 8): shown on the organisation page under "Kontakt und Links"
+  // so people can offer help directly (decision of the initiative, 28.10.2026).
+  // Not to be confused with the internal "E-Mail-Adresse für Rückfragen & Bündnisarbeit" above.
+  { key: 'projectPhone', header: 'Telefonnummer für Rückfragen', visibility: 'public' },
+  { key: 'projectEmail', header: 'E-Mail-Adresse für Rückfragen', visibility: 'public' },
   {
     // Private until the initiative decides whether help offers are shown on the website.
     key: 'help',

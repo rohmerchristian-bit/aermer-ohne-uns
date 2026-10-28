@@ -151,7 +151,7 @@ describe('privacy allowlist', () => {
     expect(Object.keys(result.projects[0]!.project).sort()).toEqual(
       [
         'id', 'anchor', 'orgSlug', 'orgName', 'name', 'area', 'cutDescription', 'amount', 'amountKind', 'amountSource',
-        'amountLater', 'amountPercent', 'nonMonetary', 'consequences', 'quote', 'infoLink', 'image', 'ownImage', 'featured',
+        'amountLater', 'amountPercent', 'nonMonetary', 'consequences', 'quote', 'infoLink', 'contactEmail', 'contactPhone', 'image', 'ownImage', 'featured',
       ].sort(),
     );
   });

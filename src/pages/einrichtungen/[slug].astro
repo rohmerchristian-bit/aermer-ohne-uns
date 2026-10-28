@@ -33,6 +33,11 @@ const related = sortedForGrid(
 
 const paragraphs = (text: string | null) => (text ? text.split(/\n{2,}/).map((p) => p.split('\n')) : []);
 const socialLinks = org.links.filter((l) => l !== org.website);
+// Contact for questions and offers of help; every form entry has its own, so collect the distinct ones.
+const unique = (values: (string | null)[]) => [...new Set(values.filter((v): v is string => Boolean(v)))];
+const emails = unique(own.map((p) => p.contactEmail));
+const phones = unique(own.map((p) => p.contactPhone));
+const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
 const linkLabel = (link: string) => new URL(link).hostname.replace(/^www\./, '');
 const pageUrl = new URL(url(`/einrichtungen/${org.slug}/`), Astro.site).toString();
 
@@ -135,6 +140,26 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
           <h2 id="abschnitt-kontakt" class="h3">Kontakt und Links</h2>
           {org.address && <p>{org.address}</p>}
           <ul class="detail__links" role="list">
+            {
+              emails.map((email) => (
+                <li>
+                  <a href={`mailto:${email}`}>
+                    <span class="visually-hidden">E-Mail an {org.name}: </span>
+                    {email}
+                  </a>
+                </li>
+              ))
+            }
+            {
+              phones.map((phone) => (
+                <li>
+                  <a href={telHref(phone)}>
+                    <span class="visually-hidden">{org.name} anrufen: </span>
+                    Tel. {phone}
+                  </a>
+                </li>
+              ))
+            }
             {
               org.website && (
                 <li>
@@ -392,6 +417,7 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
     padding: 0;
     list-style: none;
     font-weight: 700;
+    overflow-wrap: anywhere;
   }
 
   /* One block per project */

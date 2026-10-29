@@ -397,7 +397,11 @@ export function start(): void {
       await saveAsDownload(folderName(list[0]!), files);
       status.textContent = files.length === 1 ? 'Bild heruntergeladen.' : `ZIP mit ${files.length} Bildern heruntergeladen.`;
     } catch (error) {
-      status.textContent = `Fehler: ${error instanceof Error ? error.message : String(error)}`;
+      // html-to-image rejects with a plain load Event when an image (e.g. a deleted upload) cannot be read.
+      status.textContent =
+        error instanceof Error
+          ? `Fehler: ${error.message}`
+          : 'Fehler: Ein Bild konnte nicht geladen werden – bitte unter „Bild“ ein anderes wählen oder die Seite neu laden.';
     } finally {
       buttons.forEach((b) => (b.disabled = false));
     }

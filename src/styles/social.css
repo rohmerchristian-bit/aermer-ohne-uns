@@ -38,6 +38,10 @@
   flex-shrink: 1;
   min-height: 0;
   overflow: hidden;
+  /* The tight line height of the headings lets descenders (g, j, p, q, y) hang below the line box,
+     where overflow: hidden would cut them off. Extra room inside, taken back outside: same layout. */
+  padding-bottom: 0.25em;
+  margin-bottom: -0.25em;
 }
 
 /* Running text may be hyphenated; headings rather get smaller than break a word. */

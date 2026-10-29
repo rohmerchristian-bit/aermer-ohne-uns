@@ -42,3 +42,9 @@ export function initials(name: string): string {
   const picked = (words.length > 0 ? words : name.split(/\s+/)).slice(0, 2);
   return picked.map((w) => w[0]!.toUpperCase()).join('');
 }
+
+/** "@aermer.ohne.uns" from an Instagram profile URL; null if the URL has no profile name. */
+export function instagramHandle(profileUrl: string): string | null {
+  const name = /instagram\.com\/([A-Za-z0-9._]+)/.exec(profileUrl)?.[1];
+  return name ? `@${name}` : null;
+}

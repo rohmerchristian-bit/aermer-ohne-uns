@@ -2,6 +2,7 @@
 import { url } from '../lib/paths.ts';
 import ExternalLink from './ExternalLink.astro';
 import { settings } from '../data/index.ts';
+import { instagramHandle } from '../lib/format.ts';
 ---
 
 <footer class="site-footer on-dark">
@@ -14,7 +15,13 @@ import { settings } from '../data/index.ts';
         <li><a href={url('/impressum/')}>Impressum</a></li>
         <li><a href={url('/datenschutz/')}>Datenschutz</a></li>
         {settings.contactEmail && <li><a href={`mailto:${settings.contactEmail}`}>Kontakt</a></li>}
-        {settings.instagramUrl && <li><ExternalLink href={settings.instagramUrl}>Instagram</ExternalLink></li>}
+        {
+          settings.instagramUrl && (
+            <li>
+              <ExternalLink href={settings.instagramUrl}>Instagram {instagramHandle(settings.instagramUrl) ?? ''}</ExternalLink>
+            </li>
+          )
+        }
       </ul>
     </nav>
     <p class="site-footer__note small">

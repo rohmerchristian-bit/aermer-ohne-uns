@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatCompact, formatCut, formatEuro, initials, truncate } from '../src/lib/format';
+import { formatCompact, formatCut, formatEuro, initials, instagramHandle, truncate } from '../src/lib/format';
 
 const NBSP = '\u00A0';
 
@@ -42,5 +42,13 @@ describe('initials', () => {
     expect(initials('E-Werk Kulturzentrum')).toBe('EW');
     expect(initials('Theater am Fluss')).toBe('TF');
     expect(initials('Ärztehaus Mitte')).toBe('ÄM');
+  });
+});
+
+describe('instagramHandle', () => {
+  it('reads the profile name from the URL, with or without tracking parameters', () => {
+    expect(instagramHandle('https://www.instagram.com/aermer.ohne.uns/')).toBe('@aermer.ohne.uns');
+    expect(instagramHandle('https://www.instagram.com/aermer.ohne.uns?srtk=abc')).toBe('@aermer.ohne.uns');
+    expect(instagramHandle('https://example.org/')).toBeNull();
   });
 });

@@ -4,6 +4,7 @@ import JoinCta from '../components/JoinCta.astro';
 import DonationBlock from '../components/DonationBlock.astro';
 import ExternalLink from '../components/ExternalLink.astro';
 import { settings } from '../data/index.ts';
+import { instagramHandle } from '../lib/format.ts';
 import { pageCardAlt, shareImagePath } from '../data/share.ts';
 ---
 
@@ -45,7 +46,9 @@ import { pageCardAlt, shareImagePath } from '../data/share.ts';
       {
         settings.instagramUrl && (
           <p>
-            <ExternalLink href={settings.instagramUrl}>Das Bündnis auf Instagram</ExternalLink>
+            <ExternalLink href={settings.instagramUrl}>
+              Das Bündnis auf Instagram{instagramHandle(settings.instagramUrl) && `: ${instagramHandle(settings.instagramUrl)}`}
+            </ExternalLink>
           </p>
         )
       }

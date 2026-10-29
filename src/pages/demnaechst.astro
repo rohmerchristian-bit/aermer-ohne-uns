@@ -6,6 +6,7 @@ import BankTransfer from '../components/BankTransfer.astro';
 import IconExternal from '../components/icons/IconExternal.astro';
 import { settings } from '../data/index.ts';
 import { getDonationStatus } from '../data/donations.ts';
+import { instagramHandle } from '../lib/format.ts';
 
 // "Coming soon" page. With COMING_SOON=1 the deploy workflow publishes only this page
 // (as / and as the 404 page). No navigation, so it never links to pages that are not online yet –
@@ -48,7 +49,9 @@ const donation = getDonationStatus(settings);
           {
             settings.instagramUrl && (
               <li>
-                <ExternalLink href={settings.instagramUrl}>#ÄrmerOhneUns auf Instagram</ExternalLink>
+                <ExternalLink href={settings.instagramUrl}>
+                  Folgt uns auf Instagram{instagramHandle(settings.instagramUrl) && `: ${instagramHandle(settings.instagramUrl)}`}
+                </ExternalLink>
               </li>
             )
           }

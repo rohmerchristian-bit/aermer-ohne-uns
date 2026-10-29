@@ -136,7 +136,7 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
             </section>
           )
         }
-        <section class="detail__section" aria-labelledby="abschnitt-kontakt">
+        <section class="detail__section" id="kontakt" aria-labelledby="abschnitt-kontakt">
           <h2 id="abschnitt-kontakt" class="h3">Kontakt und Links</h2>
           {org.address && <p>{org.address}</p>}
           <ul class="detail__links" role="list">
@@ -260,6 +260,30 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
                     </ExternalLink>
                   </p>
                 )}
+                {/* With several projects the tile link lands here, below the organisation's contact
+                    details – so each project repeats its own contact and links back up. */}
+                {own.length > 1 && (
+                  <div class="project__contact">
+                    <h3 class="label">Kontakt</h3>
+                    {(p.contactEmail || p.contactPhone) && (
+                      <ul class="detail__links" role="list">
+                        {p.contactEmail && (
+                          <li>
+                            <a href={`mailto:${p.contactEmail}`}>{p.contactEmail}</a>
+                          </li>
+                        )}
+                        {p.contactPhone && (
+                          <li>
+                            <a href={telHref(p.contactPhone)}>Tel. {p.contactPhone}</a>
+                          </li>
+                        )}
+                      </ul>
+                    )}
+                    <p class="small">
+                      <a href="#kontakt">Mehr über {org.name}: Website, Adresse, weitere Kontakte ↑</a>
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </section>
@@ -352,6 +376,14 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
     padding: 0;
     list-style: none;
     font-weight: 700;
+  }
+
+  .project__contact {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    padding: var(--space-4);
+    border: var(--line) solid var(--color-ink);
   }
 
   .detail__about {

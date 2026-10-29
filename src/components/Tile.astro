@@ -2,7 +2,7 @@
 import { srcsetUrl, url } from '../lib/paths.ts';
 import type { Project } from '../data/types.ts';
 import { getArea } from '../data/areas.ts';
-import { getOrganisation } from '../data/index.ts';
+import { getOrganisation, projectsOf } from '../data/index.ts';
 import { AMOUNT_YEAR } from '../data/budget.ts';
 import { formatCut, initials, truncate } from '../lib/format.ts';
 import { amountSourceLabel, percentLabel } from '../lib/amount-label.ts';
@@ -38,6 +38,9 @@ const orgWebsite = getOrganisation(p.orgSlug)?.website ?? null;
 const externalUrl = p.infoLink ?? orgWebsite;
 const externalLabel = p.infoLink ? 'Stellungnahme' : 'Website';
 const fullName = showOrg ? `${p.name} (${p.orgName})` : p.name;
+// With one project the organisation page starts with its details and contact, so link to the top;
+// with several, jump to this project (which links back up to the contact details).
+const detailHref = url(`/einrichtungen/${p.orgSlug}/${projectsOf(p.orgSlug).length > 1 ? `#${p.anchor}` : ''}`);
 ---
 
 <article
@@ -132,7 +135,7 @@ const fullName = showOrg ? `${p.name} (${p.orgName})` : p.name;
 
       <ul class="tile__links" role="list">
         <li>
-          <a href={url(`/einrichtungen/${p.orgSlug}/#${p.anchor}`)}>
+          <a href={detailHref}>
             Mehr erfahren <IconArrow />
             <span class="visually-hidden"> über {fullName}</span>
           </a>

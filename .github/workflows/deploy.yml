@@ -86,11 +86,37 @@ jobs:
         name: Website bauen
         run: npm run build
 
+      # The password file for /intern/ needs the absolute path of the web folder on the server.
+      # A tiny PHP file (random name) reports its own folder once and is deleted right away.
+      # Falls back to the variable INTERN_AUTH_DIR if PHP does not answer.
+      - if: steps.setup.outputs.ready == 'true'
+        name: Serverpfad ermitteln
+        id: docroot
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: ${{ secrets.FTP_DIR }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp > /dev/null
+          probe="pfad-$(openssl rand -hex 12).php"
+          printf '<?php header("Content-Type: text/plain"); echo __DIR__;' > "/tmp/$probe"
+          ftp() { lftp -c "set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate true; open --user \"$FTP_USER\" --env-password ftp://$FTP_HOST; $1"; }
+          ftp "put /tmp/$probe -o \"$FTP_DIR/$probe\""
+          dir=$(curl -s --max-time 20 "${SITE_URL%/}/$probe" || true)
+          ftp "rm \"$FTP_DIR/$probe\"" || echo "::warning::Prüfdatei $probe konnte nicht gelöscht werden."
+          if [[ "$dir" =~ ^/[A-Za-z0-9._/-]+$ ]]; then
+            echo "Serverpfad erkannt."
+            echo "dir=$dir" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Serverpfad nicht erkannt (PHP?) – es gilt die Variable INTERN_AUTH_DIR."
+          fi
+
       - if: steps.setup.outputs.ready == 'true'
         name: Für den Server vorbereiten
         env:
           INTERN_HTPASSWD: ${{ secrets.INTERN_HTPASSWD }}
-          INTERN_AUTH_DIR: ${{ vars.INTERN_AUTH_DIR }}
+          INTERN_AUTH_DIR: ${{ steps.docroot.outputs.dir || vars.INTERN_AUTH_DIR }}
         run: node scripts/deploy-package.ts
 
       - if: steps.setup.outputs.ready == 'true'
@@ -107,7 +133,7 @@ jobs:
           LFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_DIR: ${{ secrets.FTP_DIR }}
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq lftp > /dev/null
+          command -v lftp > /dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq lftp > /dev/null; }
           # mirror -R: lädt nur geänderte Dateien hoch und entfernt online, was es nicht mehr gibt.
           # Nie gelöscht werden: Zertifikats-Prüfungen, Passwortdateien, cgi-bin.
           lftp -c "
@@ -137,6 +163,12 @@ jobs:
             lftp -c "set ftp:ssl-force true; set ftp:ssl-protect-data true; open --user \"$FTP_USER\" --env-password ftp://$FTP_HOST; rm -r \"$FTP_DIR/intern\""
             echo "::error::/intern/ war ohne Passwort erreichbar und wurde vom Server entfernt. INTERN_AUTH_DIR prüfen."
             exit 1
+          fi
+          # With wrong dummy credentials a working setup answers 401; 500 means the password file is not found.
+          probe_code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 -u "pruefung:falsches-passwort" "${SITE_URL%/}/intern/")
+          echo "/intern/ mit falschem Passwort: HTTP $probe_code"
+          if [ -d dist/intern ] && [ "$probe_code" = "500" ]; then
+            echo "::warning::/intern/ findet die Passwortdatei nicht (HTTP 500) – Serverpfad prüfen (docs/deploy/README.md)."
           fi
           if [ -d dist/intern ] && [ "$code" != "401" ]; then
             echo "::warning::/intern/ antwortet mit HTTP $code statt 401 – vermutlich stimmt INTERN_AUTH_DIR nicht (docs/deploy/README.md)."

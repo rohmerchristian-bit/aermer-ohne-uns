@@ -67,33 +67,32 @@ Unter `https://aermerohneuns.de/intern/` liegt das Werkzeug für Social-Media-Po
 geschützt und läuft auch im Coming-soon-Modus. Auf der GitHub-Vorschau gibt es den Bereich nicht – GitHub
 Pages kann keine Ordner schützen.
 
-**Einrichtung (einmalig), zwei Werte in GitHub** (*Settings → Secrets and variables → Actions*):
+**Einrichtung (einmalig):** ein Secret in GitHub (*Settings → Secrets and variables → Actions*):
+**`INTERN_HTPASSWD`** – Benutzername und verschlüsseltes Passwort. Auf dem Mac im Terminal (im
+Projektordner; fragt das Passwort zweimal ab und zeigt es nicht an; `team` ist der Benutzername):
 
-1. **Secret `INTERN_HTPASSWD`** – Benutzername und verschlüsseltes Passwort. Auf dem Mac im Terminal
-   (fragt das Passwort zweimal ab, zeigt es nicht an; `team` ist der Benutzername):
+```bash
+htpasswd -nB team | ~/.local/share/gh/bin/gh secret set INTERN_HTPASSWD --repo rohmerchristian-bit/aermer-ohne-uns
+```
 
-   ```bash
-   htpasswd -nB team
-   ```
+Mehrere Zugänge: mehrere Zeilen. Das Passwort selbst steht nirgends – nur dieser verschlüsselte Wert.
+Hinweis: Im Terminal der Claude-App funktioniert Einfügen in die `htpasswd`-Abfrage nicht zuverlässig – dann
+das Passwort tippen.
 
-   Die ausgegebene Zeile (`team:$2y$…`) komplett als Secret einfügen. Mehrere Zugänge: mehrere Zeilen.
-   Das Passwort selbst steht nirgends – nur dieser verschlüsselte Wert.
-2. **Variable `INTERN_AUTH_DIR`** – der absolute Pfad des Website-Ordners (`FTP_DIR`) auf dem Server,
-   z. B. `/usr/www/users/BENUTZER/public_html`. Steht im konsoleH unter *Einstellungen* bzw. in den
-   Server-Infos („Pfad zum Webverzeichnis“).
-
-Der Deploy schreibt daraus `intern/.htaccess` und die Benutzerdatei `intern/.htusers` (Apache liefert
-`.ht*`-Dateien nie aus).
+Den **absoluten Serverpfad** für die Passwortdatei ermittelt der Deploy selbst: Eine PHP-Datei mit
+Zufallsnamen meldet einmal ihren Ordner und wird sofort wieder gelöscht. Nur wenn das scheitert, gilt die
+optionale Variable `INTERN_AUTH_DIR`. Daraus schreibt der Deploy `intern/.htaccess` und die Benutzerdatei
+`intern/.htusers` (Apache liefert `.ht*`-Dateien nie aus).
 
 **Sicherungen:**
 
-- Fehlt einer der beiden Werte oder ist er ungültig, wird `/intern/` **gar nicht** hochgeladen.
+- Fehlt das Secret oder ist es ungültig (z. B. leer), wird `/intern/` **gar nicht** hochgeladen.
 - Nach jedem Upload ruft der Deploy `/intern/` ohne Passwort auf. Kommt die Seite trotzdem (HTTP 200),
-  wird der Ordner sofort vom Server gelöscht und der Lauf schlägt fehl. Antwortet der Server mit einem
-  Fehler statt mit der Passwortabfrage (z. B. 500), stimmt meist `INTERN_AUTH_DIR` nicht – der Lauf zeigt
-  dann eine Warnung.
+  wird der Ordner sofort vom Server gelöscht und der Lauf schlägt fehl.
+- Außerdem meldet er sich mit falschen Zugangsdaten an: Erwartet ist HTTP 401. HTTP 500 heißt, die
+  Passwortdatei wird nicht gefunden (Serverpfad) – der Lauf zeigt dann eine Warnung.
 
-**Passwort ändern:** neue Zeile mit `htpasswd -nB team` erzeugen, Secret ersetzen, Workflow starten.
+**Passwort ändern:** den Befehl oben erneut ausführen und den Workflow starten.
 
 ## Wenn ein Lauf fehlschlägt
 

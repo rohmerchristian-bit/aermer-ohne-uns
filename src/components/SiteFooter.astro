@@ -28,6 +28,10 @@ import { instagramHandle } from '../lib/format.ts';
       Eine Initiative des Bündnisses <span class="nobreak">#ÄrmerOhneUns</span>, verantwortlich: E-Werk Kulturzentrum
       GmbH, Erlangen.
     </p>
+    <p class="site-footer__credit small">
+      Erdacht und gebaut von <ExternalLink href="https://anyvent.org/">anyvent.org</ExternalLink> – mit Stolz im Dienst
+      der Erlanger Kultur seit 2011.
+    </p>
   </div>
 </footer>
 
@@ -59,5 +63,11 @@ import { instagramHandle } from '../lib/format.ts';
 
   .site-footer__note {
     color: var(--color-paper);
+  }
+
+  .site-footer__credit {
+    margin-top: calc(-1 * var(--space-4));
+    color: var(--color-paper);
+    opacity: 0.75;
   }
 </style>

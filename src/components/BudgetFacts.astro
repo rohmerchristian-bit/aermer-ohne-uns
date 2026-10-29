@@ -62,6 +62,8 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
   }
 
   .facts__item {
+    /* The figure sizes itself to this column (see .facts__value), not to the window. */
+    container-type: inline-size;
     display: grid;
     align-content: start;
     gap: var(--space-3);
@@ -69,8 +71,10 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
     border-bottom: var(--line) solid currentColor;
   }
 
+  /* The widest figure ("11.813.900 €") is about 4.9 × the font size: at most 1/5.2 of the column,
+     so neighbouring figures in the four-column layout never touch. */
   .facts__value {
-    font-size: clamp(2.5rem, 5vw, 4.25rem);
+    font-size: clamp(2rem, 100cqi / 5.2, 4.25rem);
     font-weight: 900;
     line-height: var(--lh-tight);
     font-variant-numeric: tabular-nums lining-nums;
@@ -109,9 +113,10 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
     }
   }
 
+  /* Wide enough for "11,5 Mio. €" at the largest heading size. */
   .departments__item {
     display: grid;
-    grid-template-columns: 8.5rem minmax(0, 1fr);
+    grid-template-columns: 10.5rem minmax(0, 1fr);
     gap: var(--space-3);
     align-items: baseline;
     padding-block: var(--space-3);

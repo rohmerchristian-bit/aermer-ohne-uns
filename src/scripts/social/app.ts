@@ -4,7 +4,7 @@
 import { getFontEmbedCSS, toBlob } from 'html-to-image';
 import { formatCut } from '../../lib/format.ts';
 import { fitText, getTemplate, SIZE, templates, type FieldId, type Fields, type Format, type Template } from './templates.ts';
-import { canPickFolder, loadFolder, pickFolder, saveAsDownload, saveToFolder, today, type FolderHandle, type Output } from './save.ts';
+import { saveAsDownload, today, type Output } from './save.ts';
 
 interface ProjectData {
   id: string;
@@ -80,7 +80,6 @@ export function start(): void {
     measure: Math.max(0, data.savings.findIndex((m) => m.referat === 'IV')),
     /** Texts per template, so switching templates never loses edits. */
     fields: {} as Record<string, Fields>,
-    folder: null as FolderHandle | null,
   };
   const current = () => getTemplate(state.template[state.format]);
   const project = () => data.projects.find((p) => p.id === state.projectId);
@@ -357,31 +356,10 @@ export function start(): void {
       f.logo = p?.logo ? '1' : '';
       renderFields();
       void renderPreview();
-    } else if (el.matches('[data-pick-folder]')) {
-      void pickFolder().then((folder) => {
-        if (folder) state.folder = folder;
-        renderFolderInfo();
-      });
-    } else if (el.matches('[data-forget-folder]')) {
-      state.folder = null;
-      renderFolderInfo();
     }
   });
 
-  // ---- saving ----
-  const folderInfo = $<HTMLElement>(root, '[data-folder-info]');
-  function renderFolderInfo(): void {
-    if (!canPickFolder) {
-      folderInfo.innerHTML =
-        'Bilder werden heruntergeladen (mehrere als ZIP mit Projektordner). Direkt in den Drive-Ordner speichern geht in Chrome oder Edge.';
-    } else if (state.folder) {
-      folderInfo.innerHTML = `Speichert in <strong>${esc(state.folder.name)}</strong> → ein Unterordner pro Projekt. <button type="button" class="linkbtn" data-pick-folder>Anderen Ordner wählen</button> · <button type="button" class="linkbtn" data-forget-folder>Nur herunterladen</button>`;
-    } else {
-      folderInfo.innerHTML =
-        'Noch kein Ordner gewählt – Bilder werden heruntergeladen. <button type="button" class="linkbtn" data-pick-folder>Drive-Ordner wählen …</button>';
-    }
-  }
-
+  // ---- saving (download; several images as a ZIP that contains the project folder) ----
   /** Folder name for the current content: the project, "Sparliste" or "Allgemein". */
   function folderName(tpl: Template): string {
     if (tpl.source === 'project') {
@@ -416,13 +394,8 @@ export function start(): void {
     try {
       const files: Output[] = [];
       for (const tpl of list) files.push(await exportPng(tpl));
-      const folder = folderName(list[0]!);
-      if (state.folder && (await saveToFolder(state.folder, folder, files))) {
-        status.textContent = `Gespeichert: ${files.length} ${files.length === 1 ? 'Bild' : 'Bilder'} in „${state.folder.name}/${folder}“.`;
-      } else {
-        await saveAsDownload(folder, files);
-        status.textContent = files.length === 1 ? 'Bild heruntergeladen.' : `ZIP mit ${files.length} Bildern heruntergeladen.`;
-      }
+      await saveAsDownload(folderName(list[0]!), files);
+      status.textContent = files.length === 1 ? 'Bild heruntergeladen.' : `ZIP mit ${files.length} Bildern heruntergeladen.`;
     } catch (error) {
       status.textContent = `Fehler: ${error instanceof Error ? error.message : String(error)}`;
     } finally {
@@ -446,10 +419,5 @@ export function start(): void {
 
   window.addEventListener('resize', schedulePreview);
 
-  void loadFolder().then((folder) => {
-    if (folder) state.folder = folder;
-    renderFolderInfo();
-  });
-  renderFolderInfo();
   renderAll();
 }

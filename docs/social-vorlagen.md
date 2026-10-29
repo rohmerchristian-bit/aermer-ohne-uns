@@ -1,7 +1,7 @@
 # Social-Media-Vorlagen (/intern/)
 
 Werkzeug für Posts und Stories im Stil der Website. Adresse: **https://aermerohneuns.de/intern/**
-(Benutzername und Passwort beim Bündnis erfragen). Es läuft komplett im Browser – Texte und hochgeladene
+(Benutzername `team`, Passwort beim Bündnis erfragen). Es läuft komplett im Browser – Texte und hochgeladene
 Fotos verlassen den Computer nicht.
 
 ## So geht's
@@ -29,23 +29,15 @@ Fotos verlassen den Computer nicht.
 Bei Stories zeigt *„Von Instagram verdeckte Bereiche zeigen“*, wo Instagram oben und unten Profil und
 Antwortfeld einblendet. Die Vorlagen halten diese Bereiche frei.
 
-## Ein Ordner pro Projekt in Google Drive
+## Speichern
 
-In **Chrome oder Edge** speichert das Werkzeug direkt in einen Ordner auf dem Computer und legt darin pro
-Projekt einen Unterordner an (z. B. `Kulturzentrum E-Werk – Jugendtreff Fuxx/2026-10-28_P1-Betrag.png`;
-Sparliste und freie Vorlagen in `Sparliste` bzw. `Allgemein`).
+Die Bilder werden heruntergeladen (Ordner „Downloads“). Eines als PNG mit Projektname und Datum im
+Dateinamen, mehrere auf einmal als ZIP, das bereits den Projektordner enthält
+(z. B. `Kulturzentrum E-Werk – Jugendtreff Fuxx/2026-10-28_P1-Betrag.png`; Sparliste und freie Vorlagen in
+`Sparliste` bzw. `Allgemein`). ZIP entpacken und den Ordner in die gemeinsame Ablage ziehen.
 
-Damit die Bilder in Google Drive landen:
-
-1. **Google Drive für Desktop** installieren und mit dem Konto anmelden, in dem die Formular-Uploads liegen.
-   Drive erscheint dann im Finder bzw. Explorer als Laufwerk.
-2. In Google Drive neben dem Ordner mit den Formular-Bildern einen Ordner **„Social Media“** anlegen.
-3. Im Werkzeug unter *Speichern* auf **„Drive-Ordner wählen …“** klicken und diesen Ordner „Social Media“
-   auswählen; den Zugriff erlauben. Der Ordner wird gemerkt (beim nächsten Besuch fragt der Browser
-   eventuell einmal nach, ob der Zugriff weiter erlaubt ist).
-
-In anderen Browsern (Safari, Firefox) werden die Bilder heruntergeladen – mehrere als ZIP, das bereits den
-Projektordner enthält. Das ZIP entpacken und den Ordner in Drive ziehen.
+Direkt in einen synchronisierten Ordner (Google Drive oder MS Teams) zu speichern, war eingebaut und ist
+vorerst wieder entfernt (29.10.2026), bis die Ablage geklärt ist – der Code steht in der Git-Historie.
 
 ## Technik
 

@@ -35,6 +35,9 @@ const shareTitle = title === SITE_NAME ? fullTitle : `${title} – #ÄrmerOhneUn
 const canonical = new URL(Astro.url.pathname, Astro.site);
 // PREVIEW=1: public preview build (GitHub Pages) – never indexed, clearly labelled.
 const isPreview = process.env.PREVIEW === '1';
+// Google Search Console ownership check (HTML tag method, URL-prefix property https://aermerohneuns.de/).
+// Only on the live site; must stay as long as the property should remain verified.
+const GOOGLE_SITE_VERIFICATION = '-031ZSL3V-BkAPiZUVCKaxmaNSk_WneguKcJARYj0VE';
 const robotsNoindex = noindex || isPreview;
 ---
 
@@ -46,6 +49,7 @@ const robotsNoindex = noindex || isPreview;
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     {robotsNoindex ? <meta name="robots" content="noindex, nofollow" /> : <link rel="canonical" href={canonical} />}
+    {!isPreview && <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />}
     <meta name="theme-color" content="#111111" />
     <link rel="icon" type="image/png" sizes="32x32" href={url('/favicon-32.png')} />
     <link rel="apple-touch-icon" href={url('/apple-touch-icon.png')} />

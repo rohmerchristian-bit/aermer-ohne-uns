@@ -4,6 +4,9 @@
 
 const BASE = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 
+/** The official website. The public preview (GitHub Pages) points here for anything people share. */
+export const LIVE_SITE_URL = 'https://aermerohneuns.de';
+
 /** "/einrichtungen/" → "/aermer-ohne-uns/einrichtungen/" (or unchanged at the root). */
 export function url(path: string): string {
   return BASE + path.replace(/^\//, '');

@@ -1,5 +1,5 @@
 ---
-import { url } from '../lib/paths.ts';
+import { LIVE_SITE_URL, stripBase, url } from '../lib/paths.ts';
 import { OG_HEIGHT, OG_WIDTH } from '../lib/og-size.ts';
 import { pageCardAlt, shareImagePath } from '../data/share.ts';
 import '../styles/fonts.css';
@@ -79,9 +79,15 @@ const robotsNoindex = noindex || isPreview;
     {
       isPreview && (
         <p class="preview-banner">
-          {process.env.DATA_SOURCE === 'remote'
-            ? 'Vorschau – noch nicht offiziell veröffentlicht. Es erscheinen nur vom Bündnis freigegebene Einträge.'
-            : 'Vorschau mit Beispieldaten – alle Einrichtungen und Zahlen auf den Kacheln sind erfunden.'}
+          {process.env.DATA_SOURCE === 'remote' ? (
+            <>
+              Vorschau zum Testen – die offizielle Seite ist{' '}
+              <a href={`${LIVE_SITE_URL}${stripBase(Astro.url.pathname)}`}>{LIVE_SITE_URL.replace('https://', '')}</a>. Bitte
+              nur diese Adresse teilen.
+            </>
+          ) : (
+            'Vorschau mit Beispieldaten – alle Einrichtungen und Zahlen auf den Kacheln sind erfunden.'
+          )}
         </p>
       )
     }

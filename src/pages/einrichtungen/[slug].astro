@@ -1,5 +1,5 @@
 ---
-import { srcsetUrl, url } from '../../lib/paths.ts';
+import { LIVE_SITE_URL, srcsetUrl, url } from '../../lib/paths.ts';
 import Page from '../../layouts/Page.astro';
 import TileGrid from '../../components/TileGrid.astro';
 import ExternalLink from '../../components/ExternalLink.astro';
@@ -39,7 +39,11 @@ const emails = unique(own.map((p) => p.contactEmail));
 const phones = unique(own.map((p) => p.contactPhone));
 const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
 const linkLabel = (link: string) => new URL(link).hostname.replace(/^www\./, '');
-const pageUrl = new URL(url(`/einrichtungen/${org.slug}/`), Astro.site).toString();
+// The share field always offers the official address – also on the public preview.
+const pageUrl =
+  process.env.PREVIEW === '1'
+    ? `${LIVE_SITE_URL}/einrichtungen/${org.slug}/`
+    : new URL(url(`/einrichtungen/${org.slug}/`), Astro.site).toString();
 
 const description = truncate(
   [

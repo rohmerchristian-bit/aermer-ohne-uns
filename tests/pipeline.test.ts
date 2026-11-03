@@ -151,7 +151,7 @@ describe('privacy allowlist', () => {
     expect(Object.keys(result.projects[0]!.project).sort()).toEqual(
       [
         'id', 'anchor', 'orgSlug', 'orgName', 'name', 'area', 'cutDescription', 'amount', 'amountKind', 'amountSource',
-        'amountLater', 'amountPercent', 'nonMonetary', 'consequences', 'quote', 'infoLink', 'contactEmail', 'contactPhone', 'image', 'ownImage', 'featured',
+        'amountLater', 'amountPercent', 'nonMonetary', 'consequences', 'quote', 'infoLink', 'contactEmail', 'contactPhone', 'image', 'ownImage', 'featured', 'cityEntry',
       ].sort(),
     );
   });
@@ -191,7 +191,7 @@ describe('privacy allowlist', () => {
 });
 
 describe('field rules', () => {
-  const keys: ColumnKey[] = [...BASE_KEYS, 'amountReported', 'amountVerified', 'amountSource', 'quote', 'links', 'featured'];
+  const keys: ColumnKey[] = [...BASE_KEYS, 'amountReported', 'amountVerified', 'amountSource', 'quote', 'links', 'featured', 'cityEntry'];
 
   it('prefers the verified amount and keeps the source', () => {
     const [e] = runPipeline(
@@ -271,6 +271,16 @@ describe('field rules', () => {
       .projects;
     expect(e!.project.quote).toBe('Wir bleiben.');
     expect(e!.project.featured).toBe(true);
+  });
+
+  it('reads the Stadt Erlangen checkbox', () => {
+    const [city, other] = runPipeline(
+      sheet(keys, [{ name: 'A', area: 'Kultur', cityEntry: 'TRUE', ...ok }, { name: 'B', area: 'Kultur', ...ok }]),
+      OPTIONS,
+    ).projects;
+    expect(city!.project.cityEntry).toBe(true);
+    expect(other!.project.cityEntry).toBe(false);
+    expect(findColumn('Stadt_Erlangen')?.key).toBe('cityEntry');
   });
 });
 

@@ -195,6 +195,7 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
     const imageRef = imageRefFor('projectImageUrls');
     const imageCredit = text('projectImageCredit');
     const featured = isChecked(read('featured'));
+    const cityEntry = isChecked(read('cityEntry'));
     const fields = {
       area,
       cutDescription: text('cutDescription'),
@@ -235,6 +236,7 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
           image: null,
           ownImage: false,
           featured,
+          cityEntry,
         },
         imageRef,
         imageCredit,

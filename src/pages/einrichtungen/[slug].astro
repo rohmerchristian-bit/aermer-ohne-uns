@@ -213,6 +213,12 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
                 )}
                 {p.amountLater && <p class="project__later">Danach: {p.amountLater}</p>}
                 {notes && <p class="project__source small">{notes}</p>}
+                {p.cityEntry && (
+                  <p class="project__city small">
+                    <span class="project__city-flag label">Stadt Erlangen</span> Angebot der Stadt Erlangen – vom
+                    Bündnis eingetragen.
+                  </p>
+                )}
               </header>
 
               <div class="project__body">
@@ -528,6 +534,15 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
 
   .project__source {
     color: var(--color-muted);
+  }
+
+  .project__city-flag {
+    display: inline-block;
+    margin-right: var(--space-2);
+    padding: 0.3rem 0.5rem 0.25rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    line-height: 1;
   }
 
   .project__body {

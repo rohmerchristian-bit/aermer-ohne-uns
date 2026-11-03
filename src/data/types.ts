@@ -67,6 +67,8 @@ export interface Project {
   /** True if `image` is the project's own image (not the organisation logo). */
   ownImage: boolean;
   featured: boolean;
+  /** Project of the city of Erlangen, entered by hand by the alliance (flag on the tile). */
+  cityEntry: boolean;
 }
 
 /** Where to fetch an image from – used only during the build, never published. */

@@ -51,7 +51,16 @@ const detailHref = url(`/einrichtungen/${p.orgSlug}/${projectsOf(p.orgSlug).leng
 >
   <div class="tile__card">
     <div class="tile__face tile__front" id={`${id}-front`} data-tile-front>
-      <p class="tile__area label">{area.label}</p>
+      <div class="tile__top">
+        <p class="tile__area label">{area.label}</p>
+        {
+          p.cityEntry && (
+            <p class="tile__flag label">
+              Stadt Erlangen<span class="visually-hidden">: Angebot der Stadt, vom Bündnis eingetragen</span>
+            </p>
+          )
+        }
+      </div>
       <Heading class="tile__name" id={`${id}-name`}>{p.name}</Heading>
       {showOrg && <p class="tile__project">{p.orgName}</p>}
 
@@ -225,6 +234,25 @@ const detailHref = url(`/einrichtungen/${p.orgSlug}/${projectsOf(p.orgSlug).leng
     background: var(--area-bg);
     color: var(--area-fg);
     --focus-color: var(--color-ink);
+  }
+
+  .tile__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  /* City projects: tab in inverted tile colours, like the year tab. */
+  .tile__flag {
+    flex: none;
+    margin-top: -0.3rem;
+    margin-right: calc(-0.5 * var(--tile-pad));
+    padding: 0.3rem 0.5rem 0.25rem;
+    background: var(--area-fg);
+    color: var(--area-bg);
+    line-height: 1;
+    white-space: nowrap;
   }
 
   .tile__name {

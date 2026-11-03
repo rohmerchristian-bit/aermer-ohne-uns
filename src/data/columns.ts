@@ -46,7 +46,8 @@ export type ColumnKey =
   | 'mailingList'
   | 'approved'
   | 'amountVerified'
-  | 'featured';
+  | 'featured'
+  | 'cityEntry';
 
 /**
  * public:   may appear on the website.
@@ -211,6 +212,8 @@ export const columns: readonly ColumnDef[] = [
   { key: 'approved', header: 'Freigegeben', visibility: 'filter', required: true, aliases: ['Freigeben'] },
   { key: 'amountVerified', header: 'Betrag_geprüft', visibility: 'public' },
   { key: 'featured', header: 'Hervorheben', visibility: 'public' },
+  // Admin checkbox: project of the city, entered by the alliance (city staff may not use the form themselves).
+  { key: 'cityEntry', header: 'Stadt Erlangen', visibility: 'public', aliases: ['Stadt_Erlangen'] },
 ];
 
 /** Keys that may be read from the CSV at all. Everything else is dropped on import. */

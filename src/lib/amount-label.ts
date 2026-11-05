@@ -1,10 +1,13 @@
 import type { Project } from '../data/types.ts';
 
 /** Small source note under an amount: where the number comes from. */
-export function amountSourceLabel(p: Pick<Project, 'amount' | 'amountKind' | 'amountSource'>): string | null {
+export function amountSourceLabel(
+  p: Pick<Project, 'amount' | 'amountKind' | 'amountSource'> & Partial<Pick<Project, 'cityEntry'>>,
+): string | null {
   if (p.amount === null) return null;
   if (p.amountKind === 'verified') return p.amountSource ? `Quelle: ${p.amountSource}` : 'Vom Bündnis geprüft';
-  return 'Angabe der Einrichtung';
+  // City entries come from the alliance, not from the facility.
+  return p.cityEntry ? 'Angabe des Bündnisses' : 'Angabe der Einrichtung';
 }
 
 /** "Kürzung um 10 %" from free text like "10", "10 %", "10%" or "Kürzung um 10 Prozent". */

@@ -24,6 +24,8 @@ interface Props {
 
 const { organisation: org } = Astro.props;
 const own = projectsOf(org.slug);
+// City facilities may not enter themselves; the alliance writes their page, so no first-person headings.
+const cityOrg = own.some((p) => p.cityEntry);
 const total = own.reduce((sum, p) => sum + (p.amount ?? 0), 0);
 const mainArea = getArea(own[0]!.area);
 const orgAreas = areas.filter((a) => own.some((p) => p.area === a.slug));
@@ -79,6 +81,14 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
           {total > 0 && <>, zusammen <span class="nobreak">{formatCut(total)}</span> im Jahr 2027</>}
         </p>
         {
+          cityOrg && (
+            <p class="detail__city">
+              <span class="detail__city-flag label">Stadt Erlangen</span> Diese Seite hat das Bündnis #ÄrmerOhneUns
+              erstellt, nicht die Einrichtung selbst.
+            </p>
+          )
+        }
+        {
           own.length > 1 && (
             <nav aria-label="Projekte dieser Einrichtung">
               <ul class="detail__toc" role="list">
@@ -123,7 +133,7 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
         {
           org.description && (
             <section class="detail__section" aria-labelledby="abschnitt-arbeit">
-              <h2 id="abschnitt-arbeit" class="h3">Was wir tun</h2>
+              <h2 id="abschnitt-arbeit" class="h3">{cityOrg ? 'Über die Einrichtung' : 'Was wir tun'}</h2>
               {paragraphs(org.description).map((lines) => (
                 <p>{lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</p>
               ))}
@@ -133,7 +143,7 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
         {
           org.reach && (
             <section class="detail__section" aria-labelledby="abschnitt-reichweite">
-              <h2 id="abschnitt-reichweite" class="h3">Wen wir erreichen</h2>
+              <h2 id="abschnitt-reichweite" class="h3">{cityOrg ? 'Wen die Einrichtung erreicht' : 'Wen wir erreichen'}</h2>
               {paragraphs(org.reach).map((lines) => (
                 <p>{lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}</p>
               ))}
@@ -215,8 +225,8 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
                 {notes && <p class="project__source small">{notes}</p>}
                 {p.cityEntry && (
                   <p class="project__city small">
-                    <span class="project__city-flag label">Stadt Erlangen</span> Angebot der Stadt Erlangen – vom
-                    Bündnis eingetragen.
+                    <span class="project__city-flag label">Stadt Erlangen</span> Vom Bündnis #ÄrmerOhneUns
+                    eingetragen, nicht von der Einrichtung.
                   </p>
                 )}
               </header>
@@ -534,6 +544,20 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
 
   .project__source {
     color: var(--color-muted);
+  }
+
+  .detail__city {
+    max-width: 40rem;
+    font-weight: 600;
+  }
+
+  .detail__city-flag {
+    display: inline-block;
+    margin-right: var(--space-2);
+    padding: 0.3rem 0.5rem 0.25rem;
+    background: var(--area-fg);
+    color: var(--area-bg);
+    line-height: 1;
   }
 
   .project__city-flag {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { percentLabel } from '../src/lib/amount-label.ts';
+import { amountSourceLabel, percentLabel } from '../src/lib/amount-label.ts';
 
 describe('percentLabel', () => {
   it('reads percentages with a sign or word', () => {
@@ -16,5 +16,13 @@ describe('percentLabel', () => {
   it('keeps other free text as written', () => {
     expect(percentLabel('vollständige Streichung')).toBe('vollständige Streichung');
     expect(percentLabel(null)).toBeNull();
+  });
+});
+
+describe('amountSourceLabel', () => {
+  it('credits the alliance for city entries', () => {
+    const reported = { amount: 1000, amountKind: 'reported' as const, amountSource: null };
+    expect(amountSourceLabel(reported)).toBe('Angabe der Einrichtung');
+    expect(amountSourceLabel({ ...reported, cityEntry: true })).toBe('Angabe des Bündnisses');
   });
 });

@@ -1,0 +1,154 @@
+---
+import { url } from '../lib/paths.ts';
+
+// Details on the rally of 18 November 2026, opened from the notice bar ("Mehr dazu").
+// Uses the HTML popover attribute: opens and closes without JavaScript, Escape and a click outside close it too.
+// Source: the alliance's newspaper ad. If a separate page for the rally follows, link it here.
+// Shown only while demoActive() (src/lib/demo.ts) is true.
+
+const program = [
+  { label: 'Redebeiträge', names: ['Der Bündnispartner*innen'] },
+  { label: 'Livemusik', names: ['Erlanger Kneipenchor', 'Erlanger Rhythms of Resistance', 'Erik Stenzel'] },
+  { label: 'Poetry Slam', names: ['Cris Ortega'] },
+  { label: 'Moderation', names: ['Kathi Mock'] },
+];
+---
+
+<div id="demo-info" class="demo" popover role="dialog" aria-labelledby="demo-info-title">
+  <button
+    type="button"
+    class="demo__close"
+    popovertarget="demo-info"
+    popovertargetaction="hide"
+    aria-label="Schließen"
+  >
+    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+      <path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="3" fill="none" />
+    </svg>
+  </button>
+
+  <p class="label">Kundgebung</p>
+  <h2 class="demo__title" id="demo-info-title">Kommen Sie zur Kundgebung!</h2>
+  <p class="demo__topic">
+    Zu den Folgen der Sparmaßnahmen für Soziales, Kinder, Familien, Kultur und Sport.
+  </p>
+
+  <p class="demo__when">
+    <span>Mittwoch, 18.&nbsp;November, 15&nbsp;Uhr</span>
+    <span>Rathausplatz Erlangen</span>
+  </p>
+
+  <dl class="demo__program">
+    {
+      program.map((item) => (
+        <div>
+          <dt class="label">{item.label}</dt>
+          {item.names.map((name) => (
+            <dd>{name}</dd>
+          ))}
+        </div>
+      ))
+    }
+  </dl>
+
+  <p>
+    Die Stadt Erlangen muss sparen. Die geplanten Kürzungen treffen viele Einrichtungen und Vereine in den Bereichen
+    Soziales, Kinder, Familien, Sport und Kultur. Deshalb haben das E-Werk und der Stadtjugendring das Bündnis
+    „Ärmer ohne uns“ gegründet. Die Kundgebung macht auf die Folgen aufmerksam, die drohen, wenn die Sparpläne so
+    umgesetzt werden, wie sie jetzt vorliegen. Alle sind herzlich eingeladen, dabei zu sein und laut zu werden.
+  </p>
+
+  <p class="demo__more">
+    <a href={url('/einrichtungen/')}>Wer betroffen ist</a>
+    <a href={url('/spenden/')}>Spenden</a>
+  </p>
+</div>
+
+<style>
+  .demo {
+    width: min(36rem, calc(100vw - 2 * var(--space-4)));
+    max-height: calc(100dvh - 2 * var(--space-4));
+    overflow-y: auto;
+    padding: var(--space-6) var(--space-5) var(--space-5);
+    border: var(--line-strong) solid var(--color-ink);
+    background: var(--color-paper);
+    color: var(--color-ink);
+    box-shadow: 0.5rem 0.5rem 0 var(--color-ink);
+  }
+
+  .demo::backdrop {
+    background: rgb(17 17 17 / 0.6);
+  }
+
+  .demo > * + * {
+    margin-top: var(--space-4);
+  }
+
+  .demo__close {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    cursor: pointer;
+  }
+
+  .demo__title {
+    margin-top: var(--space-2);
+    padding-right: var(--space-7);
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .demo__topic {
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .demo__when {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-size: 1.25rem;
+    font-weight: 900;
+    font-stretch: var(--stretch-semi);
+    line-height: 1.25;
+  }
+
+  .demo__program {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--space-3) var(--space-5);
+    margin-bottom: 0;
+  }
+
+  .demo__program dd {
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .demo__program dt {
+    margin-bottom: var(--space-1);
+  }
+
+  .demo p:not(.label, .demo__topic, .demo__when) {
+    font-size: var(--fs-small);
+    line-height: 1.5;
+  }
+
+  .demo__more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    font-weight: 800;
+  }
+</style>

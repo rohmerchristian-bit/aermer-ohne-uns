@@ -1,6 +1,8 @@
 ---
 import { stripBase, url } from '../lib/paths.ts';
 import { settings } from '../data/index.ts';
+import { demoActive } from '../lib/demo.ts';
+import DemoInfo from './DemoInfo.astro';
 
 // Main navigation. Works without JavaScript: links wrap below the logo on small screens.
 const path = stripBase(Astro.url.pathname);
@@ -12,15 +14,24 @@ const items = [
 const isCurrent = (href: string) => path === href || path.startsWith(href);
 // COMING_SOON=1: only the coming-soon page and the legal pages are online – no links to other pages.
 const comingSoon = process.env.COMING_SOON === '1';
+const showDemo = Boolean(settings.notice) && demoActive();
 ---
 
 {
   settings.notice && (
     <aside class="notice" aria-label="Aktueller Hinweis">
-      <p class="container notice__text">{settings.notice}</p>
+      <p class="container notice__text">
+        <span>{settings.notice}</span>
+        {showDemo && (
+          <button type="button" class="notice__more" popovertarget="demo-info">
+            Mehr dazu
+          </button>
+        )}
+      </p>
     </aside>
   )
 }
+{showDemo && <DemoInfo />}
 <header class="site-header">
   <div class="container site-header__inner">
     <a class="site-header__logo" href={url('/')} aria-current={path === '/' ? 'page' : undefined}>
@@ -57,6 +68,25 @@ const comingSoon = process.env.COMING_SOON === '1';
     padding-block: var(--space-3);
     font-weight: 800;
     font-stretch: var(--stretch-semi);
+  }
+
+  .notice__text {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-4);
+  }
+
+  .notice__more {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: var(--line-strong);
+    text-underline-offset: 0.2em;
+    cursor: pointer;
   }
 
   .site-header {

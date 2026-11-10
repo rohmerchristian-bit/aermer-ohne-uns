@@ -44,25 +44,23 @@ const detailHref = url(`/einrichtungen/${p.orgSlug}/${projectsOf(p.orgSlug).leng
 ---
 
 <article
-  class:list={['tile', { 'is-flipped': flipped }]}
+  class:list={['tile', { 'is-flipped': flipped, 'tile--editorial': p.cityEntry }]}
   data-area={area.slug}
   data-tile
   aria-labelledby={`${id}-name`}
 >
   <div class="tile__card">
     <div class="tile__face tile__front" id={`${id}-front`} data-tile-front>
-      <div class="tile__top">
-        <p class="tile__area label">{area.label}</p>
-        {
-          p.cityEntry && (
-            <p class="tile__flag label">
-              Stadt Erlangen<span class="visually-hidden">: Angebot der Stadt, vom Bündnis eingetragen</span>
-            </p>
-          )
-        }
-      </div>
+      <p class="tile__area label">{area.label}</p>
       <Heading class="tile__name" id={`${id}-name`}>{p.name}</Heading>
       {showOrg && <p class="tile__project">{p.orgName}</p>}
+      {
+        p.cityEntry && (
+          <p class="tile__editorial label">
+            Redaktioneller Eintrag<span class="visually-hidden"> des Bündnisses #ÄrmerOhneUns</span>
+          </p>
+        )
+      }
 
       <div class="tile__money">
         {
@@ -236,23 +234,20 @@ const detailHref = url(`/einrichtungen/${p.orgSlug}/${projectsOf(p.orgSlug).leng
     --focus-color: var(--color-ink);
   }
 
-  .tile__top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--space-3);
+  /* Entries the alliance made itself (city facilities may not use the form): grey tile with a white tab
+     that starts at the tile edge. */
+  .tile--editorial {
+    --area-bg: var(--color-editorial);
+    --area-fg: var(--color-ink);
   }
 
-  /* City projects: tab in inverted tile colours, like the year tab. */
-  .tile__flag {
-    flex: none;
-    margin-top: -0.3rem;
-    margin-right: calc(-0.5 * var(--tile-pad));
-    padding: 0.3rem 0.5rem 0.25rem;
-    background: var(--area-fg);
-    color: var(--area-bg);
+  .tile__editorial {
+    align-self: flex-start;
+    margin-left: calc(-1 * var(--tile-pad));
+    padding: 0.45rem 0.75rem 0.4rem var(--tile-pad);
+    background: var(--color-white);
+    color: var(--color-ink);
     line-height: 1;
-    white-space: nowrap;
   }
 
   .tile__name {

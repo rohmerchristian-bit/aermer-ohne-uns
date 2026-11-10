@@ -24,6 +24,7 @@ export const GET: APIRoute = () => {
     `  --color-paper: ${base.paper};`,
     `  --color-white: ${base.white};`,
     `  --color-muted: ${base.muted};`,
+    `  --color-editorial: ${base.editorial};`,
     `  --color-signal: ${signal};`,
     `  --color-signal-text: ${textOn(signal, 'signal')};`,
     ...areas.flatMap((a) => [

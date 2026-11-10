@@ -9,6 +9,8 @@ export const base = {
   white: '#FFFFFF',
   /** Thin rules and muted text on paper. Must keep AA contrast against paper. */
   muted: '#55524C',
+  /** Tiles the alliance entered itself ("Redaktioneller Eintrag"). Ink text on it. */
+  editorial: '#9C9A96',
 } as const;
 
 /**

@@ -72,7 +72,11 @@ export interface Project {
 }
 
 /** Where to fetch an image from – used only during the build, never published. */
-export type ImageRef = { kind: 'drive'; id: string } | { kind: 'sample'; path: string };
+export type ImageRef =
+  | { kind: 'drive'; id: string }
+  | { kind: 'sample'; path: string }
+  /** Replacement image from data/bilder/, chosen by the alliance. */
+  | { kind: 'local'; path: string };
 
 export interface OrganisationEntry {
   organisation: Organisation;

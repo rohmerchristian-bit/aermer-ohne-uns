@@ -256,14 +256,23 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
 
 /** "2028: 25.000 €, 2029: 45.000 €" from the separate amount questions; null if both are empty. */
 export function laterYears(raw2028: string, raw2029: string): string | null {
-  const parts = [
+  const byYear = new Map<string, string>();
+  const add = (year: string, raw: string) => {
+    if (byYear.has(year)) return;
+    const amount = parseAmount(raw);
+    byYear.set(year, amount.ok ? formatEuro(amount.value) : raw.trim());
+  };
+  for (const [year, raw] of [
     ['2028', raw2028],
     ['2029', raw2029],
-  ].flatMap(([year, raw]) => {
-    if (!raw!.trim()) return [];
-    const amount = parseAmount(raw);
-    return [`${year}: ${amount.ok ? formatEuro(amount.value) : raw!.trim()}`];
-  });
+  ] as const) {
+    if (!raw.trim()) continue;
+    // Some entries put both years into one field ("Danach: 2028: 30.000; 2029: 30.000").
+    const pairs = [...raw.matchAll(/\b(20\d\d)\s*:\s*([^,;]+)/g)];
+    if (pairs.length) pairs.forEach(([, y, amount]) => add(y!, amount!));
+    else add(year, raw);
+  }
+  const parts = [...byYear].sort(([a], [b]) => a.localeCompare(b)).map(([year, amount]) => `${year}: ${amount}`);
   return parts.length ? parts.join(', ') : null;
 }
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { columns, findColumn, normalizeHeader, PRIVATE_KEYS, type ColumnKey } from '../src/data/columns.ts';
-import { DataError, extractUrls, parseImageRef, runPipeline, stripQuotes } from '../src/data/pipeline.ts';
+import { DataError, extractUrls, laterYears, parseImageRef, runPipeline, stripQuotes } from '../src/data/pipeline.ts';
 import { parseSettings } from '../src/data/settings.ts';
 
 const OPTIONS = { allowSampleImages: false };
@@ -384,5 +384,17 @@ describe('settings', () => {
     expect(settings.hashtags).toEqual(['#ÄrmerOhneUns', '#Erlangen']);
     expect(messages.map((m) => m.message).join('\n')).toMatch(/unbekannter Schlüssel „tippfehler“/);
     expect(messages.map((m) => m.message).join('\n')).toMatch(/keine gültige E-Mail-Adresse/);
+  });
+});
+
+describe('laterYears', () => {
+  it('formats the 2028 and 2029 fields', () => {
+    expect(laterYears('6000', '6.000 €')).toBe('2028: 6.000 €, 2029: 6.000 €');
+    expect(laterYears('', '')).toBeNull();
+  });
+
+  it('reads both years when they were typed into one field', () => {
+    expect(laterYears('Danach: 2028: 30.000; 2029: 30.000', '')).toBe('2028: 30.000 €, 2029: 30.000 €');
+    expect(laterYears('2028: 25.000, 2029: 25.000', '25.000')).toBe('2028: 25.000 €, 2029: 25.000 €');
   });
 });

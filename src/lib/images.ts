@@ -23,6 +23,8 @@ export interface ImagePaths {
   output: string;
   publicPrefix: string;
   sampleDir: string;
+  /** data/bilder/<project id>.jpg replaces the image from the form. */
+  overrideDir: string;
 }
 
 export function imagePaths(root: string): ImagePaths {
@@ -32,10 +34,19 @@ export function imagePaths(root: string): ImagePaths {
     output: path.join(root, 'public/media'),
     publicPrefix: '/media/',
     sampleDir: path.join(root, 'data/sample'),
+    overrideDir: path.join(root, 'data/bilder'),
   };
 }
 
 export class ImageError extends Error {}
+
+const OVERRIDE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
+
+/** Replacement image for a project (data/bilder/<project id>.jpg), if there is one. */
+export function overrideImageRef(projectId: string, paths: ImagePaths): ImageRef | null {
+  const name = OVERRIDE_EXTENSIONS.map((ext) => projectId + ext).find((n) => existsSync(path.join(paths.overrideDir, n)));
+  return name ? { kind: 'local', path: name } : null;
+}
 
 async function isReadableImage(buffer: Buffer): Promise<boolean> {
   try {
@@ -89,8 +100,9 @@ async function downloadDrive(id: string, cacheFile: string): Promise<Buffer> {
 
 async function loadOriginal(ref: ImageRef, paths: ImagePaths): Promise<Buffer> {
   if (ref.kind === 'drive') return downloadDrive(ref.id, path.join(paths.originals, ref.id));
-  const file = path.resolve(paths.sampleDir, ref.path);
-  if (!file.startsWith(paths.sampleDir + path.sep)) throw new ImageError('Ungültiger Pfad.');
+  const dir = ref.kind === 'local' ? paths.overrideDir : paths.sampleDir;
+  const file = path.resolve(dir, ref.path);
+  if (!file.startsWith(dir + path.sep)) throw new ImageError('Ungültiger Pfad.');
   return readFile(file);
 }
 

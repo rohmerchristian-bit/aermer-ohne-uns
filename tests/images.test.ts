@@ -2,7 +2,7 @@ import { mkdtemp, readdir, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
-import { processImage, pruneOutput, type ImagePaths } from '../src/lib/images.ts';
+import { overrideImageRef, processImage, pruneOutput, type ImagePaths } from '../src/lib/images.ts';
 
 const tmp = await mkdtemp(path.join(os.tmpdir(), 'aou-images-'));
 const paths: ImagePaths = {
@@ -11,6 +11,7 @@ const paths: ImagePaths = {
   output: path.join(tmp, 'media'),
   publicPrefix: '/media/',
   sampleDir: path.resolve('data/sample'),
+  overrideDir: path.resolve('data/sample/bilder'),
 };
 
 afterAll(() => rm(tmp, { recursive: true, force: true }));
@@ -40,5 +41,12 @@ describe('processImage', () => {
     const { files } = await processImage({ kind: 'sample', path: 'bilder/sportplatz.jpg' }, paths);
     await pruneOutput(paths, new Set(files));
     expect((await readdir(paths.output)).sort()).toEqual([...files].sort());
+  });
+});
+
+describe('overrideImageRef', () => {
+  it('finds a replacement image by project id', () => {
+    expect(overrideImageRef('theater-buehne', paths)).toEqual({ kind: 'local', path: 'theater-buehne.jpg' });
+    expect(overrideImageRef('gibt-es-nicht', paths)).toBeNull();
   });
 });

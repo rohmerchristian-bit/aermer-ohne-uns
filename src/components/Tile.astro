@@ -234,13 +234,9 @@ const detailHref = url(`/einrichtungen/${p.orgSlug}/${projectsOf(p.orgSlug).leng
     --focus-color: var(--color-ink);
   }
 
-  /* Entries the alliance made itself (city facilities may not use the form): grey tile with a white tab
-     that starts at the tile edge. */
-  .tile--editorial {
-    --area-bg: var(--color-editorial);
-    --area-fg: var(--color-ink);
-  }
-
+  /* Entries the alliance made itself (city facilities may not use the form): white tab that starts at the
+     tile edge. They keep their area colour; a grey tile (--area-bg: var(--color-editorial) on .tile--editorial)
+     is kept in reserve. */
   .tile__editorial {
     align-self: flex-start;
     margin-left: calc(-1 * var(--tile-pad));

@@ -27,6 +27,14 @@ const swatches = [
 const mutedOnPaper = contrastRatio(base.muted, base.paper);
 // With real data there may be no approved project yet – then the tile examples are skipped.
 const demo = projects.find((p) => p.ownImage) ?? projects[0];
+// Editorial entries ("Stadt Erlangen" ticked) in four area colours: real ones first, others shown as if ticked.
+const editorialDemos = [
+  ...new Map(
+    [...projects.filter((p) => p.cityEntry), ...projects.filter((p) => !p.cityEntry)].map((p) => [p.area, p]),
+  ).values(),
+]
+  .slice(0, 4)
+  .map((p) => ({ ...p, cityEntry: true }));
 ---
 
 <Base title="Styleguide" noindex>
@@ -176,6 +184,15 @@ const demo = projects.find((p) => p.ownImage) ?? projects[0];
       {
         demo ? (
           <>
+            <h3 class="sg-subhead">Redaktionelle Einträge (Häkchen „Stadt Erlangen“)</h3>
+            <ul class="tile-grid" role="list">
+              {editorialDemos.map((p) => (
+                <li>
+                  <Tile project={p} headingLevel={4} idSuffix="-redaktionell" />
+                </li>
+              ))}
+            </ul>
+
             <h3 class="sg-subhead">Vorder- und Rückseite nebeneinander</h3>
             <ul class="tile-grid" role="list">
               <li><Tile project={demo} headingLevel={4} idSuffix="-vorn" /></li>

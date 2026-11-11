@@ -51,9 +51,11 @@ const detailHref = url(`/einrichtungen/${p.orgSlug}/${projectsOf(p.orgSlug).leng
 >
   <div class="tile__card">
     <div class="tile__face tile__front" id={`${id}-front`} data-tile-front>
-      <p class="tile__area label">{area.label}</p>
-      <Heading class="tile__name" id={`${id}-name`}>{p.name}</Heading>
-      {showOrg && <p class="tile__project">{p.orgName}</p>}
+      <div class="tile__head">
+        <p class="tile__area label">{area.label}</p>
+        <Heading class="tile__name" id={`${id}-name`}>{p.name}</Heading>
+        {showOrg && <p class="tile__project">{p.orgName}</p>}
+      </div>
       {
         p.cityEntry && (
           <p class="tile__editorial label">
@@ -234,16 +236,56 @@ const detailHref = url(`/einrichtungen/${p.orgSlug}/${projectsOf(p.orgSlug).leng
     --focus-color: var(--color-ink);
   }
 
-  /* Entries the alliance made itself (city facilities may not use the form): white tab that starts at the
-     tile edge. They keep their area colour; a grey tile (--area-bg: var(--color-editorial) on .tile--editorial)
-     is kept in reserve. */
+  /* Entries the alliance made itself (city facilities may not use the form): "Redaktioneller Eintrag".
+     The head (area, name, organisation) stays a block in the area colour over at least the upper half;
+     below it the tile is grey with a hatched edge in the area colour. The white tab sits right at the
+     edge of the grey: grey means editorial. */
+  .tile--editorial {
+    --editorial-edge: 1rem;
+    /* Read the area colour here, where data-area sets it; the front then turns grey. */
+    --editorial-accent: var(--area-bg);
+    --editorial-accent-fg: var(--area-fg);
+  }
+
+  .tile--editorial .tile__front {
+    --area-bg: var(--color-editorial);
+    --area-fg: var(--color-ink);
+    isolation: isolate;
+    background: repeating-linear-gradient(-45deg, var(--editorial-accent) 0 6px, var(--area-bg) 6px 13px);
+  }
+
+  /* Grey surface inside the hatched edge, painted below the content. */
+  .tile--editorial .tile__front::before {
+    content: '';
+    position: absolute;
+    inset: var(--editorial-edge);
+    z-index: -1;
+    background: var(--area-bg);
+  }
+
+  .tile--editorial .tile__head {
+    box-sizing: border-box;
+    flex: none;
+    min-height: calc(50% + var(--tile-pad));
+    margin: calc(-1 * var(--tile-pad)) calc(-1 * var(--tile-pad)) 0;
+    padding: var(--tile-pad) var(--tile-pad) var(--space-5);
+    background: var(--editorial-accent);
+    color: var(--editorial-accent-fg);
+  }
+
   .tile__editorial {
     align-self: flex-start;
-    margin-left: calc(-1 * var(--tile-pad));
+    margin: calc(-1 * var(--space-3)) 0 0 calc(-1 * var(--tile-pad));
     padding: 0.45rem 0.75rem 0.4rem var(--tile-pad);
     background: var(--color-white);
     color: var(--color-ink);
     line-height: 1;
+  }
+
+  .tile__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
   }
 
   .tile__name {

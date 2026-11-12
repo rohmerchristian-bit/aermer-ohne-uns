@@ -2,7 +2,7 @@ import { mkdtemp, readdir, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
-import { overrideImageRef, processImage, pruneOutput, type ImagePaths } from '../src/lib/images.ts';
+import { overrideCredit, overrideImageRef, processImage, pruneOutput, type ImagePaths } from '../src/lib/images.ts';
 
 const tmp = await mkdtemp(path.join(os.tmpdir(), 'aou-images-'));
 const paths: ImagePaths = {
@@ -48,5 +48,12 @@ describe('overrideImageRef', () => {
   it('finds a replacement image by project id', () => {
     expect(overrideImageRef('theater-buehne', paths)).toEqual({ kind: 'local', path: 'theater-buehne.jpg' });
     expect(overrideImageRef('gibt-es-nicht', paths)).toBeNull();
+  });
+});
+
+describe('overrideCredit', () => {
+  it('reads the credit for a replacement image from nachweise.csv', () => {
+    expect(overrideCredit('theater-buehne', paths)).toBe('Beispiel Fotografin');
+    expect(overrideCredit('gibt-es-nicht', paths)).toBeNull();
   });
 });

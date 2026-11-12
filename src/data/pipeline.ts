@@ -128,7 +128,9 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
       stats.notApproved++;
       return;
     }
-    if (!isConsent(read('consentPublish'))) {
+    // Editorial entries ("Stadt Erlangen") are published by the alliance itself; the facility's consent
+    // question in the form does not apply to them.
+    if (!isChecked(read('cityEntry')) && !isConsent(read('consentPublish'))) {
       stats.noConsent++;
       warn(`Zeile ${line}: „Freigeben“ ist angehakt, aber es fehlt die Zustimmung zur Veröffentlichung – Eintrag wird nicht veröffentlicht.`);
       return;

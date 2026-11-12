@@ -169,6 +169,17 @@ describe('privacy allowlist', () => {
     expect(result.stats).toMatchObject({ projects: 1, organisations: 1, notApproved: 2, noConsent: 2 });
   });
 
+  it('publishes editorial entries ("Stadt Erlangen") without the facility consent', () => {
+    const keys: ColumnKey[] = [...BASE_KEYS, 'cityEntry'];
+    const table = sheet(keys, [
+      { name: 'Redaktionell', area: 'Kultur', consentPublish: '', approved: 'TRUE', cityEntry: 'TRUE' },
+      { name: 'Ohne Zustimmung', area: 'Kultur', consentPublish: '', approved: 'TRUE', cityEntry: '' },
+    ]);
+    const result = runPipeline(table, OPTIONS);
+    expect(result.projects.map((e) => e.project.name)).toEqual(['Redaktionell']);
+    expect(result.stats).toMatchObject({ noConsent: 1 });
+  });
+
   it('accepts German checkbox values (WAHR)', () => {
     const result = runPipeline(sheet(BASE_KEYS, [{ name: 'A', area: 'Kultur', consentPublish: 'x', approved: 'WAHR' }]), OPTIONS);
     expect(result.projects).toHaveLength(1);

@@ -6,7 +6,7 @@
 //   public/media/<hash>-<width>.<format> optimised output, reused while the original is unchanged
 
 import { createHash } from 'node:crypto';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import sharp, { type Metadata } from 'sharp';
@@ -46,6 +46,23 @@ const OVERRIDE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
 export function overrideImageRef(projectId: string, paths: ImagePaths): ImageRef | null {
   const name = OVERRIDE_EXTENSIONS.map((ext) => projectId + ext).find((n) => existsSync(path.join(paths.overrideDir, n)));
   return name ? { kind: 'local', path: name } : null;
+}
+
+/**
+ * Credit for a replacement image from data/bilder/nachweise.csv (`projekt_id,bildnachweis`), if listed.
+ * Without an entry the credit from the form stays.
+ */
+export function overrideCredit(projectId: string, paths: ImagePaths): string | null {
+  const file = path.join(paths.overrideDir, 'nachweise.csv');
+  if (!existsSync(file)) return null;
+  for (const line of readFileSync(file, 'utf8').split(/\r?\n/).slice(1)) {
+    const comma = line.indexOf(',');
+    if (comma < 0) continue;
+    const id = line.slice(0, comma).trim();
+    const credit = line.slice(comma + 1).trim().replace(/^"(.*)"$/, '$1');
+    if (id === projectId && credit) return credit;
+  }
+  return null;
 }
 
 async function isReadableImage(buffer: Buffer): Promise<boolean> {

@@ -14,7 +14,7 @@ import { DataError, runPipeline } from '../src/data/pipeline.ts';
 import { DEFAULT_SETTINGS, parseSettings } from '../src/data/settings.ts';
 import type { BuildMessage, Organisation, Project } from '../src/data/types.ts';
 import { parseCsv } from '../src/lib/csv.ts';
-import { imagePaths, overrideImageRef, processImage, pruneOutput } from '../src/lib/images.ts';
+import { imagePaths, overrideCredit, overrideImageRef, processImage, pruneOutput } from '../src/lib/images.ts';
 import { formatEuro } from '../src/lib/format.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -101,7 +101,11 @@ async function main(): Promise<void> {
   }
   for (const entry of result.projects) {
     const p = entry.project;
-    entry.imageRef = overrideImageRef(p.id, paths) ?? entry.imageRef;
+    const override = overrideImageRef(p.id, paths);
+    if (override) {
+      entry.imageRef = override;
+      entry.imageCredit = overrideCredit(p.id, paths) ?? entry.imageCredit;
+    }
     if (!entry.imageRef) continue;
     jobs.push(async () => {
       try {

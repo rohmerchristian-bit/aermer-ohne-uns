@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { columns, findColumn, normalizeHeader, PRIVATE_KEYS, type ColumnKey } from '../src/data/columns.ts';
-import { DataError, extractUrls, laterYears, parseImageRef, runPipeline, stripQuotes } from '../src/data/pipeline.ts';
+import { DataError, extractUrls, firstLaterCut, laterYears, parseImageRef, runPipeline, stripQuotes } from '../src/data/pipeline.ts';
 import { parseSettings } from '../src/data/settings.ts';
 
 const OPTIONS = { allowSampleImages: false };
@@ -151,7 +151,7 @@ describe('privacy allowlist', () => {
     expect(Object.keys(result.projects[0]!.project).sort()).toEqual(
       [
         'id', 'anchor', 'orgSlug', 'orgName', 'name', 'area', 'cutDescription', 'amount', 'amountKind', 'amountSource',
-        'amountLater', 'amountPercent', 'nonMonetary', 'consequences', 'quote', 'infoLink', 'contactEmail', 'contactPhone', 'image', 'ownImage', 'featured', 'cityEntry',
+        'amountLater', 'laterCut', 'amountPercent', 'nonMonetary', 'consequences', 'quote', 'infoLink', 'contactEmail', 'contactPhone', 'image', 'ownImage', 'featured', 'cityEntry',
       ].sort(),
     );
   });
@@ -322,6 +322,22 @@ describe('several projects per organisation', () => {
     expect(result.projects[2]!.project.nonMonetary).toBe('Wegfall der Mietzuschüsse');
   });
 
+  it('shows a cut that only starts in 2028 without counting it for 2027', () => {
+    const result = runPipeline(
+      sheet([...keys, 'amount2028', 'amount2029'], [
+        { entryType: NEW, name: 'Amt', project: 'Ab 2028', area: 'Kultur & Kunst', amountReported: '0', amount2028: '24.000', amount2029: '35.000', ...ok },
+        { entryType: MORE, orgSelect: 'Amt', project: 'Sofort', area: 'Kultur & Kunst', amountReported: '10.000', amount2028: '24.000', ...ok },
+      ]),
+      OPTIONS,
+    );
+    const [later, now] = result.projects.map((e) => e.project);
+    expect(later!.amount).toBeNull();
+    expect(later!.laterCut).toEqual({ year: 2028, value: 24000 });
+    expect(now!.amount).toBe(10000);
+    expect(now!.laterCut).toBeNull();
+    expect(result.messages.some((m) => m.message.includes('nicht lesbar'))).toBe(false);
+  });
+
   it('skips additional projects for organisations that are not approved', () => {
     const result = runPipeline(
       sheet(keys, [
@@ -398,10 +414,20 @@ describe('settings', () => {
   });
 });
 
+describe('firstLaterCut', () => {
+  it('takes the first later year with an amount', () => {
+    expect(firstLaterCut('24.000', '35.000')).toEqual({ year: 2028, value: 24000 });
+    expect(firstLaterCut('0', '35.000 €')).toEqual({ year: 2029, value: 35000 });
+    expect(firstLaterCut('2028: 0; 2029: 12.000', '')).toEqual({ year: 2029, value: 12000 });
+    expect(firstLaterCut('', '')).toBeNull();
+  });
+});
+
 describe('laterYears', () => {
   it('formats the 2028 and 2029 fields', () => {
     expect(laterYears('6000', '6.000 €')).toBe('2028: 6.000 €, 2029: 6.000 €');
     expect(laterYears('', '')).toBeNull();
+    expect(laterYears('0', '672.500')).toBe('2028: keine Kürzung, 2029: 672.500 €');
   });
 
   it('reads both years when they were typed into one field', () => {

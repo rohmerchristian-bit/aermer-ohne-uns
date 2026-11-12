@@ -52,6 +52,8 @@ export interface Project {
   amountSource: string | null;
   /** Free text for later years, e.g. "2028: 85.000 €, 2029: 120.000 €". */
   amountLater: string | null;
+  /** First later year with a cut, if there is no 2027 amount (e.g. a cut that only starts in 2028). Not counted in the total. */
+  laterCut: { year: number; value: number } | null;
   /** Free text, e.g. "10 %". */
   amountPercent: string | null;
   /** What is lost if it is not a sum of money, e.g. "Wegfall der Mietzuschüsse". */

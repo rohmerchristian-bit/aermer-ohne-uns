@@ -216,12 +216,18 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
                   <p class="project__amount">
                     <span class="nobreak">{formatCut(p.amount)}</span> <span class="project__per">im Jahr 2027</span>
                   </p>
+                ) : p.laterCut ? (
+                  <p class="project__amount">
+                    <span class="nobreak">{formatCut(p.laterCut.value)}</span>{' '}
+                    <span class="project__per">ab {p.laterCut.year}</span>
+                  </p>
                 ) : p.nonMonetary ? (
                   <p class="project__amount project__amount--text">{p.nonMonetary}</p>
                 ) : (
                   <p class="project__amount project__amount--text">Betrag folgt</p>
                 )}
-                {p.amountLater && <p class="project__later">Danach: {p.amountLater}</p>}
+                {p.laterCut && <p class="project__later">2027: keine Kürzung</p>}
+                {p.amountLater && <p class="project__later">{p.laterCut ? 'Geplant' : 'Danach'}: {p.amountLater}</p>}
                 {notes && <p class="project__source small">{notes}</p>}
                 {p.cityEntry && (
                   <p class="project__city small">

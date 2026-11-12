@@ -78,6 +78,18 @@ const detailHref = url(`/einrichtungen/${p.orgSlug}/${projectsOf(p.orgSlug).leng
                 </span>
               </p>
             </div>
+          ) : p.laterCut ? (
+            <div class="tile__dated">
+              <p class="tile__year">
+                <span class="tile__year-label">Kürzung ab</span>
+                <span class="tile__year-value">{p.laterCut.year}</span>
+              </p>
+              <p class="tile__amount">
+                <span class:list={['tile__amount-value', { 'tile__amount-value--long': p.laterCut.value >= 1_000_000 }]}>
+                  {formatCut(p.laterCut.value)}
+                </span>
+              </p>
+            </div>
           ) : p.nonMonetary ? (
             <p class="tile__amount tile__amount--text">{p.nonMonetary}</p>
           ) : (

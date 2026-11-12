@@ -187,7 +187,8 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
     }
 
     const area = resolveArea(read('area'), (msg) => warn(`${label}: ${msg}`));
-    const amount = resolveAmount(read('amountVerified'), read('amountReported'), (msg) => warn(`${label}: ${msg}`));
+    const later = firstLaterCut(read('amount2028'), read('amount2029'));
+    const amount = resolveAmount(read('amountVerified'), read('amountReported'), (msg) => warn(`${label}: ${msg}`), later !== null);
     const infoLinks = extractUrls(read('infoLink'));
     if (read('infoLink') && infoLinks.length === 0) warn(`${label}: Link zu weiterführenden Informationen ist keine gültige Web-Adresse.`);
     const projectName = text('project');
@@ -205,6 +206,7 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
       amountKind: amount?.kind ?? null,
       amountSource: amount ? text('amountSource') : null,
       amountLater: laterYears(read('amount2028'), read('amount2029')) ?? text('amountLater'),
+      laterCut: amount ? null : later,
       amountPercent: text('amountPercent'),
       nonMonetary: text('nonMonetary'),
       consequences: text('consequences'),
@@ -262,7 +264,8 @@ export function laterYears(raw2028: string, raw2029: string): string | null {
   const add = (year: string, raw: string) => {
     if (byYear.has(year)) return;
     const amount = parseAmount(raw);
-    byYear.set(year, amount.ok ? formatEuro(amount.value) : raw.trim());
+    const zero = /^\s*0+([.,]0+)?\s*(€|euro)?\s*$/i.test(raw);
+    byYear.set(year, amount.ok ? formatEuro(amount.value) : zero ? 'keine Kürzung' : raw.trim());
   };
   for (const [year, raw] of [
     ['2028', raw2028],
@@ -276,6 +279,23 @@ export function laterYears(raw2028: string, raw2029: string): string | null {
   }
   const parts = [...byYear].sort(([a], [b]) => a.localeCompare(b)).map(([year, amount]) => `${year}: ${amount}`);
   return parts.length ? parts.join(', ') : null;
+}
+
+/** The first of 2028/2029 with a readable positive amount, e.g. { year: 2028, value: 24000 }; null if none. */
+export function firstLaterCut(raw2028: string, raw2029: string): { year: number; value: number } | null {
+  for (const [year, raw] of [
+    [2028, raw2028],
+    [2029, raw2029],
+  ] as const) {
+    // Both years in one field ("2028: 30.000; 2029: 45.000"): take the pairs in order.
+    const pairs = [...raw.matchAll(/\b(20\d\d)\s*:\s*([^,;]+)/g)];
+    const candidates: Array<[number, string]> = pairs.length ? pairs.map(([, y, a]) => [Number(y), a!]) : [[year, raw]];
+    for (const [y, a] of candidates) {
+      const parsed = parseAmount(a);
+      if (parsed.ok) return { year: y, value: parsed.value };
+    }
+  }
+  return null;
 }
 
 /** "Ein weiteres betroffenes Projekt für eine bereits eingetragene Einrichtung" → true. Empty (old answers) → false. */
@@ -299,6 +319,7 @@ function resolveAmount(
   verifiedRaw: string,
   reportedRaw: string,
   warn: (msg: string) => void,
+  hasLaterCut = false,
 ): { value: number; kind: 'verified' | 'reported' } | null {
   const verified = parseAmount(verifiedRaw);
   if (verified.ok) return { value: verified.value, kind: 'verified' };
@@ -306,7 +327,9 @@ function resolveAmount(
 
   const reported = parseAmount(reportedRaw);
   if (reported.ok) return { value: reported.value, kind: 'reported' };
-  if (reported.reason === 'unreadable') warn(`Betrag nicht lesbar („${reportedRaw}“) – Kachel zeigt „Betrag folgt“.`);
+  // "0" for 2027 with an amount for 2028/2029 means: the cut only starts later. Not a typo.
+  const zero = /^\s*0+([.,]0+)?\s*(€|euro)?\s*$/i.test(reportedRaw);
+  if (reported.reason === 'unreadable' && !(zero && hasLaterCut)) warn(`Betrag nicht lesbar („${reportedRaw}“) – Kachel zeigt „Betrag folgt“.`);
   return null;
 }
 

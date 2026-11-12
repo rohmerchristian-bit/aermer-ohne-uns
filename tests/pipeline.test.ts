@@ -427,7 +427,7 @@ describe('laterYears', () => {
   it('formats the 2028 and 2029 fields', () => {
     expect(laterYears('6000', '6.000 €')).toBe('2028: 6.000 €, 2029: 6.000 €');
     expect(laterYears('', '')).toBeNull();
-    expect(laterYears('0', '672.500')).toBe('2028: keine Kürzung, 2029: 672.500 €');
+    expect(laterYears('0', '672.500')).toBe('2028: keine Kürzung, 2029: 672.500\u00A0€');
   });
 
   it('reads both years when they were typed into one field', () => {

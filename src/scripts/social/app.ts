@@ -114,7 +114,8 @@ export function start(): void {
       case 'P1':
         return { ...base, cta: '#ÄrmerOhneUns · aermerohneuns.de' };
       case 'P2':
-        return { ...base, subtitle: p.org, amount: hasAmount ? amount : '' };
+        // Editorial entries were written by the alliance, not by the facility: the quote is signed accordingly.
+        return { ...base, subtitle: p.cityEntry ? 'Bündnis #ÄrmerOhneUns' : p.org, amount: hasAmount ? amount : '' };
       case 'S1':
         return { ...base, cta: 'Mehr auf aermerohneuns.de' };
       case 'S2':

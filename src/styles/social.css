@@ -164,6 +164,14 @@
   white-space: nowrap;
 }
 
+/* Head of P1 and S1 (title block): passes the free space on, so long names still shrink to fit. */
+.art .head {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 1;
+  min-height: 0;
+}
+
 /* P1 Betrag */
 .post-amount {
   padding: 80px;
@@ -566,4 +574,117 @@
   background: var(--color-signal);
   padding: 20px;
   border: 6px solid var(--color-ink);
+}
+
+
+/* ---- Editorial entries ("Stadt Erlangen" ticked): as on the website tile –
+   head in the area colour, below it grey with a hatched frame in the area colour,
+   the white tab "Redaktioneller Eintrag" sits on the edge between the two. ---- */
+.art.is-editorial {
+  --ed-edge: 40px;
+  --ed-accent: var(--area-bg);
+  --ed-accent-fg: var(--area-fg);
+  isolation: isolate;
+  color: var(--color-ink);
+  background: repeating-linear-gradient(-45deg, var(--ed-accent) 0 16px, var(--color-editorial) 16px 34px);
+}
+
+.art.is-editorial::before {
+  content: '';
+  position: absolute;
+  inset: var(--ed-edge);
+  z-index: -1;
+  background: var(--color-editorial);
+}
+
+/* The year tab takes the grey as its text colour, like on the tile. */
+.art.is-editorial .yeartab > * {
+  color: var(--color-editorial);
+  border-color: var(--color-editorial);
+}
+
+.art .edtab {
+  align-self: flex-start;
+  padding: 14px 26px 12px;
+  background: #fff;
+  color: var(--color-ink);
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* P1 and S1: the head becomes a colour block across the top half. */
+.art.is-editorial .head {
+  display: flex;
+  flex-direction: column;
+  background: var(--ed-accent);
+  color: var(--ed-accent-fg);
+}
+
+.post-amount.is-editorial .head {
+  margin: -80px -80px 0;
+  padding: 80px 80px 70px;
+  min-height: 675px;
+}
+
+.story-amount.is-editorial .head {
+  margin: -270px -80px 0;
+  padding: 270px 80px 70px;
+  min-height: 1000px;
+}
+
+.post-amount.is-editorial .edtab,
+.story-amount.is-editorial .edtab {
+  margin: -26px 0 0 -80px;
+  padding-left: 80px;
+}
+
+.story-amount.is-editorial .sa__money {
+  margin-top: 70px;
+}
+
+/* The logo on S1 stays on the colour block. */
+.story-amount.is-editorial .sa__logo {
+  z-index: 1;
+}
+
+/* P2: quote on grey inside the hatched frame; the tab at the top. */
+.art.post-quote.is-editorial .pq__band {
+  display: none;
+}
+
+.art.post-quote.is-editorial .pq__mark {
+  color: var(--ed-accent);
+}
+
+.post-quote.is-editorial .edtab {
+  position: absolute;
+  top: var(--ed-edge);
+  left: var(--ed-edge);
+}
+
+/* P3 and S2: the block below the photo is grey; the hatched frame shows around it. */
+.post-photo.is-editorial .pp__img,
+.story-photo.is-editorial .sp__img {
+  margin: 0 0 0;
+  border-bottom: 14px solid var(--ed-accent);
+}
+
+.post-photo.is-editorial .pp__block,
+.story-photo.is-editorial .sp__body {
+  margin: 0 var(--ed-edge) var(--ed-edge);
+  background: var(--color-editorial);
+  color: var(--color-ink);
+}
+
+.post-photo.is-editorial .edtab,
+.story-photo.is-editorial .edtab {
+  margin: -50px 0 10px -80px;
+  padding-left: 40px;
+}
+
+.story-photo.is-editorial .edtab {
+  margin-top: -60px;
 }

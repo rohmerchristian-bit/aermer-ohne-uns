@@ -12,6 +12,8 @@ interface ProjectData {
   name: string;
   area: string;
   amount: number | null;
+  laterCut: { year: number; value: number } | null;
+  cityEntry: boolean;
   nonMonetary: string | null;
   quote: string | null;
   consequences: string | null;
@@ -40,8 +42,9 @@ interface Data {
 
 const SAVINGS_YEARS = [2026, 2027, 2028, 2029, 2030];
 
-const FIELD_UI: Record<FieldId, { label: string; kind: 'text' | 'textarea' | 'area' | 'image'; hint?: string }> = {
+const FIELD_UI: Record<FieldId, { label: string; kind: 'text' | 'textarea' | 'area' | 'image' | 'check'; hint?: string }> = {
   area: { label: 'Farbe (Bereich)', kind: 'area' },
+  editorial: { label: 'Redaktioneller Eintrag (grau, schraffierter Rand)', kind: 'check' },
   kicker: { label: 'Kleine Überschrift', kind: 'text' },
   title: { label: 'Titel', kind: 'textarea', hint: 'Mit Enter eine neue Zeile beginnen.' },
   subtitle: { label: 'Unterzeile', kind: 'text' },
@@ -59,7 +62,7 @@ const FIELD_UI: Record<FieldId, { label: string; kind: 'text' | 'textarea' | 'ar
 
 const EMPTY: Fields = {
   area: 'kultur', kicker: '', title: '', subtitle: '', year: '', amount: '', quote: '', text: '',
-  image: '', credit: '', stamp: '', source: '', cta: '', logo: '',
+  image: '', credit: '', stamp: '', source: '', cta: '', logo: '', editorial: '',
 };
 
 const $ = <T extends Element>(root: ParentNode, selector: string) => root.querySelector<T>(selector)!;
@@ -86,7 +89,11 @@ export function start(): void {
 
   // ---- default texts ----
   function projectFields(tpl: Template, p: ProjectData): Fields {
-    const amount = p.amount !== null ? formatCut(p.amount) : (p.nonMonetary ?? 'Betrag folgt');
+    // A cut that only starts after 2027 is shown with its first year ("ab 2028"), as on the website.
+    const amount =
+      p.amount !== null ? formatCut(p.amount) : p.laterCut ? formatCut(p.laterCut.value) : (p.nonMonetary ?? 'Betrag folgt');
+    const year = p.amount !== null ? String(data.amountYear) : p.laterCut ? `ab ${p.laterCut.year}` : '';
+    const hasAmount = p.amount !== null || p.laterCut !== null;
     const subtitle = p.name !== p.org ? p.org : '';
     const base: Fields = {
       ...EMPTY,
@@ -94,7 +101,8 @@ export function start(): void {
       kicker: areaLabel(p.area),
       title: p.name,
       subtitle,
-      year: p.amount !== null ? String(data.amountYear) : '',
+      year,
+      editorial: p.cityEntry ? '1' : '',
       amount,
       quote: p.quote ?? '',
       text: p.consequences ?? '',
@@ -106,7 +114,7 @@ export function start(): void {
       case 'P1':
         return { ...base, cta: '#ÄrmerOhneUns · aermerohneuns.de' };
       case 'P2':
-        return { ...base, subtitle: p.org, amount: p.amount !== null ? amount : '' };
+        return { ...base, subtitle: p.org, amount: hasAmount ? amount : '' };
       case 'S1':
         return { ...base, cta: 'Mehr auf aermerohneuns.de' };
       case 'S2':
@@ -259,6 +267,9 @@ export function start(): void {
             .map((a) => `<option value="${a.slug}" ${a.slug === f.area ? 'selected' : ''}>${esc(a.label)}</option>`)
             .join('')}</select></label>`;
         }
+        if (ui.kind === 'check') {
+          return `<label class="field field--check"><input type="checkbox" data-field="${id}" ${f[id] ? 'checked' : ''}><span>${ui.label}</span></label>`;
+        }
         if (ui.kind === 'image') {
           return `<div class="field"><span>${ui.label}</span><div class="imgfield">${
             f.image ? `<img src="${esc(f.image)}" alt="">` : '<img alt="">'
@@ -306,7 +317,7 @@ export function start(): void {
       renderFields();
       void renderPreview();
     } else if (el.matches('[data-field]')) {
-      fieldsOf(tpl)[el.dataset.field as FieldId] = el.value;
+      fieldsOf(tpl)[el.dataset.field as FieldId] = el.type === 'checkbox' ? (el.checked ? '1' : '') : el.value;
       schedulePreview();
     }
   });

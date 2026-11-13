@@ -4,7 +4,7 @@ import { safeName } from '../src/scripts/social/save.ts';
 
 const empty: Fields = {
   area: 'kultur', kicker: '', title: '', subtitle: '', year: '', amount: '', quote: '', text: '',
-  image: '', credit: '', stamp: '', source: '', cta: '', logo: '',
+  image: '', credit: '', stamp: '', source: '', cta: '', logo: '', editorial: '',
 };
 const assets = { logo: '/brand/logo.png' };
 
@@ -12,6 +12,16 @@ describe('social templates', () => {
   it('offers the four approved layouts per format', () => {
     expect(templates.filter((t) => t.format === 'post').map((t) => t.id)).toEqual(['P1', 'P2', 'P3', 'P4']);
     expect(templates.filter((t) => t.format === 'story').map((t) => t.id)).toEqual(['S1', 'S2', 'S3', 'S4']);
+  });
+
+  it('marks editorial entries with the grey design and the tab', () => {
+    for (const id of ['P1', 'P2', 'P3', 'S1', 'S2']) {
+      const html = getTemplate(id).render({ ...empty, editorial: '1', year: 'ab 2028', amount: '−24.000 €' }, assets);
+      expect(html).toContain('is-editorial');
+      expect(html).toContain('Redaktioneller Eintrag');
+      expect(html).not.toContain('im Jahr ab');
+    }
+    expect(getTemplate('P1').render(empty, assets)).not.toContain('is-editorial');
   });
 
   it('renders every template with empty fields', () => {

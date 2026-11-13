@@ -16,6 +16,8 @@ export type FieldId =
   | 'stamp'
   | 'source'
   | 'cta'
+  /** "1": editorial entry of the alliance (grey with hatched frame, like the tile on the website). */
+  | 'editorial'
   /** Not an input: "1" if the image is a logo (shown whole instead of cropped). */
   | 'logo';
 
@@ -60,6 +62,11 @@ const opt = (text: string, html: (value: string) => string) => (text.trim() ? ht
 const badge = (a: Assets, extra = '') => `<span class="badge ${extra}"><img src="${a.logo}" alt=""></span>`;
 const yearTab = (f: Fields, extra = '') =>
   f.year.trim() ? `<span class="yeartab ${extra}"><span>Kürzung</span><b>${t(f.year)}</b></span>` : '';
+/** "im Jahr 2027", but "ab 2028" stays as it is. */
+const inYear = (v: string) => (/^ab\s/i.test(v) ? v : `im Jahr ${v}`);
+const edClass = (f: Fields) => (f.editorial ? ' is-editorial' : '');
+const edTab = (f: Fields) => (f.editorial ? '<span class="edtab">Redaktioneller Eintrag</span>' : '');
+
 const image = (f: Fields, cls: string) =>
   `<div class="${cls}${f.logo ? ' is-logo' : ''}">${f.image ? `<img src="${esc(f.image)}" alt="">` : '<span class="noimg">Bild wählen</span>'}${opt(
     f.credit,
@@ -73,12 +80,15 @@ export const templates: Template[] = [
     format: 'post',
     source: 'project',
     description: 'Bereichsfarbe, Kürzung riesig',
-    fields: ['area', 'kicker', 'title', 'subtitle', 'year', 'amount', 'cta'],
+    fields: ['area', 'editorial', 'kicker', 'title', 'subtitle', 'year', 'amount', 'cta'],
     render: (f, a) => `
-      <div class="art post-amount" data-area="${esc(f.area)}">
-        <div class="pa__top"><span class="k">${t(f.kicker)}</span>${badge(a)}</div>
-        <div class="pa__name" data-fit="140:70">${t(f.title)}</div>
-        ${opt(f.subtitle, (v) => `<div class="pa__org">${v}</div>`)}
+      <div class="art post-amount${edClass(f)}" data-area="${esc(f.area)}">
+        <div class="head">
+          <div class="pa__top"><span class="k">${t(f.kicker)}</span>${badge(a)}</div>
+          <div class="pa__name" data-fit="140:70">${t(f.title)}</div>
+          ${opt(f.subtitle, (v) => `<div class="pa__org">${v}</div>`)}
+        </div>
+        ${edTab(f)}
         <div class="pa__bottom">
           ${yearTab(f)}
           <div class="pa__amount" data-fit="250:110" data-fit-line>${t(f.amount)}</div>
@@ -92,15 +102,16 @@ export const templates: Template[] = [
     format: 'post',
     source: 'project',
     description: 'Papierweiß, das Zitat im Mittelpunkt',
-    fields: ['area', 'quote', 'subtitle', 'amount', 'year'],
+    fields: ['area', 'editorial', 'quote', 'subtitle', 'amount', 'year'],
     render: (f, a) => `
-      <div class="art post-quote" data-area="${esc(f.area)}">
+      <div class="art post-quote${edClass(f)}" data-area="${esc(f.area)}">
+        ${edTab(f)}
         <div class="pq__band"></div>
         <div class="pq__mark">„</div>
         <div class="pq__text" data-fit="96:44">${t(f.quote)}</div>
         ${opt(f.subtitle, (v) => `<div class="pq__who">— ${v}</div>`)}
         <div class="pq__bottom">
-          ${opt(f.amount, (v) => `<span class="chip">${v}${f.year.trim() ? ` im Jahr ${t(f.year)}` : ''}</span>`)}
+          ${opt(f.amount, (v) => `<span class="chip">${v}${f.year.trim() ? ` ${inYear(t(f.year))}` : ''}</span>`)}
           ${badge(a)}
         </div>
       </div>`,
@@ -111,14 +122,15 @@ export const templates: Template[] = [
     format: 'post',
     source: 'project',
     description: 'Foto oben, Farbblock mit Kürzung',
-    fields: ['area', 'image', 'credit', 'kicker', 'title', 'amount', 'year'],
+    fields: ['area', 'editorial', 'image', 'credit', 'kicker', 'title', 'amount', 'year'],
     render: (f, a) => `
-      <div class="art post-photo" data-area="${esc(f.area)}">
+      <div class="art post-photo${edClass(f)}" data-area="${esc(f.area)}">
         ${image(f, 'pp__img')}
         <div class="pp__block">
+          ${edTab(f)}
           <span class="k">${t(f.kicker)}</span>
           <div class="pp__name" data-fit="110:56">${t(f.title)}</div>
-          <div class="pp__amount" data-fit="150:80" data-fit-line>${t(f.amount)}${opt(f.year, (v) => ` <small>im Jahr ${v}</small>`)}</div>
+          <div class="pp__amount" data-fit="150:80" data-fit-line>${t(f.amount)}${opt(f.year, (v) => ` <small>${inYear(v)}</small>`)}</div>
         </div>
         ${badge(a, 'pp__badge')}
       </div>`,
@@ -144,13 +156,16 @@ export const templates: Template[] = [
     format: 'story',
     source: 'project',
     description: 'Bereichsfarbe, Kürzung und kurzes Zitat',
-    fields: ['area', 'kicker', 'title', 'subtitle', 'year', 'amount', 'quote', 'cta'],
+    fields: ['area', 'editorial', 'kicker', 'title', 'subtitle', 'year', 'amount', 'quote', 'cta'],
     render: (f, a) => `
-      <div class="art story-amount" data-area="${esc(f.area)}">
+      <div class="art story-amount${edClass(f)}" data-area="${esc(f.area)}">
         <img class="sa__logo" src="${a.logo}" alt="">
-        <span class="k sa__k">${t(f.kicker)}</span>
-        <div class="sa__name" data-fit="150:70">${t(f.title)}</div>
-        ${opt(f.subtitle, (v) => `<div class="sa__org">${v}</div>`)}
+        <div class="head">
+          <span class="k sa__k">${t(f.kicker)}</span>
+          <div class="sa__name" data-fit="150:70">${t(f.title)}</div>
+          ${opt(f.subtitle, (v) => `<div class="sa__org">${v}</div>`)}
+        </div>
+        ${edTab(f)}
         <div class="sa__money">
           ${yearTab(f)}
           <div class="sa__amount" data-fit="230:110" data-fit-line>${t(f.amount)}</div>
@@ -165,11 +180,12 @@ export const templates: Template[] = [
     format: 'story',
     source: 'project',
     description: 'Foto oben, Zitat und Kürzung darunter',
-    fields: ['area', 'image', 'credit', 'kicker', 'quote', 'year', 'amount', 'cta'],
+    fields: ['area', 'editorial', 'image', 'credit', 'kicker', 'quote', 'year', 'amount', 'cta'],
     render: (f) => `
-      <div class="art story-photo" data-area="${esc(f.area)}">
+      <div class="art story-photo${edClass(f)}" data-area="${esc(f.area)}">
         ${image(f, 'sp__img')}
         <div class="sp__body">
+          ${edTab(f)}
           <span class="k">${t(f.kicker)}</span>
           <div class="sp__quote" data-fit="84:40">${f.quote.trim() ? `„${t(f.quote)}“` : ''}</div>
           <div class="sp__amount">${yearTab(f, 'dark')} <span data-fit="90:50" data-fit-line>${t(f.amount)}</span></div>
@@ -206,7 +222,7 @@ export const templates: Template[] = [
         ${opt(f.stamp, (v) => `<span class="stamp">${v}</span>`)}
         <span class="k sf__k">${t(f.kicker)}</span>
         <div class="sf__title" data-fit="130:60">${t(f.title)}</div>
-        <div class="sf__amount"><span data-fit="200:100" data-fit-line>${t(f.amount)}</span>${opt(f.year, (v) => `<small>im Jahr ${v}</small>`)}</div>
+        <div class="sf__amount"><span data-fit="200:100" data-fit-line>${t(f.amount)}</span>${opt(f.year, (v) => `<small>${inYear(v)}</small>`)}</div>
         ${opt(f.text, (v) => `<div class="sf__note" data-fit="40:26">${v}</div>`)}
         ${opt(f.source, (v) => `<div class="sf__src">${v}</div>`)}
         <img class="sf__logo" src="${a.logo}" alt="">

@@ -631,8 +631,9 @@
 
 .story-amount.is-editorial .head {
   margin: -270px -80px 0;
-  padding: 270px 80px 70px;
-  min-height: 1000px;
+  padding: 270px 80px 60px;
+  /* Not half of the story: the quote below still needs room (Instagram covers the bottom 250 px anyway). */
+  min-height: 760px;
 }
 
 .post-amount.is-editorial .edtab,
@@ -642,7 +643,7 @@
 }
 
 .story-amount.is-editorial .sa__money {
-  margin-top: 70px;
+  margin-top: 50px;
 }
 
 /* The logo on S1 stays on the colour block. */

@@ -217,7 +217,8 @@ export const columns: readonly ColumnDef[] = [
   { key: 'cityEntry', header: 'Stadt Erlangen', visibility: 'public', aliases: ['Stadt_Erlangen'] },
   // Admin dropdown after the council sessions (Nov 2026): "vorläufig gerettet", "gerettet bis 2027",
   // "gerettet bis 2029", "von der Liste entfernt". See src/lib/rescue.ts.
-  { key: 'rescue', header: 'Status', visibility: 'public' },
+  // Not just "Status": the sheet already has an internal review column of that name ("Neu – bitte prüfen").
+  { key: 'rescue', header: 'Status Sparliste', visibility: 'public' },
 ];
 
 /** Keys that may be read from the CSV at all. Everything else is dropped on import. */

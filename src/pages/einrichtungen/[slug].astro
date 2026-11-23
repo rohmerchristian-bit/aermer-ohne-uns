@@ -10,6 +10,7 @@ import { count, organisations, projects, projectsOf, settings, sortedForGrid } f
 import type { InstitutionImage, Organisation } from '../../data/types.ts';
 import { amountSourceLabel, percentLabel } from '../../lib/amount-label.ts';
 import { formatCut, initials, truncate } from '../../lib/format.ts';
+import { RESCUE_LABEL, RESCUE_TEXT, rescueCovers } from '../../lib/rescue.ts';
 import { organisationShareImagePath } from '../../data/share.ts';
 import { organisationCardAlt } from '../../data/organisation-card.ts';
 
@@ -212,13 +213,21 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
                 <h2 id={`${p.anchor}-titel`} class="project__name">
                   {p.name}
                 </h2>
+                {p.rescue && (
+                  <p class="project__rescue">
+                    <span class="project__rescue-flag label">{RESCUE_LABEL[p.rescue]}</span> {RESCUE_TEXT[p.rescue]}
+                  </p>
+                )}
                 {p.amount !== null ? (
                   <p class="project__amount">
-                    <span class="nobreak">{formatCut(p.amount)}</span> <span class="project__per">im Jahr 2027</span>
+                    <span class:list={['nobreak', { 'is-struck': rescueCovers(p.rescue, 2027) }]}>{formatCut(p.amount)}</span>{' '}
+                    <span class="project__per">im Jahr 2027</span>
                   </p>
                 ) : p.laterCut ? (
                   <p class="project__amount">
-                    <span class="nobreak">{formatCut(p.laterCut.value)}</span>{' '}
+                    <span class:list={['nobreak', { 'is-struck': rescueCovers(p.rescue, p.laterCut.year) }]}>
+                      {formatCut(p.laterCut.value)}
+                    </span>{' '}
                     <span class="project__per">ab {p.laterCut.year}</span>
                   </p>
                 ) : p.nonMonetary ? (
@@ -546,6 +555,28 @@ const imageCaption = (img: InstitutionImage) => `${img.kind === 'logo' ? 'Bild' 
 
   .project__later {
     font-weight: 800;
+  }
+
+  .project__amount .is-struck {
+    text-decoration: line-through;
+    text-decoration-thickness: 0.08em;
+    text-decoration-skip-ink: none;
+  }
+
+  /* Status after the council sessions, same black band as on the tile. */
+  .project__rescue {
+    max-width: 40rem;
+    margin-top: var(--space-3);
+    font-weight: 600;
+  }
+
+  .project__rescue-flag {
+    display: inline-block;
+    margin-right: var(--space-2);
+    padding: 0.35rem 0.55rem 0.3rem;
+    background: var(--color-ink);
+    color: var(--color-white);
+    line-height: 1;
   }
 
   .project__source {

@@ -10,6 +10,7 @@ import { areas, FALLBACK_AREA } from './areas.ts';
 import { columns, findColumn, isChecked, isConsent, READABLE_KEYS, type ColumnKey } from './columns.ts';
 import type { BuildMessage, ImageRef, OrganisationEntry, Project, ProjectEntry } from './types.ts';
 import { parseAmount } from '../lib/amount.ts';
+import { parseRescue } from '../lib/rescue.ts';
 import { uniqueSlug } from '../lib/slug.ts';
 import { formatEuro } from '../lib/format.ts';
 
@@ -199,6 +200,11 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
     const imageCredit = text('projectImageCredit');
     const featured = isChecked(read('featured'));
     const cityEntry = isChecked(read('cityEntry'));
+    const rescueRaw = read('rescue');
+    const rescue = parseRescue(rescueRaw);
+    if (rescue === undefined) {
+      warn(`${label}: Unbekannter Status „${rescueRaw.trim()}“ – erlaubt sind: vorläufig gerettet, gerettet bis 2027, gerettet bis 2029, von der Liste entfernt. Kachel zeigt keinen Status.`);
+    }
     const fields = {
       area,
       cutDescription: text('cutDescription'),
@@ -241,6 +247,7 @@ export function runPipeline(table: string[][], options: PipelineOptions): Pipeli
           ownImage: false,
           featured,
           cityEntry,
+          rescue: rescue ?? null,
         },
         imageRef,
         imageCredit,

@@ -1,3 +1,4 @@
+import type { RescueStatus } from '../lib/rescue.ts';
 import type { AreaColorKey } from '../design/colors.ts';
 
 // Public data model: an organisation ("Einrichtung") has one or more affected projects;
@@ -71,6 +72,8 @@ export interface Project {
   featured: boolean;
   /** Project of the city of Erlangen, entered by hand by the alliance (flag on the tile). */
   cityEntry: boolean;
+  /** Set by the alliance after the council sessions; null while the cut is still under discussion. */
+  rescue: RescueStatus | null;
 }
 
 /** Where to fetch an image from – used only during the build, never published. */

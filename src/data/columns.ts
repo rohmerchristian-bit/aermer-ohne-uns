@@ -47,7 +47,8 @@ export type ColumnKey =
   | 'approved'
   | 'amountVerified'
   | 'featured'
-  | 'cityEntry';
+  | 'cityEntry'
+  | 'rescue';
 
 /**
  * public:   may appear on the website.
@@ -214,6 +215,9 @@ export const columns: readonly ColumnDef[] = [
   { key: 'featured', header: 'Hervorheben', visibility: 'public' },
   // Admin checkbox: project of the city, entered by the alliance (city staff may not use the form themselves).
   { key: 'cityEntry', header: 'Stadt Erlangen', visibility: 'public', aliases: ['Stadt_Erlangen'] },
+  // Admin dropdown after the council sessions (Nov 2026): "vorläufig gerettet", "gerettet bis 2027",
+  // "gerettet bis 2029", "von der Liste entfernt". See src/lib/rescue.ts.
+  { key: 'rescue', header: 'Status', visibility: 'public' },
 ];
 
 /** Keys that may be read from the CSV at all. Everything else is dropped on import. */

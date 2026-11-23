@@ -10,7 +10,7 @@ In das Blatt „SHEET_PUBLIC_CSV“, Zelle **A1** (alles andere im Blatt leer la
 =LET(
   kopf; ARRAYFORMULA(TRIM(Formularantworten!A1:BZ1));
   werte; Formularantworten!A2:BZ;
-  begriffe; {"Was möchtet ihr eintragen*"\"Für welche Einrichtung tragt ihr*"\"Name der Institution*"\"Standort*"\"Website*"\"Social Media*"\"Was tut eure Institution*"\"Wen erreicht eure Arbeit*"\"Logo der Einrichtung*"\"Logo-Upload für euer Profil*"\"Bildnachweis zum Logo*"\"Bildnachweis (Fotograf*"\"Betroffenes Projekt / Angebot*"\"Zu welchem Bereich*"\"Welche Zuschüsse*"\"Geplante Kürzung 2027*"\"Geplante Kürzung in Euro pro Jahr*"\"Geplante Kürzung 2028*"\"Geplante Kürzung 2029*"\"Kürzung in den Folgejahren*"\"Kürzung in Prozent*"\"Falls es nicht um einen Geldbetrag*"\"Quelle des Betrags*"\"Welche konkreten Folgen hat die Kürzung*"\"Absagen von Angeboten*"\"Prägnantes Zitat*"\"Link zu weiterführenden*"\"Bild oder Logo für dieses Projekt*"\"Bildnachweis zum Projektbild*"\"Freigabe zur Veröffentlichung*"\"Mit dem Hochladen bestätigen wir*"\"Telefonnummer für Rückfragen"\"E-Mail-Adresse für Rückfragen"\"Freigeben"\"Betrag_geprüft"\"Hervorheben"\"Stadt Erlangen"};
+  begriffe; {"Was möchtet ihr eintragen*"\"Für welche Einrichtung tragt ihr*"\"Name der Institution*"\"Standort*"\"Website*"\"Social Media*"\"Was tut eure Institution*"\"Wen erreicht eure Arbeit*"\"Logo der Einrichtung*"\"Logo-Upload für euer Profil*"\"Bildnachweis zum Logo*"\"Bildnachweis (Fotograf*"\"Betroffenes Projekt / Angebot*"\"Zu welchem Bereich*"\"Welche Zuschüsse*"\"Geplante Kürzung 2027*"\"Geplante Kürzung in Euro pro Jahr*"\"Geplante Kürzung 2028*"\"Geplante Kürzung 2029*"\"Kürzung in den Folgejahren*"\"Kürzung in Prozent*"\"Falls es nicht um einen Geldbetrag*"\"Quelle des Betrags*"\"Welche konkreten Folgen hat die Kürzung*"\"Absagen von Angeboten*"\"Prägnantes Zitat*"\"Link zu weiterführenden*"\"Bild oder Logo für dieses Projekt*"\"Bildnachweis zum Projektbild*"\"Freigabe zur Veröffentlichung*"\"Mit dem Hochladen bestätigen wir*"\"Telefonnummer für Rückfragen"\"E-Mail-Adresse für Rückfragen"\"Freigeben"\"Betrag_geprüft"\"Hervorheben"\"Stadt Erlangen"\"Status"};
   alle; HSTACK(ARRAYFORMULA(XMATCH(begriffe; kopf; 2)); ARRAYFORMULA(XMATCH(begriffe; kopf; 2; -1)));
   spalten; UNIQUE(FILTER(alle; NOT(ISNA(alle))); TRUE);
   kopfzeile; CHOOSECOLS(kopf; spalten);
@@ -25,12 +25,12 @@ Nicht direkt in die Zelle einfügen – dann verteilt Google Sheets die Zeilen a
 erweitert“. Dieselbe Formel in einer Zeile, sicher zum Einfügen:
 
 ```
-=LET(kopf; ARRAYFORMULA(TRIM(Formularantworten!A1:BZ1)); werte; Formularantworten!A2:BZ; begriffe; {"Was möchtet ihr eintragen*"\"Für welche Einrichtung tragt ihr*"\"Name der Institution*"\"Standort*"\"Website*"\"Social Media*"\"Was tut eure Institution*"\"Wen erreicht eure Arbeit*"\"Logo der Einrichtung*"\"Logo-Upload für euer Profil*"\"Bildnachweis zum Logo*"\"Bildnachweis (Fotograf*"\"Betroffenes Projekt / Angebot*"\"Zu welchem Bereich*"\"Welche Zuschüsse*"\"Geplante Kürzung 2027*"\"Geplante Kürzung in Euro pro Jahr*"\"Geplante Kürzung 2028*"\"Geplante Kürzung 2029*"\"Kürzung in den Folgejahren*"\"Kürzung in Prozent*"\"Falls es nicht um einen Geldbetrag*"\"Quelle des Betrags*"\"Welche konkreten Folgen hat die Kürzung*"\"Absagen von Angeboten*"\"Prägnantes Zitat*"\"Link zu weiterführenden*"\"Bild oder Logo für dieses Projekt*"\"Bildnachweis zum Projektbild*"\"Freigabe zur Veröffentlichung*"\"Mit dem Hochladen bestätigen wir*"\"Telefonnummer für Rückfragen"\"E-Mail-Adresse für Rückfragen"\"Freigeben"\"Betrag_geprüft"\"Hervorheben"\"Stadt Erlangen"}; alle; HSTACK(ARRAYFORMULA(XMATCH(begriffe; kopf; 2)); ARRAYFORMULA(XMATCH(begriffe; kopf; 2; -1))); spalten; UNIQUE(FILTER(alle; NOT(ISNA(alle))); TRUE); kopfzeile; CHOOSECOLS(kopf; spalten); treffer; FILTER(werte; CHOOSECOLS(werte; XMATCH("Freigeben"; kopf; 0)) = TRUE); IF(ISERROR(ROWS(treffer)); kopfzeile; VSTACK(kopfzeile; CHOOSECOLS(treffer; spalten))))
+=LET(kopf; ARRAYFORMULA(TRIM(Formularantworten!A1:BZ1)); werte; Formularantworten!A2:BZ; begriffe; {"Was möchtet ihr eintragen*"\"Für welche Einrichtung tragt ihr*"\"Name der Institution*"\"Standort*"\"Website*"\"Social Media*"\"Was tut eure Institution*"\"Wen erreicht eure Arbeit*"\"Logo der Einrichtung*"\"Logo-Upload für euer Profil*"\"Bildnachweis zum Logo*"\"Bildnachweis (Fotograf*"\"Betroffenes Projekt / Angebot*"\"Zu welchem Bereich*"\"Welche Zuschüsse*"\"Geplante Kürzung 2027*"\"Geplante Kürzung in Euro pro Jahr*"\"Geplante Kürzung 2028*"\"Geplante Kürzung 2029*"\"Kürzung in den Folgejahren*"\"Kürzung in Prozent*"\"Falls es nicht um einen Geldbetrag*"\"Quelle des Betrags*"\"Welche konkreten Folgen hat die Kürzung*"\"Absagen von Angeboten*"\"Prägnantes Zitat*"\"Link zu weiterführenden*"\"Bild oder Logo für dieses Projekt*"\"Bildnachweis zum Projektbild*"\"Freigabe zur Veröffentlichung*"\"Mit dem Hochladen bestätigen wir*"\"Telefonnummer für Rückfragen"\"E-Mail-Adresse für Rückfragen"\"Freigeben"\"Betrag_geprüft"\"Hervorheben"\"Stadt Erlangen"\"Status"}; alle; HSTACK(ARRAYFORMULA(XMATCH(begriffe; kopf; 2)); ARRAYFORMULA(XMATCH(begriffe; kopf; 2; -1))); spalten; UNIQUE(FILTER(alle; NOT(ISNA(alle))); TRUE); kopfzeile; CHOOSECOLS(kopf; spalten); treffer; FILTER(werte; CHOOSECOLS(werte; XMATCH("Freigeben"; kopf; 0)) = TRUE); IF(ISERROR(ROWS(treffer)); kopfzeile; VSTACK(kopfzeile; CHOOSECOLS(treffer; spalten))))
 ```
 
 ## Was die Formel tut
 
-- Sie sucht **37 Überschriften**, darunter auch die alten und neuen Titel beim Formular-Umbau
+- Sie sucht **38 Überschriften**, darunter auch die alten und neuen Titel beim Formular-Umbau
   (z. B. „Logo-Upload für euer Profil …“ *und* „Logo der Einrichtung“). Was es im Formular (noch) nicht
   gibt, lässt sie einfach weg – das Formular kann also Schritt für Schritt umgebaut werden.
 - Kommt eine Überschrift **mehrfach** vor (eine Frage wurde im Formular gelöscht und neu angelegt – Google behält die
@@ -41,7 +41,7 @@ erweitert“. Dieselbe Formel in einer Zeile, sicher zum Einfügen:
 - Private Fragen (Ansprechperson, E-Mail für Bündnisarbeit, Aktionen, Räume, Demo, Verteiler, „Wie könnte man Euch helfen“)
   stehen **nicht** in der Liste und kommen deshalb nie ins öffentliche Blatt.
 - Überschriften (Zeile 1) und Antworten (ab Zeile 2) werden getrennt gelesen; die Admin-Spalten
-  „Freigeben“, „Betrag_geprüft“, „Hervorheben“ und „Stadt Erlangen“ werden exakt gesucht.
+  „Freigeben“, „Betrag_geprüft“, „Hervorheben“, „Stadt Erlangen“ und „Status“ werden exakt gesucht.
 - Sie übernimmt nur Zeilen, in denen „Freigeben“ angehakt ist. Ist noch nichts freigegeben, steht nur die
   Kopfzeile im Blatt. Bewusst `IF(ISERROR(ROWS(…)))` statt `IFERROR(…)`: IFERROR arbeitet zellweise und
   würde sonst die Kopfzeile in Zeile 2 kopieren.
@@ -73,3 +73,20 @@ prüfen, ob der Fragetitel dort bekannt ist.
 - Fehlt eine **Pflichtspalte** (Name, Bereich, Freigabe zur Veröffentlichung, Freigeben), bricht der Build
   ebenfalls ab und nennt die fehlende Spalte.
 - Nach dem Einfügen prüfen: In Zeile 1 darf **keine** E-Mail-, Kontakt-, Demo- oder Verteiler-Spalte stehen.
+
+## Spalte „Status“ (nach den Ausschuss- und Stadtratssitzungen)
+
+Zeigt auf der Kachel und auf der Seite der Einrichtung ein schwarzes Band mit Häkchen, z. B.
+„✓ Gerettet bis 2027“. Ist die Kürzung für das gezeigte Jahr vom Tisch, wird der Betrag durchgestrichen.
+
+1. Im Tab `Formularantworten` ganz rechts (neben „Stadt Erlangen“) eine Spalte mit der Überschrift
+   **`Status`** anlegen (genau so geschrieben).
+2. Die Spalte markieren → *Einfügen → Drop-down* mit genau diesen vier Werten:
+   - `vorläufig gerettet` – Band, Betrag bleibt stehen
+   - `gerettet bis 2027` – Band, Betrag für 2027 durchgestrichen
+   - `gerettet bis 2029` – Band, Beträge bis 2029 durchgestrichen
+   - `von der Liste entfernt` – Band, Betrag durchgestrichen
+3. Die Formel oben in „SHEET_PUBLIC_CSV“ A1 neu einfügen (sie enthält „Status“ schon).
+
+Leer = noch in der Diskussion, die Kachel bleibt wie bisher. Groß-/Kleinschreibung ist egal; andere Werte
+meldet die Website beim Bauen als Warnung und zeigt dann keinen Status.

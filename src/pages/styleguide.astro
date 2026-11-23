@@ -1,4 +1,5 @@
 ---
+import type { RescueStatus } from '../lib/rescue.ts';
 import { url } from '../lib/paths.ts';
 import Base from '../layouts/Base.astro';
 import Tile from '../components/Tile.astro';
@@ -35,6 +36,12 @@ const editorialDemos = [
 ]
   .slice(0, 4)
   .map((p) => ({ ...p, cityEntry: true }));
+
+// One tile per status after the council sessions; the last one is also an editorial entry.
+const RESCUE_DEMO: RescueStatus[] = ['provisional', 'until2027', 'until2029', 'removed'];
+const rescueDemos = [...projects.filter((p) => p.amount !== null && !p.cityEntry).slice(0, 3), ...editorialDemos.slice(0, 1)].map(
+  (p, i) => ({ ...p, rescue: RESCUE_DEMO[i]! }),
+);
 ---
 
 <Base title="Styleguide" noindex>
@@ -189,6 +196,15 @@ const editorialDemos = [
               {editorialDemos.map((p) => (
                 <li>
                   <Tile project={p} headingLevel={4} idSuffix="-redaktionell" />
+                </li>
+              ))}
+            </ul>
+
+            <h3 class="sg-subhead">Status nach den Sitzungen (Spalte „Status“)</h3>
+            <ul class="tile-grid" role="list">
+              {rescueDemos.map((p) => (
+                <li>
+                  <Tile project={p} headingLevel={4} idSuffix="-status" />
                 </li>
               ))}
             </ul>

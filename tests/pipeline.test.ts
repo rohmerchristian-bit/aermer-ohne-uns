@@ -151,7 +151,7 @@ describe('privacy allowlist', () => {
     expect(Object.keys(result.projects[0]!.project).sort()).toEqual(
       [
         'id', 'anchor', 'orgSlug', 'orgName', 'name', 'area', 'cutDescription', 'amount', 'amountKind', 'amountSource',
-        'amountLater', 'laterCut', 'amountPercent', 'nonMonetary', 'consequences', 'quote', 'infoLink', 'contactEmail', 'contactPhone', 'image', 'ownImage', 'featured', 'cityEntry',
+        'amountLater', 'laterCut', 'amountPercent', 'nonMonetary', 'consequences', 'quote', 'infoLink', 'contactEmail', 'contactPhone', 'image', 'ownImage', 'featured', 'cityEntry', 'rescue',
       ].sort(),
     );
   });
@@ -336,6 +336,20 @@ describe('several projects per organisation', () => {
     expect(now!.amount).toBe(10000);
     expect(now!.laterCut).toBeNull();
     expect(result.messages.some((m) => m.message.includes('nicht lesbar'))).toBe(false);
+  });
+
+  it('reads the status after the council sessions and warns about unknown values', () => {
+    const result = runPipeline(
+      sheet([...keys, 'rescue'], [
+        { entryType: NEW, name: 'Verein', project: 'A', area: 'Kultur & Kunst', rescue: ' Gerettet  bis 2027 ', ...ok },
+        { entryType: MORE, orgSelect: 'Verein', project: 'B', area: 'Kultur & Kunst', rescue: 'von der Liste entfernt', ...ok },
+        { entryType: MORE, orgSelect: 'Verein', project: 'C', area: 'Kultur & Kunst', rescue: '', ...ok },
+        { entryType: MORE, orgSelect: 'Verein', project: 'D', area: 'Kultur & Kunst', rescue: 'gerettet!!', ...ok },
+      ]),
+      OPTIONS,
+    );
+    expect(result.projects.map((e) => e.project.rescue)).toEqual(['until2027', 'removed', null, null]);
+    expect(result.messages.filter((m) => m.message.includes('Unbekannter Status'))).toHaveLength(1);
   });
 
   it('skips additional projects for organisations that are not approved', () => {

@@ -6,6 +6,7 @@ import { getOrganisation, projectsOf } from '../data/index.ts';
 import { AMOUNT_YEAR } from '../data/budget.ts';
 import { formatCut, initials, truncate } from '../lib/format.ts';
 import { amountSourceLabel, percentLabel } from '../lib/amount-label.ts';
+import { RESCUE_LABEL, rescueCovers } from '../lib/rescue.ts';
 import IconFlip from './icons/IconFlip.astro';
 import IconArrow from './icons/IconArrow.astro';
 import IconExternal from './icons/IconExternal.astro';
@@ -33,6 +34,8 @@ const quoteSize = !p.quote ? null : p.quote.length > 220 ? 'small' : p.quote.len
 const IMAGE_SIZES = '(min-width: 96em) 22rem, (min-width: 64em) 30vw, (min-width: 40em) 46vw, 92vw';
 
 const showOrg = p.name !== p.orgName;
+// After the council sessions: the amount is struck through if the cut for the shown year is off the table.
+const struck = (year: number) => rescueCovers(p.rescue, year);
 const notes = [percentLabel(p.amountPercent), amountSourceLabel(p)].filter(Boolean).join(' · ');
 const orgWebsite = getOrganisation(p.orgSlug)?.website ?? null;
 const externalUrl = p.infoLink ?? orgWebsite;
@@ -66,6 +69,16 @@ const detailHref = url(`/einrichtungen/${p.orgSlug}/${projectsOf(p.orgSlug).leng
 
       <div class="tile__money">
         {
+          p.rescue && (
+            <p class="tile__rescue">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                <path d="M3 12.5l6 6L21 6" stroke="currentColor" stroke-width="3.5" fill="none" />
+              </svg>
+              {RESCUE_LABEL[p.rescue]}
+            </p>
+          )
+        }
+        {
           p.amount !== null ? (
             <div class="tile__dated">
               <p class="tile__year">
@@ -73,8 +86,14 @@ const detailHref = url(`/einrichtungen/${p.orgSlug}/${projectsOf(p.orgSlug).leng
                 <span class="tile__year-value">{AMOUNT_YEAR}</span>
               </p>
               <p class="tile__amount">
-                <span class:list={['tile__amount-value', { 'tile__amount-value--long': p.amount >= 1_000_000 }]}>
+                <span
+                  class:list={[
+                    'tile__amount-value',
+                    { 'tile__amount-value--long': p.amount >= 1_000_000, 'tile__amount-value--struck': struck(AMOUNT_YEAR) },
+                  ]}
+                >
                   {formatCut(p.amount)}
+                  {struck(AMOUNT_YEAR) && <span class="visually-hidden"> (abgewendet)</span>}
                 </span>
               </p>
             </div>
@@ -85,8 +104,17 @@ const detailHref = url(`/einrichtungen/${p.orgSlug}/${projectsOf(p.orgSlug).leng
                 <span class="tile__year-value">{p.laterCut.year}</span>
               </p>
               <p class="tile__amount">
-                <span class:list={['tile__amount-value', { 'tile__amount-value--long': p.laterCut.value >= 1_000_000 }]}>
+                <span
+                  class:list={[
+                    'tile__amount-value',
+                    {
+                      'tile__amount-value--long': p.laterCut.value >= 1_000_000,
+                      'tile__amount-value--struck': struck(p.laterCut.year),
+                    },
+                  ]}
+                >
                   {formatCut(p.laterCut.value)}
+                  {struck(p.laterCut.year) && <span class="visually-hidden"> (abgewendet)</span>}
                 </span>
               </p>
             </div>
@@ -346,6 +374,34 @@ const detailHref = url(`/einrichtungen/${p.orgSlug}/${projectsOf(p.orgSlug).leng
 
   .tile__amount-value--long {
     font-size: clamp(2.25rem, 13cqi, 3.75rem);
+  }
+
+  /* Cut averted for this year: the amount stays readable but is crossed out. */
+  .tile__amount-value--struck {
+    text-decoration: line-through;
+    text-decoration-thickness: 0.09em;
+    text-decoration-skip-ink: none;
+  }
+
+  /* Status after the council sessions: a black band across the whole tile, right above the amount.
+     Black works on every area colour and on the grey of editorial entries. */
+  .tile__rescue {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: var(--space-2) calc(-1 * var(--tile-pad)) var(--space-5);
+    padding: 0.6rem var(--tile-pad) 0.55rem;
+    background: var(--color-ink);
+    color: var(--color-white);
+    font-size: 0.9375rem;
+    font-weight: 800;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .tile__rescue svg {
+    flex: none;
   }
 
   /* Year tab: sits on the rule above the amount like the tab of a filing card, in inverted tile colours. */
